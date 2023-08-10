@@ -15,26 +15,36 @@ import JsonSchema
   , JsonObjectSchemaSpec
   , JsonSchema(..)
   , JsonStringSchemaSpec
+  , ObjectFormJsonSchemaSpec(..)
   )
 
 validateAgainst ∷ Json → JsonSchema → Set String
 validateAgainst json schema = case schema of
-  JsonArraySchema spec →
-    validateAgainstArraySchema json spec
-  JsonBooleanSchema →
-    validateAgainstBooleanSchema json
-  JsonIntegerSchema spec →
-    validateAgainstIntegerSchema json spec
-  JsonEmptySchema →
-    Set.empty
-  JsonNullSchema →
-    validateAgainstNullSchema json
-  JsonNumberSchema spec →
-    validateAgainstNumberSchema json spec
-  JsonObjectSchema spec →
-    validateAgainstObjectSchema json spec
-  JsonStringSchema spec →
-    validateAgainstStringSchema json spec
+  BooleanFormJsonSchema bool →
+    if bool then Set.empty else Set.singleton "invalid JSON value"
+  ObjectFormJsonSchema spec →
+    validateAgainstObjectFormSchema json spec
+
+validateAgainstObjectFormSchema
+  ∷ Json → ObjectFormJsonSchemaSpec → Set String
+validateAgainstObjectFormSchema json objectFormSpec =
+  case objectFormSpec of
+    JsonArraySchema spec →
+      validateAgainstArraySchema json spec
+    JsonBooleanSchema →
+      validateAgainstBooleanSchema json
+    JsonIntegerSchema spec →
+      validateAgainstIntegerSchema json spec
+    JsonEmptySchema →
+      Set.empty
+    JsonNullSchema →
+      validateAgainstNullSchema json
+    JsonNumberSchema spec →
+      validateAgainstNumberSchema json spec
+    JsonObjectSchema spec →
+      validateAgainstObjectSchema json spec
+    JsonStringSchema spec →
+      validateAgainstStringSchema json spec
 
 validateAgainstArraySchema ∷ Json → JsonArraySchemaSpec → Set String
 validateAgainstArraySchema json spec =

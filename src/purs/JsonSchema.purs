@@ -6,6 +6,7 @@ module JsonSchema
   , JsonSchemaObjectProperty
   , JsonSchema(..)
   , JsonStringSchemaSpec
+  , ObjectFormJsonSchemaSpec(..)
   , genSchema
   , genArraySchema
   , genIntegerSchema
@@ -30,6 +31,16 @@ import Data.NonEmpty ((:|))
 import Data.Show.Generic (genericShow)
 
 data JsonSchema
+  = BooleanFormJsonSchema Boolean
+  | ObjectFormJsonSchema ObjectFormJsonSchemaSpec
+
+derive instance Generic JsonSchema _
+derive instance Eq JsonSchema
+
+instance Show JsonSchema where
+  show schema = genericShow schema
+
+data ObjectFormJsonSchemaSpec
   = JsonArraySchema JsonArraySchemaSpec
   | JsonBooleanSchema
   | JsonEmptySchema
@@ -39,10 +50,10 @@ data JsonSchema
   | JsonObjectSchema JsonObjectSchemaSpec
   | JsonStringSchema JsonStringSchemaSpec
 
-derive instance Generic JsonSchema _
-derive instance Eq JsonSchema
+derive instance Generic ObjectFormJsonSchemaSpec _
+derive instance Eq ObjectFormJsonSchemaSpec
 
-instance Show JsonSchema where
+instance Show ObjectFormJsonSchemaSpec where
   show schema = genericShow schema
 
 type JsonArraySchemaSpec =
@@ -67,42 +78,58 @@ type JsonSchemaObjectProperty =
   , schema ∷ JsonSchema
   }
 
+-- genSchema ∷ ∀ m. Lazy (m JsonSchema) ⇒ MonadGen m ⇒ m JsonSchema
+-- genSchema = genBooleanFormSchema <|> genObjectFormSchema
+
 genSchema ∷ ∀ m. Lazy (m JsonSchema) ⇒ MonadGen m ⇒ m JsonSchema
-genSchema = Lazy.defer \_ → Gen.oneOf $ genBooleanSchema :|
-  [ genArraySchema
-  , genEmptySchema
-  , genIntegerSchema
-  , genNullSchema
-  , genNumberSchema
-  , genObjectSchema
-  , genStringSchema
-  ]
+genSchema = Lazy.defer \_ →
+  Gen.choose genBooleanFormSchema genObjectFormSchema
+
+genBooleanFormSchema
+  ∷ ∀ m. Lazy (m JsonSchema) ⇒ MonadGen m ⇒ m JsonSchema
+genBooleanFormSchema = Lazy.defer \_ →
+  BooleanFormJsonSchema <$> Gen.chooseBool
+
+genObjectFormSchema
+  ∷ ∀ m. Lazy (m JsonSchema) ⇒ MonadGen m ⇒ m JsonSchema
+genObjectFormSchema = Lazy.defer \_ →
+  Gen.oneOf $ genBooleanSchema :|
+    [ genArraySchema
+    , genEmptySchema
+    , genIntegerSchema
+    , genNullSchema
+    , genNumberSchema
+    , genObjectSchema
+    , genStringSchema
+    ]
 
 genArraySchema ∷ ∀ m. Lazy (m JsonSchema) ⇒ MonadGen m ⇒ m JsonSchema
 genArraySchema = do
   itemsSchema ← GenCommon.genMaybe genSchema
   uniqueItems ← Gen.chooseBool
-  pure $ JsonArraySchema { itemsSchema, uniqueItems }
+  pure
+    $ ObjectFormJsonSchema
+    $ JsonArraySchema { itemsSchema, uniqueItems }
 
 genBooleanSchema ∷ ∀ m. MonadGen m ⇒ m JsonSchema
-genBooleanSchema = pure JsonBooleanSchema
+genBooleanSchema = pure $ ObjectFormJsonSchema JsonBooleanSchema
 
 genEmptySchema ∷ ∀ m. MonadGen m ⇒ m JsonSchema
-genEmptySchema = pure JsonEmptySchema
+genEmptySchema = pure $ ObjectFormJsonSchema JsonEmptySchema
 
 genIntegerSchema ∷ ∀ m. MonadGen m ⇒ m JsonSchema
-genIntegerSchema = pure $ JsonIntegerSchema {}
+genIntegerSchema = pure $ ObjectFormJsonSchema $ JsonIntegerSchema {}
 
 genNullSchema ∷ ∀ m. MonadGen m ⇒ m JsonSchema
-genNullSchema = pure JsonNullSchema
+genNullSchema = pure $ ObjectFormJsonSchema JsonNullSchema
 
 genNumberSchema ∷ ∀ m. MonadGen m ⇒ m JsonSchema
-genNumberSchema = pure $ JsonNumberSchema {}
+genNumberSchema = pure $ ObjectFormJsonSchema $ JsonNumberSchema {}
 
 genObjectSchema ∷ ∀ m. Lazy (m JsonSchema) ⇒ MonadGen m ⇒ m JsonSchema
 genObjectSchema = do
   properties ← genProperties
-  pure $ JsonObjectSchema { properties }
+  pure $ ObjectFormJsonSchema $ JsonObjectSchema { properties }
   where
   genProperties ∷ m (Map String JsonSchemaObjectProperty)
   genProperties = (Map.fromFoldable <<< List.singleton)
@@ -115,4 +142,4 @@ genObjectSchema = do
     pure { isRequired, schema }
 
 genStringSchema ∷ ∀ m. MonadGen m ⇒ m JsonSchema
-genStringSchema = pure $ JsonStringSchema {}
+genStringSchema = pure $ ObjectFormJsonSchema $ JsonStringSchema {}

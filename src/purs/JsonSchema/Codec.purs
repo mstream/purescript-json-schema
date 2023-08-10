@@ -2,6 +2,7 @@ module JsonSchema.Codec (parseSchema, printSchema) where
 
 import Prelude
 
+import Control.Alternative ((<|>))
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Core as A
 import Data.Array as Array
@@ -12,7 +13,7 @@ import Data.FunctorWithIndex (mapWithIndex)
 import Data.List (List(..), (:))
 import Data.Map (Map)
 import Data.Map as Map
-import Data.Maybe (Maybe(..), fromMaybe, maybe)
+import Data.Maybe (Maybe(..), maybe)
 import Data.Set (Set)
 import Data.Set as Set
 import Data.Traversable (traverse)
@@ -28,41 +29,57 @@ import JsonSchema
   , JsonSchema(..)
   , JsonSchemaObjectProperty
   , JsonStringSchemaSpec
+  , ObjectFormJsonSchemaSpec(..)
   )
 
 parseSchema ∷ Json → String \/ JsonSchema
-parseSchema json = do
+parseSchema json = parseBooleanFormSchema json <|> parseObjectFormSchema
+  json
+
+parseBooleanFormSchema ∷ Json → String \/ JsonSchema
+parseBooleanFormSchema json = do
+  bool ← note
+    (parsingErrorMessage "schema is not a JSON boolean")
+    (A.toBoolean json)
+  pure $ BooleanFormJsonSchema bool
+
+parseObjectFormSchema ∷ Json → String \/ JsonSchema
+parseObjectFormSchema json = do
   schemaObject ← note
     (parsingErrorMessage "schema is not a JSON object")
     (A.toObject json)
 
-  maybe
-    (Right JsonEmptySchema)
-    ( \schemaTypeJson → case A.toString schemaTypeJson of
-        Nothing →
-          Left
-            $ parsingErrorMessage
-            $ "invalid schema type JSON " <> A.stringify schemaTypeJson
-        Just "array" →
-          JsonArraySchema <$> parseArraySchemaSpec schemaObject
-        Just "boolean" →
-          Right JsonBooleanSchema
-        Just "integer" →
-          JsonIntegerSchema <$> parseIntegerSchemaSpec schemaObject
-        Just "null" →
-          Right JsonNullSchema
-        Just "number" →
-          JsonNumberSchema <$> parseNumberSchemaSpec schemaObject
-        Just "object" →
-          JsonObjectSchema <$> parseObjectSchemaSpec schemaObject
-        Just "string" →
-          JsonStringSchema <$> parseStringSchemaSpec schemaObject
-        Just unsupportedType →
-          Left
-            $ parsingErrorMessage
-            $ "unsupported schema type " <> unsupportedType
-    )
-    (Object.lookup "type" schemaObject)
+  objectFormJsonSchemaSpec ←
+    maybe
+      (Right JsonEmptySchema)
+      ( \schemaTypeJson → case A.toString schemaTypeJson of
+          Nothing →
+            Left
+              $ parsingErrorMessage
+              $ "invalid schema type JSON " <> A.stringify
+                  schemaTypeJson
+          Just "array" →
+            JsonArraySchema <$> parseArraySchemaSpec schemaObject
+          Just "boolean" →
+            Right JsonBooleanSchema
+          Just "integer" →
+            JsonIntegerSchema <$> parseIntegerSchemaSpec schemaObject
+          Just "null" →
+            Right JsonNullSchema
+          Just "number" →
+            JsonNumberSchema <$> parseNumberSchemaSpec schemaObject
+          Just "object" →
+            JsonObjectSchema <$> parseObjectSchemaSpec schemaObject
+          Just "string" →
+            JsonStringSchema <$> parseStringSchemaSpec schemaObject
+          Just unsupportedType →
+            Left
+              $ parsingErrorMessage
+              $ "unsupported schema type " <> unsupportedType
+      )
+      (Object.lookup "type" schemaObject)
+
+  pure $ ObjectFormJsonSchema objectFormJsonSchemaSpec
 
 parseArraySchemaSpec ∷ Object Json → String \/ JsonArraySchemaSpec
 parseArraySchemaSpec obj = do
@@ -148,6 +165,13 @@ parsingErrorMessage reason = "Invalid schema: " <> reason
 
 printSchema ∷ JsonSchema → Json
 printSchema = case _ of
+  BooleanFormJsonSchema bool →
+    A.fromBoolean bool
+  ObjectFormJsonSchema spec →
+    printObjectFormSchema spec
+
+printObjectFormSchema ∷ ObjectFormJsonSchemaSpec → Json
+printObjectFormSchema = case _ of
   JsonArraySchema spec →
     printArraySchema spec
   JsonBooleanSchema →

@@ -2,7 +2,6 @@ module Test.Spec.JsonSchema.Validation (spec) where
 
 import Prelude
 
-import Control.Alternative ((<|>))
 import Control.Alternative as Map
 import Control.Lazy (class Lazy)
 import Control.Monad.Gen (class MonadGen)
@@ -20,7 +19,7 @@ import Data.String.Gen as StringGen
 import Data.Tuple (Tuple(..))
 import Data.Tuple.Nested (type (/\))
 import Foreign.Object as Object
-import JsonSchema (JsonSchema(..))
+import JsonSchema (JsonSchema(..), ObjectFormJsonSchemaSpec(..))
 import JsonSchema as JsonSchema
 import JsonSchema.Validation as Validation
 import Test.QuickCheck (Result(..))
@@ -34,6 +33,30 @@ spec = describe "Validation" do
 
   describe "validateAgainst" do
 
+    describe "boolean schema" do
+
+      positiveTestCase
+        { jsonSpec:
+            { description: "All JSONs"
+            , gen: AGen.genJson
+            }
+        , schemaSpec:
+            { description: "true-boolean schemata"
+            , gen: pure $ BooleanFormJsonSchema true
+            }
+        }
+
+      negativeTestCase
+        { jsonSpec:
+            { description: "All JSONs"
+            , gen: AGen.genJson
+            }
+        , schemaSpec:
+            { description: "false-boolean schemata"
+            , gen: pure $ BooleanFormJsonSchema false
+            }
+        }
+
     describe "empty-object schema" do
 
       positiveTestCase
@@ -43,7 +66,7 @@ spec = describe "Validation" do
             }
         , schemaSpec:
             { description: "empty-object schemata"
-            , gen: pure JsonEmptySchema
+            , gen: pure $ ObjectFormJsonSchema JsonEmptySchema
             }
         }
 
@@ -56,8 +79,10 @@ spec = describe "Validation" do
             }
         , schemaSpec:
             { description: "unrestricted array schemata"
-            , gen: pure $ JsonArraySchema
-                { itemsSchema: Nothing, uniqueItems: false }
+            , gen: pure
+                $ ObjectFormJsonSchema
+                $ JsonArraySchema
+                    { itemsSchema: Nothing, uniqueItems: false }
             }
         }
 
@@ -77,11 +102,11 @@ spec = describe "Validation" do
       positiveTestCase
         { jsonSpec:
             { description: "All boolean JSONs"
-            , gen: A.fromBoolean <$> (pure false <|> pure true)
+            , gen: A.fromBoolean <$> Gen.chooseBool
             }
         , schemaSpec:
             { description: "any boolean schema"
-            , gen: pure JsonBooleanSchema
+            , gen: pure $ ObjectFormJsonSchema JsonBooleanSchema
             }
         }
 
@@ -92,7 +117,7 @@ spec = describe "Validation" do
             }
         , schemaSpec:
             { description: "any boolean schema"
-            , gen: pure JsonBooleanSchema
+            , gen: pure $ ObjectFormJsonSchema JsonBooleanSchema
             }
         }
 
@@ -107,7 +132,7 @@ spec = describe "Validation" do
             }
         , schemaSpec:
             { description: "unrestricted integer schemata"
-            , gen: pure $ JsonIntegerSchema {}
+            , gen: pure $ ObjectFormJsonSchema $ JsonIntegerSchema {}
             }
         }
 
@@ -132,7 +157,7 @@ spec = describe "Validation" do
             }
         , schemaSpec:
             { description: "null schemata"
-            , gen: pure JsonNullSchema
+            , gen: pure $ ObjectFormJsonSchema JsonNullSchema
             }
         }
 
@@ -143,7 +168,7 @@ spec = describe "Validation" do
             }
         , schemaSpec:
             { description: "null schemata"
-            , gen: pure JsonNullSchema
+            , gen: pure $ ObjectFormJsonSchema JsonNullSchema
             }
         }
 
@@ -155,7 +180,7 @@ spec = describe "Validation" do
             }
         , schemaSpec:
             { description: "unrestricted number schemata"
-            , gen: pure $ JsonNumberSchema {}
+            , gen: pure $ ObjectFormJsonSchema $ JsonNumberSchema {}
             }
         }
 
@@ -180,7 +205,9 @@ spec = describe "Validation" do
             }
         , schemaSpec:
             { description: "unrestricted object schemata"
-            , gen: pure $ JsonObjectSchema { properties: Map.empty }
+            , gen: pure
+                $ ObjectFormJsonSchema
+                $ JsonObjectSchema { properties: Map.empty }
             }
         }
 
@@ -203,7 +230,7 @@ spec = describe "Validation" do
             }
         , schemaSpec:
             { description: "unrestricted string schemata"
-            , gen: pure $ JsonStringSchema {}
+            , gen: pure $ ObjectFormJsonSchema $ JsonStringSchema {}
             }
         }
 
