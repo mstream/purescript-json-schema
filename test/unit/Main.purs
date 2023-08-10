@@ -11,6 +11,7 @@ import Effect.Exception (throw)
 import Node.Process as Process
 import Test.Spec.JsonSchema.Codec as Codec
 import Test.Spec.JsonSchema.Diff as Diff
+import Test.Spec.JsonSchema.Validation as Validation
 import Test.Spec.Reporter (consoleReporter)
 import Test.Spec.Runner (defaultConfig, runSpecT)
 import Test.Types (TestSpec)
@@ -31,12 +32,15 @@ main = do
           pure [ Codec.spec ]
         "Diff" →
           pure [ Diff.spec ]
+        "Validation" →
+          pure [ Validation.spec ]
         _ →
           throw $ "Unknown module name \"" <> moduleName <> "\""
 
   allSpecs =
     [ Codec.spec
     , Diff.spec
+    , Validation.spec
     ]
 
 runTestSpecs ∷ ∀ f. Foldable f ⇒ f TestSpec → Aff Unit

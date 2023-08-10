@@ -10,6 +10,7 @@
   , "foldable-traversable"
   , "foreign-object"
   , "gen"
+  , "integers"
   , "lists"
   , "maybe"
   , "node-process"

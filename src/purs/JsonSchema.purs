@@ -7,6 +7,11 @@ module JsonSchema
   , JsonSchema(..)
   , JsonStringSchemaSpec
   , genSchema
+  , genArraySchema
+  , genIntegerSchema
+  , genNumberSchema
+  , genObjectSchema
+  , genStringSchema
   ) where
 
 import Prelude
