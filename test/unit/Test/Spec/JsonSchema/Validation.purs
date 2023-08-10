@@ -18,12 +18,13 @@ import Data.Set (Set)
 import Data.Set as Set
 import Data.String.Gen as StringGen
 import Data.Tuple (Tuple(..))
-import Data.Tuple.Nested (type (/\), (/\))
+import Data.Tuple.Nested (type (/\))
 import Foreign.Object as Object
 import JsonSchema (JsonSchema(..))
 import JsonSchema as JsonSchema
 import JsonSchema.Validation as Validation
 import Test.QuickCheck (Result(..))
+import Test.QuickCheck.Gen (Gen)
 import Test.Spec (describe)
 import Test.Types (TestSpec)
 import Test.Utils (TestLength(..), generativeTestCase)
@@ -31,111 +32,191 @@ import Test.Utils (TestLength(..), generativeTestCase)
 spec ∷ TestSpec
 spec = describe "Validation" do
 
-  describe "violations" do
+  describe "validateAgainst" do
 
-    generativeTestCase Long
-      "No JSON violates empty schema."
-      do
-        json ← AGen.genJson
-        pure $ json `shouldNotViolate` JsonEmptySchema
+    describe "empty-object schema" do
 
-    generativeTestCase Long
-      "No array JSON violates unrestricted array schema."
-      do
-        json ← A.fromArray <$> Gen.unfoldable AGen.genJson
-        pure $ json `shouldNotViolate` JsonArraySchema
-          { itemsSchema: Nothing, uniqueItems: false }
+      positiveTestCase
+        { jsonSpec:
+            { description: "All JSONs"
+            , gen: AGen.genJson
+            }
+        , schemaSpec:
+            { description: "empty-object schemata"
+            , gen: pure JsonEmptySchema
+            }
+        }
 
-    generativeTestCase Long
-      "Any non-array JSON violates any array schema."
-      do
-        json ← AGen.genJson `Gen.suchThat` not A.isArray
-        schema ← JsonSchema.genArraySchema
-        pure $ json `shouldViolate` schema
+    describe "array schema" do
 
-    generativeTestCase Long
-      "No boolean JSON violates boolean schema."
-      do
-        json ← A.fromBoolean <$> (pure false <|> pure true)
-        pure $ json `shouldNotViolate` JsonBooleanSchema
+      positiveTestCase
+        { jsonSpec:
+            { description: "All array JSONs"
+            , gen: A.fromArray <$> Gen.unfoldable AGen.genJson
+            }
+        , schemaSpec:
+            { description: "unrestricted array schemata"
+            , gen: pure $ JsonArraySchema
+                { itemsSchema: Nothing, uniqueItems: false }
+            }
+        }
 
-    generativeTestCase Long
-      "Any non-boolean JSON violates boolean schema."
-      do
-        json ← AGen.genJson `Gen.suchThat` not A.isBoolean
-        pure $ json `shouldViolate` JsonBooleanSchema
+      negativeTestCase
+        { jsonSpec:
+            { description: "All non-array JSONs"
+            , gen: AGen.genJson `Gen.suchThat` not A.isArray
+            }
+        , schemaSpec:
+            { description: "any array schema"
+            , gen: JsonSchema.genArraySchema
+            }
+        }
 
-    generativeTestCase Long
-      "No integer JSON violates unrestricted integer schema."
-      do
-        json ← A.fromNumber
-          <$> Int.toNumber
-          <$> Gen.chooseInt bottom top
-        pure $ json `shouldNotViolate` (JsonIntegerSchema {})
+    describe "boolean schema" do
 
-    generativeTestCase Long
-      "Any non-integer JSON violates any integer schema."
-      do
-        json ← AGen.genJson `Gen.suchThat`
-          A.caseJsonNumber true (isNothing <<< Int.fromNumber)
-        schema ← JsonSchema.genIntegerSchema
-        pure $ json `shouldViolate` schema
+      positiveTestCase
+        { jsonSpec:
+            { description: "All boolean JSONs"
+            , gen: A.fromBoolean <$> (pure false <|> pure true)
+            }
+        , schemaSpec:
+            { description: "any boolean schema"
+            , gen: pure JsonBooleanSchema
+            }
+        }
 
-    generativeTestCase Long
-      "No null JSON violates null schema."
-      do
-        json ← pure A.jsonNull
-        pure $ json `shouldNotViolate` JsonNullSchema
+      negativeTestCase
+        { jsonSpec:
+            { description: "All non-boolean JSONs"
+            , gen: AGen.genJson `Gen.suchThat` not A.isBoolean
+            }
+        , schemaSpec:
+            { description: "any boolean schema"
+            , gen: pure JsonBooleanSchema
+            }
+        }
 
-    generativeTestCase Long
-      "Any non-null JSON violates null schema."
-      do
-        json ← AGen.genJson `Gen.suchThat` not A.isNull
-        pure $ json `shouldViolate` JsonNullSchema
+    describe "integer schema" do
 
-    generativeTestCase Long
-      "No number JSON violates unrestricted number schema."
-      do
-        json ← A.fromNumber <$> Gen.chooseFloat bottom top
-        pure $ json `shouldNotViolate` (JsonNumberSchema {})
+      positiveTestCase
+        { jsonSpec:
+            { description: "All integer JSONs"
+            , gen: A.fromNumber
+                <$> Int.toNumber
+                <$> Gen.chooseInt bottom top
+            }
+        , schemaSpec:
+            { description: "unrestricted integer schemata"
+            , gen: pure $ JsonIntegerSchema {}
+            }
+        }
 
-    generativeTestCase Long
-      "Any non-number JSON violates any number schema."
-      do
-        json ← AGen.genJson `Gen.suchThat` not A.isNumber
-        schema ← JsonSchema.genNumberSchema
-        pure $ json `shouldViolate` schema
+      negativeTestCase
+        { jsonSpec:
+            { description: "All non-integer JSONs"
+            , gen: AGen.genJson `Gen.suchThat`
+                A.caseJsonNumber true (isNothing <<< Int.fromNumber)
+            }
+        , schemaSpec:
+            { description: "any integer schema"
+            , gen: JsonSchema.genIntegerSchema
+            }
+        }
 
-    generativeTestCase Long
-      "No object JSON violates unrestricted object schema."
-      do
-        json ←
-          A.fromObject
-            <$> Object.fromFoldable
-            <$> genKeyValuePairs
+    describe "null schema" do
 
-        pure $ json `shouldNotViolate`
-          (JsonObjectSchema { properties: Map.empty })
+      positiveTestCase
+        { jsonSpec:
+            { description: "Null JSONs"
+            , gen: pure A.jsonNull
+            }
+        , schemaSpec:
+            { description: "null schemata"
+            , gen: pure JsonNullSchema
+            }
+        }
 
-    generativeTestCase Long
-      "Any non-object JSON violates any object schema."
-      do
-        json ← AGen.genJson `Gen.suchThat` not A.isObject
-        schema ← JsonSchema.genObjectSchema
-        pure $ json `shouldViolate` schema
+      negativeTestCase
+        { jsonSpec:
+            { description: "All non-null JSONs"
+            , gen: AGen.genJson `Gen.suchThat` not A.isNull
+            }
+        , schemaSpec:
+            { description: "null schemata"
+            , gen: pure JsonNullSchema
+            }
+        }
 
-    generativeTestCase Long
-      "No string JSON violates unrestricted string schema."
-      do
-        json ← A.fromString <$> StringGen.genUnicodeString
-        pure $ json `shouldNotViolate` (JsonStringSchema {})
+    describe "number schema" do
+      positiveTestCase
+        { jsonSpec:
+            { description: "All number JSONs"
+            , gen: A.fromNumber <$> Gen.chooseFloat bottom top
+            }
+        , schemaSpec:
+            { description: "unrestricted number schemata"
+            , gen: pure $ JsonNumberSchema {}
+            }
+        }
 
-    generativeTestCase Long
-      "Any non-string JSON violates any string schema."
-      do
-        json ← AGen.genJson `Gen.suchThat` not A.isString
-        schema ← JsonSchema.genStringSchema
-        pure $ json `shouldViolate` schema
+      negativeTestCase
+        { jsonSpec:
+            { description: "All non-number JSONs"
+            , gen: AGen.genJson `Gen.suchThat` not A.isNumber
+            }
+        , schemaSpec:
+            { description: "any number schema"
+            , gen: JsonSchema.genNumberSchema
+            }
+        }
+
+    describe "object schema" do
+      positiveTestCase
+        { jsonSpec:
+            { description: "All object JSONs"
+            , gen: A.fromObject
+                <$> Object.fromFoldable
+                <$> genKeyValuePairs
+            }
+        , schemaSpec:
+            { description: "unrestricted object schemata"
+            , gen: pure $ JsonObjectSchema { properties: Map.empty }
+            }
+        }
+
+      negativeTestCase
+        { jsonSpec:
+            { description: "All non-object JSONs"
+            , gen: AGen.genJson `Gen.suchThat` not A.isObject
+            }
+        , schemaSpec:
+            { description: "any object schema"
+            , gen: JsonSchema.genObjectSchema
+            }
+        }
+
+    describe "string schema" do
+      positiveTestCase
+        { jsonSpec:
+            { description: "All string JSONs"
+            , gen: A.fromString <$> StringGen.genUnicodeString
+            }
+        , schemaSpec:
+            { description: "unrestricted string schemata"
+            , gen: pure $ JsonStringSchema {}
+            }
+        }
+
+      negativeTestCase
+        { jsonSpec:
+            { description: "All non-string JSONs"
+            , gen: AGen.genJson `Gen.suchThat` not A.isString
+            }
+        , schemaSpec:
+            { description: "any string schema"
+            , gen: JsonSchema.genStringSchema
+            }
+        }
 
 genKeyValuePairs
   ∷ ∀ m
@@ -149,6 +230,41 @@ genKeyValuePairs =
   genKeyValuePair = Tuple
     <$> StringGen.genUnicodeString
     <*> AGen.genJson
+
+type GenSpec a =
+  { description ∷ String
+  , gen ∷ Gen a
+  }
+
+positiveTestCase
+  ∷ { jsonSpec ∷ GenSpec Json, schemaSpec ∷ GenSpec JsonSchema }
+  → TestSpec
+positiveTestCase { jsonSpec, schemaSpec } =
+  generativeTestCase
+    Long
+    ( jsonSpec.description
+        <> " do not violate "
+        <> schemaSpec.description
+    )
+    do
+      json ← jsonSpec.gen
+      schema ← schemaSpec.gen
+      pure $ json `shouldNotViolate` schema
+
+negativeTestCase
+  ∷ { jsonSpec ∷ GenSpec Json, schemaSpec ∷ GenSpec JsonSchema }
+  → TestSpec
+negativeTestCase { jsonSpec, schemaSpec } =
+  generativeTestCase
+    Long
+    ( jsonSpec.description
+        <> " do violate "
+        <> schemaSpec.description
+    )
+    do
+      json ← jsonSpec.gen
+      schema ← schemaSpec.gen
+      pure $ json `shouldViolate` schema
 
 shouldNotViolate ∷ Json → JsonSchema → Result
 shouldNotViolate json schema =
