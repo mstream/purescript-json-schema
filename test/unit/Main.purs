@@ -16,6 +16,8 @@ import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
 import Effect.Class.Console as Console
 import Effect.Exception (throw)
+import Node.Encoding (Encoding(..))
+import Node.FS.Aff as FS
 import Node.Process as Process
 import Test.Spec.JsonSchema.Codec as Codec
 import Test.Spec.JsonSchema.Codec.Parsing as Parsing
@@ -31,8 +33,9 @@ main = do
   args ← Process.argv
   examples ← selectExamples $ args !! 2
   specs ← selectSpecs $ args !! 2
+
   launchAff_ do
-    Console.info
+    FS.writeTextFile UTF8 "Examples.generated.md"
       $ printExamples
       $ groupExamplesByCategory examples
 

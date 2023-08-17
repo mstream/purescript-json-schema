@@ -14,6 +14,8 @@
   , "integers"
   , "lists"
   , "maybe"
+  , "node-buffer"
+  , "node-fs-aff"
   , "node-process"
   , "nonempty"
   , "ordered-collections"
