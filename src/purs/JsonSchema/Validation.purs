@@ -5,89 +5,56 @@ import Prelude
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Core as A
 import Data.Int as Int
-import Data.Maybe (isNothing)
+import Data.Maybe (Maybe(..), maybe)
 import Data.Set (Set)
 import Data.Set as Set
-import JsonSchema
-  ( JsonArraySchemaSpec
-  , JsonIntegerSchemaSpec
-  , JsonNumberSchemaSpec
-  , JsonObjectSchemaSpec
-  , JsonSchema(..)
-  , JsonStringSchemaSpec
-  , ObjectFormJsonSchemaSpec(..)
-  )
+import JsonSchema (JsonSchema(..), JsonValueType(..), Keywords)
 
-validateAgainst ∷ Json → JsonSchema → Set String
+type Violation = { description ∷ String, path ∷ String }
+
+validateAgainst ∷ Json → JsonSchema → Set Violation
 validateAgainst json schema = case schema of
-  BooleanFormJsonSchema bool →
-    if bool then Set.empty else Set.singleton "invalid JSON value"
-  ObjectFormJsonSchema spec →
-    validateAgainstObjectFormSchema json spec
+  BooleanSchema bool →
+    if bool then Set.empty
+    else Set.singleton { description: "invalid JSON value", path: "?" }
+  ObjectSchema keywords →
+    validateAgainstObjectSchema json keywords
 
-validateAgainstObjectFormSchema
-  ∷ Json → ObjectFormJsonSchemaSpec → Set String
-validateAgainstObjectFormSchema json objectFormSpec =
-  case objectFormSpec of
-    JsonArraySchema spec →
-      validateAgainstArraySchema json spec
-    JsonBooleanSchema →
-      validateAgainstBooleanSchema json
-    JsonIntegerSchema spec →
-      validateAgainstIntegerSchema json spec
-    JsonEmptySchema →
+validateAgainstObjectSchema
+  ∷ Json → Keywords → Set Violation
+validateAgainstObjectSchema json keywords =
+  notViolations <> typeKeywordViolations
+  where
+  notViolations = case keywords.not of
+    Just schema →
+      if Set.isEmpty $ validateAgainst json schema then Set.singleton
+        { description: "JSON value matches schema when it should not."
+        , path: "?"
+        }
+      else Set.empty
+    Nothing →
       Set.empty
-    JsonNullSchema →
-      validateAgainstNullSchema json
-    JsonNumberSchema spec →
-      validateAgainstNumberSchema json spec
-    JsonObjectSchema spec →
-      validateAgainstObjectSchema json spec
-    JsonStringSchema spec →
-      validateAgainstStringSchema json spec
 
-validateAgainstArraySchema ∷ Json → JsonArraySchemaSpec → Set String
-validateAgainstArraySchema json spec =
-  A.caseJsonArray
-    (Set.singleton "Not an array")
-    ( \jsons →
-        Set.empty
-    )
-    json
+  typeKeywordViolations ∷ Set Violation
+  typeKeywordViolations = maybe
+    Set.empty
+    (validateTypeKeyword json)
+    keywords.typeKeyword
 
-validateAgainstBooleanSchema ∷ Json → Set String
-validateAgainstBooleanSchema json =
-  if A.isBoolean json then Set.empty else Set.singleton "Not a boolean."
-
-validateAgainstIntegerSchema ∷ Json → JsonIntegerSchemaSpec → Set String
-validateAgainstIntegerSchema json spec =
-  A.caseJsonNumber
-    (Set.singleton "Not an integer")
+validateTypeKeyword ∷ Json → Set JsonValueType → Set Violation
+validateTypeKeyword json allowedJsonValueTypes =
+  if jsonValueType `Set.member` allowedJsonValueTypes then Set.empty
+  else Set.singleton { description: "", path: "?" }
+  where
+  jsonValueType ∷ JsonValueType
+  jsonValueType = A.caseJson
+    (const JsonNull)
+    (const JsonBoolean)
     ( \x →
-        if isNothing $ Int.fromNumber x then
-          Set.singleton "Not an integer"
-        else
-          Set.empty
+        if (Int.toNumber $ Int.trunc x) == x then JsonInteger
+        else JsonNumber
     )
+    (const JsonString)
+    (const JsonArray)
+    (const JsonObject)
     json
-
-validateAgainstNullSchema ∷ Json → Set String
-validateAgainstNullSchema json =
-  if A.isNull json then Set.empty else Set.singleton "Not a null."
-
-validateAgainstNumberSchema ∷ Json → JsonNumberSchemaSpec → Set String
-validateAgainstNumberSchema json spec =
-  if A.isNumber json then Set.empty else Set.singleton "Not a number."
-
-validateAgainstObjectSchema ∷ Json → JsonObjectSchemaSpec → Set String
-validateAgainstObjectSchema json spec =
-  A.caseJsonObject
-    (Set.singleton "Not an object")
-    ( \object →
-        Set.empty
-    )
-    json
-
-validateAgainstStringSchema ∷ Json → JsonStringSchemaSpec → Set String
-validateAgainstStringSchema json spec =
-  if A.isString json then Set.empty else Set.singleton "Not a string."

@@ -1,5 +1,6 @@
 module Test.Utils
   ( TestLength(..)
+  , failWithDetails
   , generativeTestCase
   ) where
 
@@ -9,12 +10,12 @@ import Data.Maybe (maybe)
 import Effect (Effect)
 import Effect.Class (liftEffect)
 import Node.Process as Process
-import Test.QuickCheck (Result, quickCheckGen')
+import Test.QuickCheck (Result(..), quickCheckGen')
 import Test.QuickCheck.Gen (Gen)
 import Test.Spec (it)
 import Test.Types (TestSpec)
 
-data TestLength = Long | Short
+data TestLength = Long | Medium | Short
 
 generativeTestCase ∷ TestLength → String → Gen Result → TestSpec
 generativeTestCase testLength title property = do
@@ -31,5 +32,11 @@ generativeTestCase testLength title property = do
   iterations = case testLength of
     Short →
       10
-    Long →
+    Medium →
       100
+    Long →
+      1000
+
+failWithDetails ∷ ∀ r. Show (Record r) ⇒ String → Record r → Result
+failWithDetails message details =
+  Failed $ message <> "\n" <> show details

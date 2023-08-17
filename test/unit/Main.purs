@@ -10,6 +10,8 @@ import Effect.Aff (Aff, launchAff_)
 import Effect.Exception (throw)
 import Node.Process as Process
 import Test.Spec.JsonSchema.Codec as Codec
+import Test.Spec.JsonSchema.Codec.Parsing as Parsing
+import Test.Spec.JsonSchema.Codec.Printing as Printing
 import Test.Spec.JsonSchema.Diff as Diff
 import Test.Spec.JsonSchema.Validation as Validation
 import Test.Spec.Reporter (consoleReporter)
@@ -32,6 +34,10 @@ main = do
           pure [ Codec.spec ]
         "Diff" →
           pure [ Diff.spec ]
+        "Parsing" →
+          pure [ Parsing.spec ]
+        "Printing" →
+          pure [ Printing.spec ]
         "Validation" →
           pure [ Validation.spec ]
         _ →
@@ -40,6 +46,8 @@ main = do
   allSpecs =
     [ Codec.spec
     , Diff.spec
+    , Parsing.spec
+    , Printing.spec
     , Validation.spec
     ]
 

@@ -2,312 +2,108 @@ module Test.Spec.JsonSchema.Validation (spec) where
 
 import Prelude
 
-import Control.Alternative as Map
-import Control.Lazy (class Lazy)
-import Control.Monad.Gen (class MonadGen)
 import Control.Monad.Gen as Gen
-import Control.Monad.Rec.Class (class MonadRec)
-import Data.Argonaut.Core (Json)
 import Data.Argonaut.Core as A
 import Data.Argonaut.Gen as AGen
-import Data.Int as Int
-import Data.List (List)
-import Data.Maybe (Maybe(..), isNothing)
-import Data.Set (Set)
+import Data.List as List
+import Data.Maybe (Maybe(..))
 import Data.Set as Set
-import Data.String.Gen as StringGen
-import Data.Tuple (Tuple(..))
-import Data.Tuple.Nested (type (/\))
-import Foreign.Object as Object
-import JsonSchema (JsonSchema(..), ObjectFormJsonSchemaSpec(..))
-import JsonSchema as JsonSchema
+import JsonSchema (JsonSchema(..), JsonValueType(..))
+import JsonSchema as Schema
+import JsonSchema.Codec.Printing as Printing
+import JsonSchema.Gen as SchemaGen
 import JsonSchema.Validation as Validation
 import Test.QuickCheck (Result(..))
-import Test.QuickCheck.Gen (Gen)
 import Test.Spec (describe)
 import Test.Types (TestSpec)
-import Test.Utils (TestLength(..), generativeTestCase)
+import Test.Utils (TestLength(..), failWithDetails, generativeTestCase)
 
 spec ∷ TestSpec
 spec = describe "Validation" do
 
   describe "validateAgainst" do
 
-    describe "boolean schema" do
+    generativeTestCase Short
+      "null type accepts only null JSON values"
+      do
+        nonNullJsons ← Gen.unfoldable
+          $ AGen.genJson `Gen.suchThat` (not A.isNull)
 
-      positiveTestCase
-        { jsonSpec:
-            { description: "All JSONs"
-            , gen: AGen.genJson
-            }
-        , schemaSpec:
-            { description: "true-boolean schemata"
-            , gen: pure $ BooleanFormJsonSchema true
-            }
-        }
+        nullJsons ← Gen.unfoldable
+          $ pure A.jsonNull
 
-      negativeTestCase
-        { jsonSpec:
-            { description: "All JSONs"
-            , gen: AGen.genJson
-            }
-        , schemaSpec:
-            { description: "false-boolean schemata"
-            , gen: pure $ BooleanFormJsonSchema false
-            }
-        }
+        let
+          schema = ObjectSchema $ Schema.defaultKeywords
+            { typeKeyword = Just $ Set.fromFoldable [ JsonNull ] }
+          violationsLists = (_ `Validation.validateAgainst` schema)
+            <$> (nonNullJsons <> nullJsons)
+          failedValidations = List.filter
+            (not Set.isEmpty)
+            violationsLists
+          successfulValidations = List.filter
+            Set.isEmpty
+            violationsLists
+          actualFailures = List.length failedValidations
+          actualSuccesses = List.length successfulValidations
+          expectedFailures = List.length nonNullJsons
+          expectedSuccesses = List.length nullJsons
 
-    describe "empty-object schema" do
+        pure
+          if
+            actualFailures == expectedFailures
+              && actualSuccesses == expectedSuccesses then
+            Success
+          else failWithDetails
+            "number of failed and successful validation results do not match expectations"
+            { actualFailures
+            , actualSuccesses
+            , expectedFailures
+            , expectedSuccesses
+            , failedValidations
+            , nonNullJsons: A.stringify <$> nonNullJsons
+            , nullJsons: A.stringify <$> nullJsons
+            , successfulValidations
+            }
 
-      positiveTestCase
-        { jsonSpec:
-            { description: "All JSONs"
-            , gen: AGen.genJson
-            }
-        , schemaSpec:
-            { description: "empty-object schemata"
-            , gen: pure $ ObjectFormJsonSchema JsonEmptySchema
-            }
-        }
+    generativeTestCase Long
+      "negated schema should yield negated validation result"
+      do
+        originalSchema ← SchemaGen.genSchema
+        json ← AGen.genJson
 
-    describe "array schema" do
+        let
+          negatedSchema = ObjectSchema
+            $ Schema.defaultKeywords { not = Just originalSchema }
+          originalSchemaViolations = Set.toUnfoldable
+            $ json `Validation.validateAgainst` originalSchema
+          negatedSchemaViolations = Set.toUnfoldable
+            $ json `Validation.validateAgainst` negatedSchema
 
-      positiveTestCase
-        { jsonSpec:
-            { description: "All array JSONs"
-            , gen: A.fromArray <$> Gen.unfoldable AGen.genJson
-            }
-        , schemaSpec:
-            { description: "unrestricted array schemata"
-            , gen: pure
-                $ ObjectFormJsonSchema
-                $ JsonArraySchema
-                    { itemsSchema: Nothing, uniqueItems: false }
-            }
-        }
+        pure case originalSchemaViolations of
+          [] →
+            case negatedSchemaViolations of
+              [] →
+                failWithDetails
+                  "validation has passed for both original and negated schemata"
+                  { negatedSchema: A.stringify
+                      $ Printing.printSchema negatedSchema
+                  , originalSchema: A.stringify
+                      $ Printing.printSchema originalSchema
+                  }
 
-      negativeTestCase
-        { jsonSpec:
-            { description: "All non-array JSONs"
-            , gen: AGen.genJson `Gen.suchThat` not A.isArray
-            }
-        , schemaSpec:
-            { description: "any array schema"
-            , gen: JsonSchema.genArraySchema
-            }
-        }
-
-    describe "boolean schema" do
-
-      positiveTestCase
-        { jsonSpec:
-            { description: "All boolean JSONs"
-            , gen: A.fromBoolean <$> Gen.chooseBool
-            }
-        , schemaSpec:
-            { description: "any boolean schema"
-            , gen: pure $ ObjectFormJsonSchema JsonBooleanSchema
-            }
-        }
-
-      negativeTestCase
-        { jsonSpec:
-            { description: "All non-boolean JSONs"
-            , gen: AGen.genJson `Gen.suchThat` not A.isBoolean
-            }
-        , schemaSpec:
-            { description: "any boolean schema"
-            , gen: pure $ ObjectFormJsonSchema JsonBooleanSchema
-            }
-        }
-
-    describe "integer schema" do
-
-      positiveTestCase
-        { jsonSpec:
-            { description: "All integer JSONs"
-            , gen: A.fromNumber
-                <$> Int.toNumber
-                <$> Gen.chooseInt bottom top
-            }
-        , schemaSpec:
-            { description: "unrestricted integer schemata"
-            , gen: pure $ ObjectFormJsonSchema $ JsonIntegerSchema {}
-            }
-        }
-
-      negativeTestCase
-        { jsonSpec:
-            { description: "All non-integer JSONs"
-            , gen: AGen.genJson `Gen.suchThat`
-                A.caseJsonNumber true (isNothing <<< Int.fromNumber)
-            }
-        , schemaSpec:
-            { description: "any integer schema"
-            , gen: JsonSchema.genIntegerSchema
-            }
-        }
-
-    describe "null schema" do
-
-      positiveTestCase
-        { jsonSpec:
-            { description: "Null JSONs"
-            , gen: pure A.jsonNull
-            }
-        , schemaSpec:
-            { description: "null schemata"
-            , gen: pure $ ObjectFormJsonSchema JsonNullSchema
-            }
-        }
-
-      negativeTestCase
-        { jsonSpec:
-            { description: "All non-null JSONs"
-            , gen: AGen.genJson `Gen.suchThat` not A.isNull
-            }
-        , schemaSpec:
-            { description: "null schemata"
-            , gen: pure $ ObjectFormJsonSchema JsonNullSchema
-            }
-        }
-
-    describe "number schema" do
-      positiveTestCase
-        { jsonSpec:
-            { description: "All number JSONs"
-            , gen: A.fromNumber <$> Gen.chooseFloat bottom top
-            }
-        , schemaSpec:
-            { description: "unrestricted number schemata"
-            , gen: pure $ ObjectFormJsonSchema $ JsonNumberSchema {}
-            }
-        }
-
-      negativeTestCase
-        { jsonSpec:
-            { description: "All non-number JSONs"
-            , gen: AGen.genJson `Gen.suchThat` not A.isNumber
-            }
-        , schemaSpec:
-            { description: "any number schema"
-            , gen: JsonSchema.genNumberSchema
-            }
-        }
-
-    describe "object schema" do
-      positiveTestCase
-        { jsonSpec:
-            { description: "All object JSONs"
-            , gen: A.fromObject
-                <$> Object.fromFoldable
-                <$> genKeyValuePairs
-            }
-        , schemaSpec:
-            { description: "unrestricted object schemata"
-            , gen: pure
-                $ ObjectFormJsonSchema
-                $ JsonObjectSchema { properties: Map.empty }
-            }
-        }
-
-      negativeTestCase
-        { jsonSpec:
-            { description: "All non-object JSONs"
-            , gen: AGen.genJson `Gen.suchThat` not A.isObject
-            }
-        , schemaSpec:
-            { description: "any object schema"
-            , gen: JsonSchema.genObjectSchema
-            }
-        }
-
-    describe "string schema" do
-      positiveTestCase
-        { jsonSpec:
-            { description: "All string JSONs"
-            , gen: A.fromString <$> StringGen.genUnicodeString
-            }
-        , schemaSpec:
-            { description: "unrestricted string schemata"
-            , gen: pure $ ObjectFormJsonSchema $ JsonStringSchema {}
-            }
-        }
-
-      negativeTestCase
-        { jsonSpec:
-            { description: "All non-string JSONs"
-            , gen: AGen.genJson `Gen.suchThat` not A.isString
-            }
-        , schemaSpec:
-            { description: "any string schema"
-            , gen: JsonSchema.genStringSchema
-            }
-        }
-
-genKeyValuePairs
-  ∷ ∀ m
-  . Lazy (m Json)
-  ⇒ MonadGen m
-  ⇒ MonadRec m
-  ⇒ m (List (String /\ Json))
-genKeyValuePairs =
-  Gen.unfoldable genKeyValuePair
-  where
-  genKeyValuePair = Tuple
-    <$> StringGen.genUnicodeString
-    <*> AGen.genJson
-
-type GenSpec a =
-  { description ∷ String
-  , gen ∷ Gen a
-  }
-
-positiveTestCase
-  ∷ { jsonSpec ∷ GenSpec Json, schemaSpec ∷ GenSpec JsonSchema }
-  → TestSpec
-positiveTestCase { jsonSpec, schemaSpec } =
-  generativeTestCase
-    Long
-    ( jsonSpec.description
-        <> " do not violate "
-        <> schemaSpec.description
-    )
-    do
-      json ← jsonSpec.gen
-      schema ← schemaSpec.gen
-      pure $ json `shouldNotViolate` schema
-
-negativeTestCase
-  ∷ { jsonSpec ∷ GenSpec Json, schemaSpec ∷ GenSpec JsonSchema }
-  → TestSpec
-negativeTestCase { jsonSpec, schemaSpec } =
-  generativeTestCase
-    Long
-    ( jsonSpec.description
-        <> " do violate "
-        <> schemaSpec.description
-    )
-    do
-      json ← jsonSpec.gen
-      schema ← schemaSpec.gen
-      pure $ json `shouldViolate` schema
-
-shouldNotViolate ∷ Json → JsonSchema → Result
-shouldNotViolate json schema =
-  if Set.isEmpty violations then Success
-  else Failed
-    $ "Unexpected violations found: "
-        <> show { json: A.stringify json, schema, violations }
-  where
-  violations ∷ Set String
-  violations = json `Validation.validateAgainst` schema
-
-shouldViolate ∷ Json → JsonSchema → Result
-shouldViolate json schema =
-  if Set.isEmpty violations then Failed
-    $ "No violations found: " <> show { json: A.stringify json, schema }
-  else Success
-  where
-  violations ∷ Set String
-  violations = json `Validation.validateAgainst` schema
+              _ →
+                Success
+          _ →
+            case negatedSchemaViolations of
+              [] →
+                Success
+              _ →
+                failWithDetails
+                  "validation has failed for both original and negated schemata"
+                  { negatedSchema: A.stringify
+                      $ Printing.printSchema negatedSchema
+                  , negatedSchemaViolations
+                  , originalSchema: A.stringify
+                      $ Printing.printSchema originalSchema
+                  , originalSchemaViolations
+                  }
