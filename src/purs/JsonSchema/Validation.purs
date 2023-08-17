@@ -1,4 +1,4 @@
-module JsonSchema.Validation (validateAgainst) where
+module JsonSchema.Validation (Violation, validateAgainst) where
 
 import Prelude
 

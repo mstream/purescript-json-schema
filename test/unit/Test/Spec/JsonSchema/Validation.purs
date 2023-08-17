@@ -1,27 +1,104 @@
-module Test.Spec.JsonSchema.Validation (spec) where
+module Test.Spec.JsonSchema.Validation (examples, spec) where
 
 import Prelude
 
 import Control.Monad.Gen as Gen
+import Data.Argonaut.Core (Json)
 import Data.Argonaut.Core as A
 import Data.Argonaut.Gen as AGen
+import Data.Array as Array
+import Data.Foldable (traverse_)
 import Data.List as List
 import Data.Maybe (Maybe(..))
+import Data.Set (Set)
 import Data.Set as Set
 import JsonSchema (JsonSchema(..), JsonValueType(..))
 import JsonSchema as Schema
 import JsonSchema.Codec.Printing as Printing
 import JsonSchema.Gen as SchemaGen
+import JsonSchema.Validation (Violation)
 import JsonSchema.Validation as Validation
 import Test.QuickCheck (Result(..))
 import Test.Spec (describe)
-import Test.Types (TestSpec)
-import Test.Utils (TestLength(..), failWithDetails, generativeTestCase)
+import Test.Types (Example, TestLength(..), TestSpec)
+import Test.Utils (exampleTestCase, failWithDetails, generativeTestCase)
+
+type ValidationExampleInput = { json ∷ Json, schema ∷ JsonSchema }
+
+type ValidationExample = Example ValidationExampleInput (Set Violation)
+
+renderInput ∷ ValidationExampleInput → String
+renderInput { json, schema } = "##### JSON schema\n"
+  <> "```json\n"
+  <> (A.stringify <<< Printing.printSchema) schema
+  <> "\n```\n"
+  <> "##### JSON\n"
+  <> "```json\n"
+  <> A.stringify json
+  <> "\n```"
+
+renderOutput ∷ Set Violation → String
+renderOutput violations = "> "
+  <>
+    if Set.isEmpty violations then "<no violations>"
+    else show $ Array.fromFoldable violations
+
+transform ∷ ValidationExampleInput → Set Violation
+transform { json, schema } = json `Validation.validateAgainst` schema
+
+positiveScenario
+  ∷ String → String → ValidationExampleInput → ValidationExample
+positiveScenario title description input =
+  { description
+  , expectedOutput: Set.empty
+  , input
+  , renderInput
+  , renderOutput
+  , title
+  , transform
+  }
+
+negativeScenario
+  ∷ String
+  → String
+  → ValidationExampleInput
+  → Set Violation
+  → ValidationExample
+negativeScenario title description input expectedViolations =
+  { description
+  , expectedOutput: expectedViolations
+  , input
+  , renderInput
+  , renderOutput
+  , title
+  , transform
+  }
+
+examples ∷ Array ValidationExample
+examples =
+  [ positiveScenario
+      "A null value against a schema accepting only null values"
+      "A null value conforms to the schema."
+      { json: A.jsonNull
+      , schema: ObjectSchema $ Schema.defaultKeywords
+          { typeKeyword = Just $ Set.fromFoldable [ JsonNull ] }
+      }
+  , negativeScenario
+      "A boolean value against a schema accepting only null values"
+      "A boolean value does not conform to the schema as only null values do."
+      { json: A.jsonTrue
+      , schema: ObjectSchema $ Schema.defaultKeywords
+          { typeKeyword = Just $ Set.fromFoldable [ JsonNull ] }
+      }
+      (Set.singleton { description: "", path: "?" })
+  ]
 
 spec ∷ TestSpec
 spec = describe "Validation" do
 
   describe "validateAgainst" do
+
+    traverse_ exampleTestCase examples
 
     generativeTestCase Short
       "null type accepts only null JSON values"

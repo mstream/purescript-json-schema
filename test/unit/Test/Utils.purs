@@ -1,5 +1,5 @@
 module Test.Utils
-  ( TestLength(..)
+  ( exampleTestCase
   , failWithDetails
   , generativeTestCase
   ) where
@@ -13,9 +13,8 @@ import Node.Process as Process
 import Test.QuickCheck (Result(..), quickCheckGen')
 import Test.QuickCheck.Gen (Gen)
 import Test.Spec (it)
-import Test.Types (TestSpec)
-
-data TestLength = Long | Medium | Short
+import Test.Spec.Assertions (shouldEqual)
+import Test.Types (Example, TestLength(..), TestSpec)
 
 generativeTestCase ∷ TestLength → String → Gen Result → TestSpec
 generativeTestCase testLength title property = do
@@ -36,6 +35,13 @@ generativeTestCase testLength title property = do
       100
     Long →
       1000
+
+exampleTestCase ∷ ∀ i o. Eq o ⇒ Show o ⇒ Example i o → TestSpec
+exampleTestCase example = it ("Example: " <> example.title) do
+  actual `shouldEqual` example.expectedOutput
+  where
+  actual ∷ o
+  actual = example.transform example.input
 
 failWithDetails ∷ ∀ r. Show (Record r) ⇒ String → Record r → Result
 failWithDetails message details =

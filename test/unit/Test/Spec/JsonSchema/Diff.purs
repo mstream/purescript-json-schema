@@ -1,4 +1,4 @@
-module Test.Spec.JsonSchema.Diff (spec) where
+module Test.Spec.JsonSchema.Diff (examples, spec) where
 
 import Prelude
 
@@ -7,8 +7,13 @@ import JsonSchema.Diff as Diff
 import JsonSchema.Gen as SchemaGen
 import Test.QuickCheck ((===))
 import Test.Spec (describe)
-import Test.Types (TestSpec)
-import Test.Utils (TestLength(..), generativeTestCase)
+import Test.Types (Example, TestLength(..), TestSpec)
+import Test.Utils (generativeTestCase)
+
+type DiffExample = Example Unit Unit
+
+examples ∷ Array DiffExample
+examples = []
 
 spec ∷ TestSpec
 spec = describe "Diff" do

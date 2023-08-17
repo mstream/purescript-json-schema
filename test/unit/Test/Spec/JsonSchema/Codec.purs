@@ -1,4 +1,4 @@
-module Test.Spec.JsonSchema.Codec (spec) where
+module Test.Spec.JsonSchema.Codec (examples, spec) where
 
 import Prelude
 
@@ -9,8 +9,13 @@ import JsonSchema.Codec.Printing as Printing
 import JsonSchema.Gen as SchemaGen
 import Test.QuickCheck (Result(..))
 import Test.Spec (describe)
-import Test.Types (TestSpec)
-import Test.Utils (TestLength(..), failWithDetails, generativeTestCase)
+import Test.Types (Example, TestLength(..), TestSpec)
+import Test.Utils (failWithDetails, generativeTestCase)
+
+type CodecExample = Example Unit Unit
+
+examples ∷ Array CodecExample
+examples = []
 
 spec ∷ TestSpec
 spec = describe "Codec" do

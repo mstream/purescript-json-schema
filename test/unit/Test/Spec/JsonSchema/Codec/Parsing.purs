@@ -1,4 +1,4 @@
-module Test.Spec.JsonSchema.Codec.Parsing (spec) where
+module Test.Spec.JsonSchema.Codec.Parsing (examples, spec) where
 
 import Prelude
 
@@ -18,7 +18,12 @@ import JsonSchema.Codec.Parsing as Parsing
 import Test.QuickCheck (Result(..))
 import Test.Spec (describe, it)
 import Test.Spec.Assertions (fail, shouldEqual)
-import Test.Types (TestSpec)
+import Test.Types (Example, TestSpec)
+
+type ParsingExample = Example Unit Unit
+
+examples ∷ Array ParsingExample
+examples = []
 
 spec ∷ TestSpec
 spec = describe "Parsing" do

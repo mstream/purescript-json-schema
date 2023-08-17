@@ -1,4 +1,4 @@
-module Test.Spec.JsonSchema.Codec.Printing (spec) where
+module Test.Spec.JsonSchema.Codec.Printing (examples, spec) where
 
 import Prelude
 
@@ -9,7 +9,12 @@ import JsonSchema as Schema
 import JsonSchema.Codec.Printing as Printing
 import Test.Spec (describe, it)
 import Test.Spec.Assertions (shouldEqual)
-import Test.Types (TestSpec)
+import Test.Types (Example, TestSpec)
+
+type PrintingExample = Example Unit Unit
+
+examples ∷ Array PrintingExample
+examples = []
 
 spec ∷ TestSpec
 spec = describe "Printing" do
