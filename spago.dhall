@@ -3,7 +3,6 @@
   [ "aff"
   , "argonaut-core"
   , "arrays"
-  , "console"
   , "control"
   , "effect"
   , "either"

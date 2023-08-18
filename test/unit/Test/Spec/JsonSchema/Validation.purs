@@ -6,8 +6,8 @@ import Control.Monad.Gen as Gen
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Core as A
 import Data.Argonaut.Gen as AGen
-import Data.Array as Array
-import Data.Foldable (traverse_)
+import Data.Foldable (foldMap, traverse_)
+import Data.List (List(..), (:))
 import Data.List as List
 import Data.Maybe (Maybe(..))
 import Data.Set (Set)
@@ -16,7 +16,11 @@ import JsonSchema (JsonSchema(..), JsonValueType(..))
 import JsonSchema as Schema
 import JsonSchema.Codec.Printing as Printing
 import JsonSchema.Gen as SchemaGen
-import JsonSchema.Validation (Violation)
+import JsonSchema.Validation
+  ( SchemaPathSegment(..)
+  , Violation
+  , ViolationReason(..)
+  )
 import JsonSchema.Validation as Validation
 import Test.QuickCheck (Result(..))
 import Test.Spec (describe)
@@ -38,10 +42,24 @@ renderInput { json, schema } = "##### JSON schema\n"
   <> "\n```"
 
 renderOutput ∷ Set Violation → String
-renderOutput violations = "> "
-  <>
-    if Set.isEmpty violations then "<no violations>"
-    else show $ Array.fromFoldable violations
+renderOutput violations = "```\n" <> renderViolations <> "```"
+  where
+  renderViolations ∷ String
+  renderViolations =
+    if Set.isEmpty violations then "✓ no violations\n"
+    else foldMap
+      ( \{ jsonPath, reason, schemaPath } →
+          "✗ "
+            <> Validation.renderViolationReason reason
+            <> "\n  "
+            <> "Schema path: "
+            <> Validation.renderSchemaPath schemaPath
+            <> "\n  "
+            <> "JSON path: "
+            <> Validation.renderJsonPath jsonPath
+            <> "\n"
+      )
+      violations
 
 transform ∷ ValidationExampleInput → Set Violation
 transform { json, schema } = json `Validation.validateAgainst` schema
@@ -90,7 +108,34 @@ examples =
       , schema: ObjectSchema $ Schema.defaultKeywords
           { typeKeyword = Just $ Set.fromFoldable [ JsonNull ] }
       }
-      (Set.singleton { description: "", path: "?" })
+      ( Set.singleton $
+          { jsonPath: Nil
+          , reason: TypeMismatch
+              { allowedJsonValueTypes: Set.fromFoldable [ JsonNull ]
+              , actualJsonValueType: JsonBoolean
+              }
+          , schemaPath: TypeKeyword : Nil
+          }
+      )
+  , negativeScenario
+      "A boolean value against a schema accepting only null and string values"
+      "A boolean value does not conform to the schema as only null or string values do."
+      { json: A.jsonTrue
+      , schema: ObjectSchema $ Schema.defaultKeywords
+          { typeKeyword = Just $ Set.fromFoldable
+              [ JsonNull, JsonString ]
+          }
+      }
+      ( Set.singleton $
+          { jsonPath: Nil
+          , reason: TypeMismatch
+              { allowedJsonValueTypes: Set.fromFoldable
+                  [ JsonNull, JsonString ]
+              , actualJsonValueType: JsonBoolean
+              }
+          , schemaPath: TypeKeyword : Nil
+          }
+      )
   ]
 
 spec ∷ TestSpec

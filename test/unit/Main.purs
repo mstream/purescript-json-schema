@@ -14,7 +14,6 @@ import Data.Maybe (Maybe(..))
 import Data.String as String
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
-import Effect.Class.Console as Console
 import Effect.Exception (throw)
 import Node.Encoding (Encoding(..))
 import Node.FS.Aff as FS
@@ -170,7 +169,7 @@ printExamples examplesByCategory =
 
   printExample ∷ PrintableExample → String
   printExample { description, input, output, title } =
-    "### "
+    "### ► "
       <> title
       <> "\n"
       <> description

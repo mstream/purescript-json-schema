@@ -3,6 +3,7 @@ module JsonSchema
   , JsonValueType(..)
   , Keywords
   , defaultKeywords
+  , renderJsonValueType
   ) where
 
 import Prelude
@@ -56,3 +57,20 @@ derive instance Ord JsonValueType
 
 instance Show JsonValueType where
   show keyword = genericShow keyword
+
+renderJsonValueType ∷ JsonValueType → String
+renderJsonValueType = case _ of
+  JsonArray →
+    "array"
+  JsonBoolean →
+    "boolean"
+  JsonInteger →
+    "integer"
+  JsonNull →
+    "null"
+  JsonNumber →
+    "number"
+  JsonObject →
+    "object"
+  JsonString →
+    "string"
