@@ -23,8 +23,10 @@ render = ("#" <> _) <<< foldMap f <<< List.reverse
       "/items"
     TypeKeyword →
       "/type"
+    UniqueItems →
+      "/uniqueItems"
 
-data SchemaPathSegment = Items | TypeKeyword
+data SchemaPathSegment = Items | TypeKeyword | UniqueItems
 
 derive instance Eq SchemaPathSegment
 derive instance Generic SchemaPathSegment _

@@ -168,6 +168,44 @@ examples =
           , schemaPath: Nil
           }
       )
+  , negativeScenario
+      "An array with forbidden duplicate value."
+      "When schema requires items to be unique, any duplicate occurrence of any value will cause a validation failure."
+      { json: A.fromArray
+          [ A.fromString "a"
+          , A.fromString "b"
+          , A.fromString "b"
+          , A.fromString "c"
+          , A.fromString "d"
+          , A.fromString "d"
+          , A.fromString "e"
+          ]
+      , schema: ObjectSchema
+          $ Schema.defaultKeywords { uniqueItems = true }
+      }
+      ( Set.singleton $
+          { jsonPath: Nil
+          , reason: InvalidArray $ Set.fromFoldable
+              [ { jsonPath: ItemIndex 1 : Nil
+                , reason: NonUniqueArrayItem
+                , schemaPath: UniqueItems : Nil
+                }
+              , { jsonPath: ItemIndex 2 : Nil
+                , reason: NonUniqueArrayItem
+                , schemaPath: UniqueItems : Nil
+                }
+              , { jsonPath: ItemIndex 4 : Nil
+                , reason: NonUniqueArrayItem
+                , schemaPath: UniqueItems : Nil
+                }
+              , { jsonPath: ItemIndex 5 : Nil
+                , reason: NonUniqueArrayItem
+                , schemaPath: UniqueItems : Nil
+                }
+              ]
+          , schemaPath: Nil
+          }
+      )
   ]
 
 spec ∷ TestSpec

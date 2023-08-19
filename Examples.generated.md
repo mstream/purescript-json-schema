@@ -35,10 +35,8 @@ true
 #### Output
 ```
 ✗
-  Schema path:
-  #/type
-  JSON path:
-  $
+  Schema path: #/type
+  JSON path: $
   Invalid type. Expected null but got boolean.
 ```
 
@@ -56,10 +54,8 @@ true
 #### Output
 ```
 ✗
-  Schema path:
-  #/type
-  JSON path:
-  $
+  Schema path: #/type
+  JSON path: $
   Invalid type. Expected null or string but got boolean.
 ```
 
@@ -77,22 +73,51 @@ When schema requires items to conform to a certain schema, every single value in
 #### Output
 ```
 ✗
-  Schema path:
-  #
-  JSON path:
-  $
+  Schema path: #
+  JSON path: $
   Invalid array: 
   -
-    Schema path:
-    #/items/type
-    JSON path:
-    $[1]
+    Schema path: #/items/type
+    JSON path: $[1]
     Invalid type. Expected null but got boolean.
   -
-    Schema path:
-    #/items/type
-    JSON path:
-    $[3]
+    Schema path: #/items/type
+    JSON path: $[3]
     Invalid type. Expected null but got boolean.
+```
+
+### ► An array with forbidden duplicate value.
+When schema requires items to be unique, any duplicate occurrence of any value will cause a validation failure.
+#### Input
+##### JSON schema
+```json
+{"uniqueItems":true}
+```
+##### JSON
+```json
+["a","b","b","c","d","d","e"]
+```
+#### Output
+```
+✗
+  Schema path: #
+  JSON path: $
+  Invalid array: 
+  -
+    Schema path: #/uniqueItems
+    JSON path: $[1]
+    Non-unique array item.
+  -
+    Schema path: #/uniqueItems
+    JSON path: $[2]
+    Non-unique array item.
+  -
+    Schema path: #/uniqueItems
+    JSON path: $[4]
+    Non-unique array item.
+  -
+    Schema path: #/uniqueItems
+    JSON path: $[5]
+    Non-unique array item.
 ```
 

@@ -10,11 +10,13 @@ import Prelude
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Core as A
 import Data.Array as Array
-import Data.Foldable (foldMap)
+import Data.Foldable (foldMap, foldl)
 import Data.FoldableWithIndex (foldMapWithIndex)
 import Data.Generic.Rep (class Generic)
 import Data.Int as Int
 import Data.List ((:))
+import Data.Map (Map)
+import Data.Map as Map
 import Data.Maybe (Maybe(..), maybe)
 import Data.Set (Set)
 import Data.Set as Set
@@ -41,6 +43,7 @@ type Violation =
 data ViolationReason
   = AlwaysFailingSchema
   | InvalidArray (Set Violation)
+  | NonUniqueArrayItem
   | TypeMismatch
       { actualJsonValueType ∷ JsonValueType
       , allowedJsonValueTypes ∷ Set JsonValueType
@@ -56,10 +59,8 @@ instance Show ViolationReason where
 
 renderViolation ∷ Violation → Array String
 renderViolation { jsonPath, reason, schemaPath } =
-  [ "Schema path:"
-  , SchemaPath.render schemaPath
-  , "JSON path:"
-  , JsonPath.render jsonPath
+  [ "Schema path: " <> SchemaPath.render schemaPath
+  , "JSON path: " <> JsonPath.render jsonPath
   ]
     <> renderViolationReason reason
 
@@ -73,6 +74,8 @@ renderViolationReason = case _ of
           [ "-" ] <> (("  " <> _) <$> renderViolation violation)
       )
       itemViolations
+  NonUniqueArrayItem →
+    [ "Non-unique array item." ]
   TypeMismatch { actualJsonValueType, allowedJsonValueTypes } →
     [ "Invalid type. Expected "
         <>
@@ -163,16 +166,22 @@ validateAgainst = go mempty mempty
     . SchemaPath
     → JsonPath
     → Array Json
-    → { items ∷ Maybe JsonSchema | r }
+    → { items ∷ Maybe JsonSchema, uniqueItems ∷ Boolean | r }
     → Set Violation
   validateArray schemaPath jsonPath array constraints =
-    itemsViolations
+    itemsViolations <> uniqueItemsViolations
     where
     itemsViolations ∷ Set Violation
     itemsViolations = maybe
       Set.empty
       (validateItems (Items : schemaPath) jsonPath array)
       constraints.items
+
+    uniqueItemsViolations ∷ Set Violation
+    uniqueItemsViolations =
+      if constraints.uniqueItems then
+        validateUniqueItems (UniqueItems : schemaPath) jsonPath array
+      else Set.empty
 
   validateItems
     ∷ SchemaPath → JsonPath → Array Json → JsonSchema → Set Violation
@@ -185,6 +194,30 @@ validateAgainst = go mempty mempty
       (ItemIndex itemIndex : jsonPath)
       itemJson
       schema
+
+validateUniqueItems
+  ∷ SchemaPath → JsonPath → Array Json → Set Violation
+validateUniqueItems schemaPath jsonPath itemJsons =
+  foldMapWithIndex f itemJsons
+  where
+  f ∷ Int → Json → Set Violation
+  f itemIndex itemJson =
+    if itemJson `Set.member` duplicates then
+      Set.singleton
+        { jsonPath: ItemIndex itemIndex : jsonPath
+        , reason: NonUniqueArrayItem
+        , schemaPath
+        }
+    else Set.empty
+
+  duplicates ∷ Set Json
+  duplicates = Map.keys $ Map.filter (_ > 1) frequencies
+
+  frequencies ∷ Map Json Int
+  frequencies = foldl
+    (\acc json → Map.insertWith (+) json 1 acc)
+    Map.empty
+    itemJsons
 
 validateTypeKeyword
   ∷ SchemaPath → JsonPath → Json → Set JsonValueType → Set Violation
