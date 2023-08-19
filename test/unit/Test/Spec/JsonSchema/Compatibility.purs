@@ -34,7 +34,10 @@ renderInput differences =
       differences
 
 renderOutput ∷ Compatibility → String
-renderOutput = Compatibility.renderCompatibility
+renderOutput compatibility =
+  "```\n"
+    <> Compatibility.renderCompatibility compatibility
+    <> "\n```"
 
 transform ∷ Set Difference → Compatibility
 transform = Compatibility.calculate

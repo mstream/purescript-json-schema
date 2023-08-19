@@ -15,7 +15,6 @@ import Data.String as String
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
 import Effect.Exception (throw)
-import JsonSchema.Compatibility (Compatibility)
 import Node.Encoding (Encoding(..))
 import Node.FS.Aff as FS
 import Node.Process as Process

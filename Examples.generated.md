@@ -14,7 +14,9 @@ When there is not JSON schema differences, schema change is fully compatible.
 no differences
 ```
 #### Output
+```
 full
+```
 
 ---
 ## Diff
