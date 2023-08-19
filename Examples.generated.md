@@ -10,7 +10,7 @@
 When there is not JSON schema differences, schema change is fully compatible.
 #### Input
 ##### JSON schema differences
-```json
+```
 no differences
 ```
 #### Output

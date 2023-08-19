@@ -19,7 +19,7 @@ type DiffExample = Example (Set Difference) Compatibility
 renderInput ∷ Set Difference → String
 renderInput differences =
   "##### JSON schema differences\n"
-    <> "```json\n"
+    <> "```\n"
     <> String.joinWith "\n" renderDifferences
     <> "\n```"
   where
