@@ -12,15 +12,14 @@ import Data.List as List
 import Data.Maybe (Maybe(..))
 import Data.Set (Set)
 import Data.Set as Set
+import Data.String as String
 import JsonSchema (JsonSchema(..), JsonValueType(..))
 import JsonSchema as Schema
 import JsonSchema.Codec.Printing as Printing
 import JsonSchema.Gen as SchemaGen
-import JsonSchema.Validation
-  ( SchemaPathSegment(..)
-  , Violation
-  , ViolationReason(..)
-  )
+import JsonSchema.JsonPath (JsonPathSegment(..))
+import JsonSchema.SchemaPath (SchemaPathSegment(..))
+import JsonSchema.Validation (Violation, ViolationReason(..))
 import JsonSchema.Validation as Validation
 import Test.QuickCheck (Result(..))
 import Test.Spec (describe)
@@ -42,22 +41,18 @@ renderInput { json, schema } = "##### JSON schema\n"
   <> "\n```"
 
 renderOutput ∷ Set Violation → String
-renderOutput violations = "```\n" <> renderViolations <> "```"
+renderOutput violations =
+  "```\n"
+    <> String.joinWith "\n" renderViolations
+    <> "\n```"
   where
-  renderViolations ∷ String
+  renderViolations ∷ Array String
   renderViolations =
-    if Set.isEmpty violations then "✓ no violations\n"
+    if Set.isEmpty violations then [ "✓ no violations\n" ]
     else foldMap
-      ( \{ jsonPath, reason, schemaPath } →
-          "✗ "
-            <> Validation.renderViolationReason reason
-            <> "\n  "
-            <> "Schema path: "
-            <> Validation.renderSchemaPath schemaPath
-            <> "\n  "
-            <> "JSON path: "
-            <> Validation.renderJsonPath jsonPath
-            <> "\n"
+      ( \violation →
+          [ "✗" ]
+            <> (("  " <> _) <$> Validation.renderViolation violation)
       )
       violations
 
@@ -134,6 +129,43 @@ examples =
               , actualJsonValueType: JsonBoolean
               }
           , schemaPath: TypeKeyword : Nil
+          }
+      )
+  , negativeScenario
+      "An array with 2 out of 5 items not matching the desired item type"
+      "When schema requires items to conform to a certain schema, every single value in the array has to."
+      { json: A.fromArray
+          [ A.jsonNull
+          , A.jsonFalse
+          , A.jsonNull
+          , A.jsonTrue
+          , A.jsonNull
+          ]
+      , schema: ObjectSchema $ Schema.defaultKeywords
+          { items = Just $ ObjectSchema $ Schema.defaultKeywords
+              { typeKeyword = Just $ Set.singleton JsonNull }
+          , typeKeyword = Just $ Set.singleton JsonArray
+          }
+      }
+      ( Set.singleton $
+          { jsonPath: Nil
+          , reason: InvalidArray $ Set.fromFoldable
+              [ { jsonPath: ItemIndex 1 : Nil
+                , reason: TypeMismatch
+                    { actualJsonValueType: JsonBoolean
+                    , allowedJsonValueTypes: Set.singleton JsonNull
+                    }
+                , schemaPath: TypeKeyword : Items : Nil
+                }
+              , { jsonPath: ItemIndex 3 : Nil
+                , reason: TypeMismatch
+                    { actualJsonValueType: JsonBoolean
+                    , allowedJsonValueTypes: Set.singleton JsonNull
+                    }
+                , schemaPath: TypeKeyword : Items : Nil
+                }
+              ]
+          , schemaPath: Nil
           }
       )
   ]
