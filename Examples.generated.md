@@ -1,6 +1,25 @@
 # Examples
 
+- [Diff](#diff)
 - [Validation](#validation)
+
+---
+## Diff
+### ► Comparing identical schemata
+When two identical schemata are compared, no difference should be found.
+#### Input
+##### Previous JSON schema
+```json
+false
+```
+##### Next JSON schema
+```json
+false
+```
+#### Output
+```
+no differences
+```
 
 ---
 ## Validation
@@ -18,7 +37,6 @@ null
 #### Output
 ```
 ✓ no violations
-
 ```
 
 ### ► A boolean value against a schema accepting only null values

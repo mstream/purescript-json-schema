@@ -48,7 +48,7 @@ renderOutput violations =
   where
   renderViolations ∷ Array String
   renderViolations =
-    if Set.isEmpty violations then [ "✓ no violations\n" ]
+    if Set.isEmpty violations then [ "✓ no violations" ]
     else foldMap
       ( \violation →
           [ "✗" ]
