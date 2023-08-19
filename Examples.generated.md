@@ -1,7 +1,20 @@
 # Examples
 
+- [Compatibility](#compatibility)
 - [Diff](#diff)
 - [Validation](#validation)
+
+---
+## Compatibility
+### ► Compatibility when there are no JSON schema differences
+When there is not JSON schema differences, schema change is fully compatible.
+#### Input
+##### JSON schema differences
+```json
+no differences
+```
+#### Output
+full
 
 ---
 ## Diff

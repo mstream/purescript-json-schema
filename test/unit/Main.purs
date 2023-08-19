@@ -15,12 +15,14 @@ import Data.String as String
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
 import Effect.Exception (throw)
+import JsonSchema.Compatibility (Compatibility)
 import Node.Encoding (Encoding(..))
 import Node.FS.Aff as FS
 import Node.Process as Process
 import Test.Spec.JsonSchema.Codec as Codec
 import Test.Spec.JsonSchema.Codec.Parsing as Parsing
 import Test.Spec.JsonSchema.Codec.Printing as Printing
+import Test.Spec.JsonSchema.Compatibility as Compatibility
 import Test.Spec.JsonSchema.Diff as Diff
 import Test.Spec.JsonSchema.Validation as Validation
 import Test.Spec.Reporter (consoleReporter)
@@ -48,6 +50,9 @@ main = do
       case moduleName of
         "Codec" →
           pure $ makePrintable "Codec" <$> Codec.examples
+        "Compatibility" →
+          pure $ makePrintable "Compatibility" <$>
+            Compatibility.examples
         "Diff" →
           pure $ makePrintable "Diff" <$> Diff.examples
         "Parsing" →
@@ -67,6 +72,8 @@ main = do
       case moduleName of
         "Codec" →
           pure [ Codec.spec ]
+        "Compatibility" →
+          pure [ Compatibility.spec ]
         "Diff" →
           pure [ Diff.spec ]
         "Parsing" →
@@ -81,6 +88,7 @@ main = do
   allExamples ∷ Array PrintableExample
   allExamples =
     (makePrintable "Codec" <$> Codec.examples)
+      <> (makePrintable "Compatibility" <$> Compatibility.examples)
       <> (makePrintable "Diff" <$> Diff.examples)
       <> (makePrintable "Parsing" <$> Parsing.examples)
       <> (makePrintable "Printing" <$> Printing.examples)
@@ -89,6 +97,7 @@ main = do
   allSpecs ∷ Array TestSpec
   allSpecs =
     [ Codec.spec
+    , Compatibility.spec
     , Diff.spec
     , Parsing.spec
     , Printing.spec

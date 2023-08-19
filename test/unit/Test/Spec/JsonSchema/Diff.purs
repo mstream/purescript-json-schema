@@ -3,7 +3,7 @@ module Test.Spec.JsonSchema.Diff (examples, spec) where
 import Prelude
 
 import Data.Argonaut.Core as A
-import Data.Foldable (foldMap)
+import Data.Foldable (foldMap, traverse_)
 import Data.Maybe (Maybe(..))
 import Data.Set (Set)
 import Data.Set as Set
@@ -16,7 +16,7 @@ import JsonSchema.Gen as SchemaGen
 import Test.QuickCheck ((===))
 import Test.Spec (describe)
 import Test.Types (Example, TestLength(..), TestSpec)
-import Test.Utils (generativeTestCase)
+import Test.Utils (exampleTestCase, generativeTestCase)
 
 type DiffExampleInput =
   { nextSchema ∷ JsonSchema
@@ -82,6 +82,8 @@ examples =
 spec ∷ TestSpec
 spec = describe "Diff" do
   describe "calculate" do
+    traverse_ exampleTestCase examples
+
     generativeTestCase Long "Identical schemata yield no differences."
       do
         schema ← SchemaGen.genSchema
