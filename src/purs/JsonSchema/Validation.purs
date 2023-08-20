@@ -14,7 +14,7 @@ import Data.Foldable (foldMap, foldl)
 import Data.FoldableWithIndex (foldMapWithIndex)
 import Data.Generic.Rep (class Generic)
 import Data.Int as Int
-import Data.List ((:))
+import Data.List (List(..), (:))
 import Data.Map (Map)
 import Data.Map as Map
 import Data.Maybe (Maybe(..), maybe)
@@ -97,7 +97,7 @@ renderViolationReason = case _ of
     [ "JSON is valid against schema from 'not'." ]
 
 validateAgainst ∷ Json → JsonSchema → Set Violation
-validateAgainst = go mempty mempty
+validateAgainst = go Nil Nil
   where
   go ∷ SchemaPath → JsonPath → Json → JsonSchema → Set Violation
   go schemaPath jsonPath json schema = case schema of

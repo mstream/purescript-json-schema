@@ -4,13 +4,15 @@ import Prelude
 
 import Data.Argonaut.Core as A
 import Data.Foldable (foldMap, traverse_)
+import Data.List (List(..))
 import Data.Maybe (Maybe(..))
 import Data.Set (Set)
 import Data.Set as Set
 import Data.String as String
-import JsonSchema (JsonSchema(..))
+import JsonSchema (JsonSchema(..), JsonValueType(..))
+import JsonSchema as Schema
 import JsonSchema.Codec.Printing as Printing
-import JsonSchema.Diff (Difference(..))
+import JsonSchema.Diff (Difference, DifferenceType(..))
 import JsonSchema.Diff as Diff
 import JsonSchema.Gen as SchemaGen
 import Test.QuickCheck ((===))
@@ -77,6 +79,23 @@ examples =
       , previousSchema: BooleanSchema false
       }
       Set.empty
+  , scenario
+      "Changing expected JSON value type from null to boolean"
+      "Any change in expected JSON value type should be accounted as a difference."
+      { nextSchema: ObjectSchema
+          $ Schema.defaultKeywords
+              { typeKeyword = Just $ Set.singleton JsonBoolean }
+      , previousSchema: ObjectSchema
+          $ Schema.defaultKeywords
+              { typeKeyword = Just $ Set.singleton JsonNull }
+      }
+      ( Set.singleton
+          { differenceType: TypeChange
+              (Just $ Set.singleton JsonNull)
+              (Just $ Set.singleton JsonBoolean)
+          , path: Nil
+          }
+      )
   ]
 
 spec ∷ TestSpec

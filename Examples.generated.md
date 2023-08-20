@@ -6,7 +6,7 @@
 
 ---
 ## Compatibility
-### ► Compatibility when there are no JSON schema differences
+### ► No JSON schema differences
 When there is not JSON schema differences, schema change is fully compatible.
 #### Input
 ##### JSON schema differences
@@ -16,6 +16,165 @@ no differences
 #### Output
 ```
 full
+```
+
+### ► Expected JSON value type changes from null to boolean
+Because no boolean value can satisfy null JSON type constraint, and vice versa, such a change is incompatible.
+#### Input
+##### JSON schema differences
+```
+-
+  Schema path: #
+  Change of accepted JSON value types from 
+  - null
+  to
+  - boolean
+```
+#### Output
+```
+none
+```
+
+### ► Expected JSON value type changes from integer to number
+Because every integer is a number, but not vice versa, such a change is backward compatible.
+#### Input
+##### JSON schema differences
+```
+-
+  Schema path: #
+  Change of accepted JSON value types from 
+  - integer
+  to
+  - number
+```
+#### Output
+```
+backward
+```
+
+### ► Expected JSON value type changes from number to integer
+Because every integer is a number, but not vice versa, such a change is forward compatible.
+#### Input
+##### JSON schema differences
+```
+-
+  Schema path: #
+  Change of accepted JSON value types from 
+  - number
+  to
+  - integer
+```
+#### Output
+```
+forward
+```
+
+### ► Expected JSON value types is extended
+Because more value types than before are accepted, this change is backward compatible.
+#### Input
+##### JSON schema differences
+```
+-
+  Schema path: #
+  Change of accepted JSON value types from 
+  - null
+  to
+  - boolean
+  - null
+```
+#### Output
+```
+backward
+```
+
+### ► Expected JSON value types is reduced
+Because less value types than before are accepted, this change is forward compatible.
+#### Input
+##### JSON schema differences
+```
+-
+  Schema path: #
+  Change of accepted JSON value types from 
+  - boolean
+  - null
+  to
+  - null
+```
+#### Output
+```
+forward
+```
+
+### ► Expected JSON value types including number is extended by integer
+Because every integer is a number, such a change is fully compatible.
+#### Input
+##### JSON schema differences
+```
+-
+  Schema path: #
+  Change of accepted JSON value types from 
+  - number
+  to
+  - integer
+  - number
+```
+#### Output
+```
+full
+```
+
+### ► Expected JSON value types including integer is extended by number
+Because not every integer is a number, such a change is backward compatible.
+#### Input
+##### JSON schema differences
+```
+-
+  Schema path: #
+  Change of accepted JSON value types from 
+  - integer
+  to
+  - integer
+  - number
+```
+#### Output
+```
+backward
+```
+
+### ► Expected JSON value types including integer and number is reduced by integer
+Because every integer is a number, such a change is fully compatible.
+#### Input
+##### JSON schema differences
+```
+-
+  Schema path: #
+  Change of accepted JSON value types from 
+  - integer
+  - number
+  to
+  - number
+```
+#### Output
+```
+full
+```
+
+### ► Expected JSON value types including integer and number is reuced by number
+Because not every integer is a number, such a change is forward compatible.
+#### Input
+##### JSON schema differences
+```
+-
+  Schema path: #
+  Change of accepted JSON value types from 
+  - integer
+  - number
+  to
+  - integer
+```
+#### Output
+```
+forward
 ```
 
 ---
@@ -34,6 +193,27 @@ false
 #### Output
 ```
 no differences
+```
+
+### ► Changing expected JSON value type from null to boolean
+Any change in expected JSON value type should be accounted as a difference.
+#### Input
+##### Previous JSON schema
+```json
+{"type":["null"]}
+```
+##### Next JSON schema
+```json
+{"type":["boolean"]}
+```
+#### Output
+```
+-
+  Schema path: #
+  Change of accepted JSON value types from 
+  - null
+  to
+  - boolean
 ```
 
 ---
