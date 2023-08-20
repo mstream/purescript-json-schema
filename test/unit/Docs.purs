@@ -11,6 +11,7 @@ import Data.FoldableWithIndex
 import Data.Map (Map)
 import Data.Map as Map
 import Data.Maybe (Maybe(..))
+import Data.String (Pattern(..), Replacement(..))
 import Data.String as String
 import Effect (Effect)
 import Effect.Aff (launchAff_)
@@ -26,56 +27,44 @@ import Test.Spec.JsonSchema.Diff as Diff
 import Test.Spec.JsonSchema.Validation as Validation
 import Test.Types (Example)
 
+data Category
+  = Compatibility
+  | Diff
+  | Validation
+
+derive instance Eq Category
+derive instance Ord Category
+
+renderCategory ∷ Category → String
+renderCategory = case _ of
+  Compatibility →
+    "JSON Schema Change Compatibility Checks"
+  Diff →
+    "JSON Schema Difference Calculation"
+  Validation →
+    "JSON Values Validation"
+
 main ∷ Effect Unit
-main = do
-  args ← Process.argv
-  examples ← selectExamples $ args !! 2
-
-  launchAff_
-    $ FS.writeTextFile UTF8 "docs/src/examples/README.generated.md"
-    $ printExamples
-    $ groupExamplesByCategory examples
+main = launchAff_
+  $ FS.writeTextFile UTF8 "docs/src/examples/README.generated.md"
+  $ printExamples
+  $ groupExamplesByCategory examples
   where
-  selectExamples ∷ Maybe String → Effect (Array PrintableExample)
-  selectExamples = case _ of
-    Nothing →
-      pure allExamples
-    Just moduleName →
-      case moduleName of
-        "Codec" →
-          pure $ makePrintable "Codec" <$> Codec.examples
-        "Compatibility" →
-          pure $ makePrintable "Compatibility" <$>
-            Compatibility.examples
-        "Diff" →
-          pure $ makePrintable "Diff" <$> Diff.examples
-        "Parsing" →
-          pure $ makePrintable "Parsing" <$> Parsing.examples
-        "Printing" →
-          pure $ makePrintable "Printing" <$> Printing.examples
-        "Validation" →
-          pure $ makePrintable "Validation" <$> Validation.examples
-        _ →
-          throw $ "Unknown module name \"" <> moduleName <> "\""
-
-  allExamples ∷ Array PrintableExample
-  allExamples =
-    (makePrintable "Codec" <$> Codec.examples)
-      <> (makePrintable "Compatibility" <$> Compatibility.examples)
-      <> (makePrintable "Diff" <$> Diff.examples)
-      <> (makePrintable "Parsing" <$> Parsing.examples)
-      <> (makePrintable "Printing" <$> Printing.examples)
-      <> (makePrintable "Validation" <$> Validation.examples)
+  examples ∷ Array PrintableExample
+  examples =
+    (makePrintable Compatibility <$> Compatibility.examples)
+      <> (makePrintable Diff <$> Diff.examples)
+      <> (makePrintable Validation <$> Validation.examples)
 
 type PrintableExample =
-  { category ∷ String
+  { category ∷ Category
   , description ∷ String
   , input ∷ String
   , output ∷ String
   , title ∷ String
   }
 
-makePrintable ∷ ∀ i o. String → Example i o → PrintableExample
+makePrintable ∷ ∀ i o. Category → Example i o → PrintableExample
 makePrintable category example =
   { category
   , description: example.description
@@ -88,7 +77,7 @@ groupExamplesByCategory
   ∷ ∀ f
   . Foldable f
   ⇒ f PrintableExample
-  → Map String (Array PrintableExample)
+  → Map Category (Array PrintableExample)
 groupExamplesByCategory = foldl
   ( \acc example →
       Map.insertWith
@@ -101,7 +90,7 @@ groupExamplesByCategory = foldl
 
 printExamples
   ∷ ∀ f
-  . FoldableWithIndex String f
+  . FoldableWithIndex Category f
   ⇒ f (Array PrintableExample)
   → String
 printExamples examplesByCategory =
@@ -114,19 +103,23 @@ printExamples examplesByCategory =
       )
     <> foldMapWithIndex printCategory examplesByCategory
   where
-  printTableOfContents ∷ Array String → String
+  printTableOfContents ∷ Array Category → String
   printTableOfContents = (_ <> "\n")
     <<< foldMap printTableOfContentsEntry
 
-  printTableOfContentsEntry ∷ String → String
+  printTableOfContentsEntry ∷ Category → String
   printTableOfContentsEntry category =
-    "- [" <> category <> "](#" <> String.toLower category <> ")\n"
+    "- ["
+      <> renderCategory category
+      <> "](#"
+      <> (formatAnchor $ renderCategory category)
+      <> ")\n"
 
-  printCategory ∷ String → Array PrintableExample → String
+  printCategory ∷ Category → Array PrintableExample → String
   printCategory category examples =
     "---\n"
       <> "## "
-      <> category
+      <> renderCategory category
       <> "\n"
       <> foldMap printExample examples
 
@@ -141,3 +134,7 @@ printExamples examplesByCategory =
       <> "\n#### Output\n"
       <> output
       <> "\n\n"
+
+  formatAnchor ∷ String → String
+  formatAnchor = String.replaceAll (Pattern " ") (Replacement "-")
+    <<< String.toLower

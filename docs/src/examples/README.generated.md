@@ -1,11 +1,11 @@
 # Examples
 
-- [Compatibility](#compatibility)
-- [Diff](#diff)
-- [Validation](#validation)
+- [JSON Schema Change Compatibility Checks](#json-schema-change-compatibility-checks)
+- [JSON Schema Difference Calculation](#json-schema-difference-calculation)
+- [JSON Values Validation](#json-values-validation)
 
 ---
-## Compatibility
+## JSON Schema Change Compatibility Checks
 ### ⌘ No JSON schema differences
 When there is not JSON schema differences, schema change is fully compatible.
 #### Input
@@ -178,7 +178,7 @@ forward
 ```
 
 ---
-## Diff
+## JSON Schema Difference Calculation
 ### ⌘ Comparing identical schemata
 When two identical schemata are compared, no difference should be found.
 #### Input
@@ -217,7 +217,7 @@ Any change in expected JSON value type should be accounted as a difference.
 ```
 
 ---
-## Validation
+## JSON Values Validation
 ### ⌘ A null value against a schema accepting only null values
 A null value conforms to the schema.
 #### Input
