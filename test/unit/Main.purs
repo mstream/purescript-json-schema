@@ -177,7 +177,7 @@ printExamples examplesByCategory =
 
   printExample ∷ PrintableExample → String
   printExample { description, input, output, title } =
-    "### ► "
+    "### ⌘ "
       <> title
       <> "\n"
       <> description

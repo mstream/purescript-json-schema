@@ -6,7 +6,7 @@
 
 ---
 ## Compatibility
-### ► No JSON schema differences
+### ⌘ No JSON schema differences
 When there is not JSON schema differences, schema change is fully compatible.
 #### Input
 ##### JSON schema differences
@@ -18,7 +18,7 @@ no differences
 full
 ```
 
-### ► Expected JSON value type changes from null to boolean
+### ⌘ Expected JSON value type changes from null to boolean
 Because no boolean value can satisfy null JSON type constraint, and vice versa, such a change is incompatible.
 #### Input
 ##### JSON schema differences
@@ -35,7 +35,7 @@ Because no boolean value can satisfy null JSON type constraint, and vice versa, 
 none
 ```
 
-### ► Expected JSON value type changes from integer to number
+### ⌘ Expected JSON value type changes from integer to number
 Because every integer is a number, but not vice versa, such a change is backward compatible.
 #### Input
 ##### JSON schema differences
@@ -52,7 +52,7 @@ Because every integer is a number, but not vice versa, such a change is backward
 backward
 ```
 
-### ► Expected JSON value type changes from number to integer
+### ⌘ Expected JSON value type changes from number to integer
 Because every integer is a number, but not vice versa, such a change is forward compatible.
 #### Input
 ##### JSON schema differences
@@ -69,7 +69,7 @@ Because every integer is a number, but not vice versa, such a change is forward 
 forward
 ```
 
-### ► Expected JSON value types is extended
+### ⌘ Expected JSON value types is extended
 Because more value types than before are accepted, this change is backward compatible.
 #### Input
 ##### JSON schema differences
@@ -87,7 +87,7 @@ Because more value types than before are accepted, this change is backward compa
 backward
 ```
 
-### ► Expected JSON value types is reduced
+### ⌘ Expected JSON value types is reduced
 Because less value types than before are accepted, this change is forward compatible.
 #### Input
 ##### JSON schema differences
@@ -105,7 +105,7 @@ Because less value types than before are accepted, this change is forward compat
 forward
 ```
 
-### ► Expected JSON value types including number is extended by integer
+### ⌘ Expected JSON value types including number is extended by integer
 Because every integer is a number, such a change is fully compatible.
 #### Input
 ##### JSON schema differences
@@ -123,7 +123,7 @@ Because every integer is a number, such a change is fully compatible.
 full
 ```
 
-### ► Expected JSON value types including integer is extended by number
+### ⌘ Expected JSON value types including integer is extended by number
 Because not every integer is a number, such a change is backward compatible.
 #### Input
 ##### JSON schema differences
@@ -141,7 +141,7 @@ Because not every integer is a number, such a change is backward compatible.
 backward
 ```
 
-### ► Expected JSON value types including integer and number is reduced by integer
+### ⌘ Expected JSON value types including integer and number is reduced by integer
 Because every integer is a number, such a change is fully compatible.
 #### Input
 ##### JSON schema differences
@@ -159,7 +159,7 @@ Because every integer is a number, such a change is fully compatible.
 full
 ```
 
-### ► Expected JSON value types including integer and number is reuced by number
+### ⌘ Expected JSON value types including integer and number is reuced by number
 Because not every integer is a number, such a change is forward compatible.
 #### Input
 ##### JSON schema differences
@@ -179,7 +179,7 @@ forward
 
 ---
 ## Diff
-### ► Comparing identical schemata
+### ⌘ Comparing identical schemata
 When two identical schemata are compared, no difference should be found.
 #### Input
 ##### Previous JSON schema
@@ -195,7 +195,7 @@ false
 no differences
 ```
 
-### ► Changing expected JSON value type from null to boolean
+### ⌘ Changing expected JSON value type from null to boolean
 Any change in expected JSON value type should be accounted as a difference.
 #### Input
 ##### Previous JSON schema
@@ -218,7 +218,7 @@ Any change in expected JSON value type should be accounted as a difference.
 
 ---
 ## Validation
-### ► A null value against a schema accepting only null values
+### ⌘ A null value against a schema accepting only null values
 A null value conforms to the schema.
 #### Input
 ##### JSON schema
@@ -234,7 +234,7 @@ null
 ✓ no violations
 ```
 
-### ► A boolean value against a schema accepting only null values
+### ⌘ A boolean value against a schema accepting only null values
 A boolean value does not conform to the schema as only null values do.
 #### Input
 ##### JSON schema
@@ -253,7 +253,7 @@ true
   Invalid type. Expected null but got boolean.
 ```
 
-### ► A boolean value against a schema accepting only null and string values
+### ⌘ A boolean value against a schema accepting only null and string values
 A boolean value does not conform to the schema as only null or string values do.
 #### Input
 ##### JSON schema
@@ -272,7 +272,7 @@ true
   Invalid type. Expected null or string but got boolean.
 ```
 
-### ► An array with 2 out of 5 items not matching the desired item type
+### ⌘ An array with 2 out of 5 items not matching the desired item type
 When schema requires items to conform to a certain schema, every single value in the array has to.
 #### Input
 ##### JSON schema
@@ -299,7 +299,7 @@ When schema requires items to conform to a certain schema, every single value in
     Invalid type. Expected null but got boolean.
 ```
 
-### ► An array with forbidden duplicate value.
+### ⌘ An array with forbidden duplicate value.
 When schema requires items to be unique, any duplicate occurrence of any value will cause a validation failure.
 #### Input
 ##### JSON schema
