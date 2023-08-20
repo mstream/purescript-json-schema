@@ -64,6 +64,7 @@
           gh
           git
           imagemagick
+          mdbook
           nodejs
         ];
       };
@@ -81,6 +82,7 @@
           PS1="\[\e[33m\][\[\e[m\]\[\e[34;40m\]${name}:\[\e[m\]\[\e[36m\]\w\[\e[m\]\[\e[33m\]]\[\e[m\]\[\e[32m\]\\$\[\e[m\] "
         '';
       };
+      packages = { docs = import ./nix/packages/docs { inherit pkgs; }; };
     }
     );
 }

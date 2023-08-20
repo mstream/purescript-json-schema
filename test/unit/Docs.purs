@@ -1,9 +1,9 @@
-module Test.Main where
+module Test.Docs where
 
 import Prelude
 
 import Data.Array ((!!))
-import Data.Foldable (class Foldable, foldMap, foldl, sequence_)
+import Data.Foldable (class Foldable, foldMap, foldl)
 import Data.FoldableWithIndex
   ( class FoldableWithIndex
   , foldMapWithIndex
@@ -13,8 +13,10 @@ import Data.Map as Map
 import Data.Maybe (Maybe(..))
 import Data.String as String
 import Effect (Effect)
-import Effect.Aff (Aff, launchAff_)
+import Effect.Aff (launchAff_)
 import Effect.Exception (throw)
+import Node.Encoding (Encoding(..))
+import Node.FS.Aff as FS
 import Node.Process as Process
 import Test.Spec.JsonSchema.Codec as Codec
 import Test.Spec.JsonSchema.Codec.Parsing as Parsing
@@ -22,55 +24,48 @@ import Test.Spec.JsonSchema.Codec.Printing as Printing
 import Test.Spec.JsonSchema.Compatibility as Compatibility
 import Test.Spec.JsonSchema.Diff as Diff
 import Test.Spec.JsonSchema.Validation as Validation
-import Test.Spec.Reporter (consoleReporter)
-import Test.Spec.Runner (defaultConfig, runSpecT)
-import Test.Types (Example, TestSpec)
+import Test.Types (Example)
 
 main ∷ Effect Unit
 main = do
   args ← Process.argv
-  specs ← selectSpecs $ args !! 2
-  launchAff_ $ runTestSpecs specs
+  examples ← selectExamples $ args !! 2
+
+  launchAff_
+    $ FS.writeTextFile UTF8 "docs/src/examples/README.generated.md"
+    $ printExamples
+    $ groupExamplesByCategory examples
   where
-  selectSpecs ∷ Maybe String → Effect (Array TestSpec)
-  selectSpecs = case _ of
+  selectExamples ∷ Maybe String → Effect (Array PrintableExample)
+  selectExamples = case _ of
     Nothing →
-      pure allSpecs
+      pure allExamples
     Just moduleName →
       case moduleName of
         "Codec" →
-          pure [ Codec.spec ]
+          pure $ makePrintable "Codec" <$> Codec.examples
         "Compatibility" →
-          pure [ Compatibility.spec ]
+          pure $ makePrintable "Compatibility" <$>
+            Compatibility.examples
         "Diff" →
-          pure [ Diff.spec ]
+          pure $ makePrintable "Diff" <$> Diff.examples
         "Parsing" →
-          pure [ Parsing.spec ]
+          pure $ makePrintable "Parsing" <$> Parsing.examples
         "Printing" →
-          pure [ Printing.spec ]
+          pure $ makePrintable "Printing" <$> Printing.examples
         "Validation" →
-          pure [ Validation.spec ]
+          pure $ makePrintable "Validation" <$> Validation.examples
         _ →
           throw $ "Unknown module name \"" <> moduleName <> "\""
 
-  allSpecs ∷ Array TestSpec
-  allSpecs =
-    [ Codec.spec
-    , Compatibility.spec
-    , Diff.spec
-    , Parsing.spec
-    , Printing.spec
-    , Validation.spec
-    ]
-
-runTestSpecs ∷ ∀ f. Foldable f ⇒ f TestSpec → Aff Unit
-runTestSpecs specs = do
-  resultsAff ← runSpecT
-    defaultConfig
-    [ consoleReporter ]
-    (sequence_ specs)
-
-  void resultsAff
+  allExamples ∷ Array PrintableExample
+  allExamples =
+    (makePrintable "Codec" <$> Codec.examples)
+      <> (makePrintable "Compatibility" <$> Compatibility.examples)
+      <> (makePrintable "Diff" <$> Diff.examples)
+      <> (makePrintable "Parsing" <$> Parsing.examples)
+      <> (makePrintable "Printing" <$> Printing.examples)
+      <> (makePrintable "Validation" <$> Validation.examples)
 
 type PrintableExample =
   { category ∷ String

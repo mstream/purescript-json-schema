@@ -1,0 +1,6 @@
+[book]
+authors = ["mstream"]
+language = "en"
+multilingual = false
+src = "src"
+title = "PureScript JSON Schema"
