@@ -2,7 +2,7 @@ module Test.Docs where
 
 import Prelude
 
-import Data.Array ((!!))
+import Data.Array as Array
 import Data.Foldable (class Foldable, foldMap, foldl)
 import Data.FoldableWithIndex
   ( class FoldableWithIndex
@@ -10,18 +10,16 @@ import Data.FoldableWithIndex
   )
 import Data.Map (Map)
 import Data.Map as Map
-import Data.Maybe (Maybe(..))
+import Data.Markdown (CodeBlockType(..), Document, Node)
+import Data.Markdown as M
+import Data.Mermaid.FlowChart (FlowChartDef(..), Orientation(..))
+import Data.Mermaid.FlowChart as FlowChart
 import Data.String (Pattern(..), Replacement(..))
 import Data.String as String
 import Effect (Effect)
 import Effect.Aff (launchAff_)
-import Effect.Exception (throw)
 import Node.Encoding (Encoding(..))
 import Node.FS.Aff as FS
-import Node.Process as Process
-import Test.Spec.JsonSchema.Codec as Codec
-import Test.Spec.JsonSchema.Codec.Parsing as Parsing
-import Test.Spec.JsonSchema.Codec.Printing as Printing
 import Test.Spec.JsonSchema.Compatibility as Compatibility
 import Test.Spec.JsonSchema.Diff as Diff
 import Test.Spec.JsonSchema.Validation as Validation
@@ -44,9 +42,57 @@ renderCategory = case _ of
   Validation →
     "JSON Values Validation"
 
+printCategoryDescription ∷ Category → String
+printCategoryDescription = M.render <<< case _ of
+  Compatibility →
+    [ M.paragraph
+        "**Backward compatibility** - an ability of a system to understand input intended for previous versions of itself"
+    , M.paragraph
+        "**Forward compatibility** - an ability of a system to understand input intended for future versions of itself"
+    , M.paragraph
+        "**Full compatibility** - backward and forward compatibility combined"
+    , M.paragraph
+        "**No compatibility** - neither level of compatibility"
+    , renderMermaid $ FlowChartDef LeftToRight
+        [ FlowChart.subGraph "data writers"
+            [ FlowChart.capsule "current_writer" "writer"
+            , FlowChart.capsule "next_writer" "writer<sub>+1</sub>"
+            ]
+        , FlowChart.subGraph "data readers"
+            [ FlowChart.capsule "current_reader" "reader"
+            , FlowChart.capsule "next_reader" "reader<sub>+1</sub>"
+            ]
+        , FlowChart.normalArrow
+            "current_writer"
+            "current_reader"
+        , FlowChart.normalArrowWithAnnotation
+            "backward compatibility"
+            "current_writer"
+            "next_reader"
+        , FlowChart.normalArrowWithAnnotation
+            "forward compatibility"
+            "next_writer"
+            "current_reader"
+        ]
+    ]
+  Diff →
+    [ M.paragraph "TODO"
+    ]
+  Validation →
+    [ M.paragraph "TODO"
+    ]
+
+renderMermaid ∷ FlowChartDef → Node
+renderMermaid flowChartDef =
+  M.codeBlock Mermaid code
+  where
+  code ∷ String
+  code = FlowChart.render flowChartDef
+
 main ∷ Effect Unit
 main = launchAff_
   $ FS.writeTextFile UTF8 "docs/src/examples/README.generated.md"
+  $ M.render
   $ printExamples
   $ groupExamplesByCategory examples
   where
@@ -59,8 +105,8 @@ main = launchAff_
 type PrintableExample =
   { category ∷ Category
   , description ∷ String
-  , input ∷ String
-  , output ∷ String
+  , input ∷ Document
+  , output ∷ Document
   , title ∷ String
   }
 
@@ -92,9 +138,9 @@ printExamples
   ∷ ∀ f
   . FoldableWithIndex Category f
   ⇒ f (Array PrintableExample)
-  → String
+  → Document
 printExamples examplesByCategory =
-  "# Examples\n\n"
+  [ M.heading1 "Examples" ]
     <>
       ( printTableOfContents
           $ foldMapWithIndex
@@ -103,37 +149,33 @@ printExamples examplesByCategory =
       )
     <> foldMapWithIndex printCategory examplesByCategory
   where
-  printTableOfContents ∷ Array Category → String
-  printTableOfContents = (_ <> "\n")
-    <<< foldMap printTableOfContentsEntry
+  printTableOfContents ∷ Array Category → Document
+  printTableOfContents = Array.singleton
+    <<< M.list
+    <<< map printTableOfContentsEntry
 
-  printTableOfContentsEntry ∷ Category → String
-  printTableOfContentsEntry category =
-    "- ["
-      <> renderCategory category
-      <> "](#"
-      <> (formatAnchor $ renderCategory category)
-      <> ")\n"
+  printTableOfContentsEntry ∷ Category → Node
+  printTableOfContentsEntry category = M.link
+    (renderCategory category)
+    ("#" <> (formatAnchor $ renderCategory category))
 
-  printCategory ∷ Category → Array PrintableExample → String
+  printCategory ∷ Category → Array PrintableExample → Document
   printCategory category examples =
-    "---\n"
-      <> "## "
-      <> renderCategory category
-      <> "\n"
+    [ M.rule
+    , M.heading2 $ renderCategory category
+    , M.paragraph $ printCategoryDescription category
+    ]
       <> foldMap printExample examples
 
-  printExample ∷ PrintableExample → String
+  printExample ∷ PrintableExample → Document
   printExample { description, input, output, title } =
-    "### ⌘ "
-      <> title
-      <> "\n"
-      <> description
-      <> "\n#### Input\n"
+    [ M.heading3 $ "⌘ " <> title
+    , M.paragraph description
+    , M.heading4 "Input"
+    ]
       <> input
-      <> "\n#### Output\n"
+      <> [ M.heading4 "Output" ]
       <> output
-      <> "\n\n"
 
   formatAnchor ∷ String → String
   formatAnchor = String.replaceAll (Pattern " ") (Replacement "-")

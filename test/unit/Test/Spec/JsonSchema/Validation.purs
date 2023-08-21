@@ -9,6 +9,8 @@ import Data.Argonaut.Gen as AGen
 import Data.Foldable (foldMap, traverse_)
 import Data.List (List(..), (:))
 import Data.List as List
+import Data.Markdown (CodeBlockType(..), Document)
+import Data.Markdown as M
 import Data.Maybe (Maybe(..))
 import Data.Set (Set)
 import Data.Set as Set
@@ -30,21 +32,17 @@ type ValidationExampleInput = { json ∷ Json, schema ∷ JsonSchema }
 
 type ValidationExample = Example ValidationExampleInput (Set Violation)
 
-renderInput ∷ ValidationExampleInput → String
-renderInput { json, schema } = "##### JSON schema\n"
-  <> "```json\n"
-  <> (A.stringify <<< Printing.printSchema) schema
-  <> "\n```\n"
-  <> "##### JSON\n"
-  <> "```json\n"
-  <> A.stringify json
-  <> "\n```"
+renderInput ∷ ValidationExampleInput → Document
+renderInput { json, schema } =
+  [ M.heading5 "JSON schema"
+  , M.codeBlock Json $ (A.stringify <<< Printing.printSchema) schema
+  , M.heading5 "JSON"
+  , M.codeBlock Json $ A.stringify json
+  ]
 
-renderOutput ∷ Set Violation → String
+renderOutput ∷ Set Violation → Document
 renderOutput violations =
-  "```\n"
-    <> String.joinWith "\n" renderViolations
-    <> "\n```"
+  [ M.codeBlock' $ String.joinWith "\n" renderViolations ]
   where
   renderViolations ∷ Array String
   renderViolations =

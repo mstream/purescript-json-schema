@@ -5,6 +5,8 @@ import Prelude
 import Data.Argonaut.Core as A
 import Data.Foldable (foldMap, traverse_)
 import Data.List (List(..))
+import Data.Markdown (CodeBlockType(..), Document)
+import Data.Markdown as M
 import Data.Maybe (Maybe(..))
 import Data.Set (Set)
 import Data.Set as Set
@@ -27,22 +29,19 @@ type DiffExampleInput =
 
 type DiffExample = Example DiffExampleInput (Set Difference)
 
-renderInput ∷ DiffExampleInput → String
+renderInput ∷ DiffExampleInput → Document
 renderInput { nextSchema, previousSchema } =
-  "##### Previous JSON schema\n"
-    <> "```json\n"
-    <> (A.stringify <<< Printing.printSchema) previousSchema
-    <> "\n```\n"
-    <> "##### Next JSON schema\n"
-    <> "```json\n"
-    <> (A.stringify <<< Printing.printSchema) nextSchema
-    <> "\n```"
+  [ M.heading5 "Previous JSON schema"
+  , M.codeBlock Json
+      $ (A.stringify <<< Printing.printSchema) previousSchema
+  , M.heading5 "Next JSON schema"
+  , M.codeBlock Json
+      $ (A.stringify <<< Printing.printSchema) nextSchema
+  ]
 
-renderOutput ∷ Set Difference → String
+renderOutput ∷ Set Difference → Document
 renderOutput differences =
-  "```\n"
-    <> String.joinWith "\n" renderDifferences
-    <> "\n```"
+  [ M.codeBlock' $ String.joinWith "\n" renderDifferences ]
   where
   renderDifferences ∷ Array String
   renderDifferences =

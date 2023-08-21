@@ -1,6 +1,6 @@
 { pkgs, ... }:
 pkgs.stdenv.mkDerivation {
-  buildInputs = with pkgs; [ esbuild mdbook ];
+  buildInputs = with pkgs; [ esbuild mdbook mdbook-mermaid ];
   installPhase = ''
     mkdir "$out"
     cp -r $src/docs .

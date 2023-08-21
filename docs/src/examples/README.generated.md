@@ -1,13 +1,39 @@
 # Examples
-
 - [JSON Schema Change Compatibility Checks](#json-schema-change-compatibility-checks)
 - [JSON Schema Difference Calculation](#json-schema-difference-calculation)
 - [JSON Values Validation](#json-values-validation)
-
 ---
 ## JSON Schema Change Compatibility Checks
+**Backward compatibility** - an ability of a system to understand input intended for previous versions of itself
+
+**Forward compatibility** - an ability of a system to understand input intended for future versions of itself
+
+**Full compatibility** - backward and forward compatibility combined
+
+**No compatibility** - neither level of compatibility
+
+```mermaid
+flowchart LR
+    subgraph data writers
+        current_writer("writer")
+        next_writer("writer<sub>+1</sub>")
+
+    end
+    subgraph data readers
+        current_reader("reader")
+        next_reader("reader<sub>+1</sub>")
+
+    end
+    current_writer -->  current_reader
+    current_writer --> |backward compatibility| next_reader
+    next_writer --> |forward compatibility| current_reader
+
+```
+
+
 ### ⌘ No JSON schema differences
 When there is not JSON schema differences, schema change is fully compatible.
+
 #### Input
 ##### JSON schema differences
 ```
@@ -17,9 +43,9 @@ no differences
 ```
 full
 ```
-
 ### ⌘ Expected JSON value type changes from null to boolean
 Because no boolean value can satisfy null JSON type constraint, and vice versa, such a change is incompatible.
+
 #### Input
 ##### JSON schema differences
 ```
@@ -34,9 +60,9 @@ Because no boolean value can satisfy null JSON type constraint, and vice versa, 
 ```
 none
 ```
-
 ### ⌘ Expected JSON value type changes from integer to number
 Because every integer is a number, but not vice versa, such a change is backward compatible.
+
 #### Input
 ##### JSON schema differences
 ```
@@ -51,9 +77,9 @@ Because every integer is a number, but not vice versa, such a change is backward
 ```
 backward
 ```
-
 ### ⌘ Expected JSON value type changes from number to integer
 Because every integer is a number, but not vice versa, such a change is forward compatible.
+
 #### Input
 ##### JSON schema differences
 ```
@@ -68,9 +94,9 @@ Because every integer is a number, but not vice versa, such a change is forward 
 ```
 forward
 ```
-
 ### ⌘ Expected JSON value types is extended
 Because more value types than before are accepted, this change is backward compatible.
+
 #### Input
 ##### JSON schema differences
 ```
@@ -86,9 +112,9 @@ Because more value types than before are accepted, this change is backward compa
 ```
 backward
 ```
-
 ### ⌘ Expected JSON value types is reduced
 Because less value types than before are accepted, this change is forward compatible.
+
 #### Input
 ##### JSON schema differences
 ```
@@ -104,9 +130,9 @@ Because less value types than before are accepted, this change is forward compat
 ```
 forward
 ```
-
 ### ⌘ Expected JSON value types including number is extended by integer
 Because every integer is a number, such a change is fully compatible.
+
 #### Input
 ##### JSON schema differences
 ```
@@ -122,9 +148,9 @@ Because every integer is a number, such a change is fully compatible.
 ```
 full
 ```
-
 ### ⌘ Expected JSON value types including integer is extended by number
 Because not every integer is a number, such a change is backward compatible.
+
 #### Input
 ##### JSON schema differences
 ```
@@ -140,9 +166,9 @@ Because not every integer is a number, such a change is backward compatible.
 ```
 backward
 ```
-
 ### ⌘ Expected JSON value types including integer and number is reduced by integer
 Because every integer is a number, such a change is fully compatible.
+
 #### Input
 ##### JSON schema differences
 ```
@@ -158,9 +184,9 @@ Because every integer is a number, such a change is fully compatible.
 ```
 full
 ```
-
 ### ⌘ Expected JSON value types including integer and number is reuced by number
 Because not every integer is a number, such a change is forward compatible.
+
 #### Input
 ##### JSON schema differences
 ```
@@ -176,11 +202,15 @@ Because not every integer is a number, such a change is forward compatible.
 ```
 forward
 ```
-
 ---
 ## JSON Schema Difference Calculation
+Diff TODO
+
+
+
 ### ⌘ Comparing identical schemata
 When two identical schemata are compared, no difference should be found.
+
 #### Input
 ##### Previous JSON schema
 ```json
@@ -194,9 +224,9 @@ false
 ```
 no differences
 ```
-
 ### ⌘ Changing expected JSON value type from null to boolean
 Any change in expected JSON value type should be accounted as a difference.
+
 #### Input
 ##### Previous JSON schema
 ```json
@@ -215,11 +245,15 @@ Any change in expected JSON value type should be accounted as a difference.
   to
   - boolean
 ```
-
 ---
 ## JSON Values Validation
+Validation TODO
+
+
+
 ### ⌘ A null value against a schema accepting only null values
 A null value conforms to the schema.
+
 #### Input
 ##### JSON schema
 ```json
@@ -233,9 +267,9 @@ null
 ```
 ✓ no violations
 ```
-
 ### ⌘ A boolean value against a schema accepting only null values
 A boolean value does not conform to the schema as only null values do.
+
 #### Input
 ##### JSON schema
 ```json
@@ -252,9 +286,9 @@ true
   JSON path: $
   Invalid type. Expected null but got boolean.
 ```
-
 ### ⌘ A boolean value against a schema accepting only null and string values
 A boolean value does not conform to the schema as only null or string values do.
+
 #### Input
 ##### JSON schema
 ```json
@@ -271,9 +305,9 @@ true
   JSON path: $
   Invalid type. Expected null or string but got boolean.
 ```
-
 ### ⌘ An array with 2 out of 5 items not matching the desired item type
 When schema requires items to conform to a certain schema, every single value in the array has to.
+
 #### Input
 ##### JSON schema
 ```json
@@ -298,9 +332,9 @@ When schema requires items to conform to a certain schema, every single value in
     JSON path: $[3]
     Invalid type. Expected null but got boolean.
 ```
-
 ### ⌘ An array with forbidden duplicate value.
 When schema requires items to be unique, any duplicate occurrence of any value will cause a validation failure.
+
 #### Input
 ##### JSON schema
 ```json
@@ -333,4 +367,3 @@ When schema requires items to be unique, any duplicate occurrence of any value w
     JSON path: $[5]
     Non-unique array item.
 ```
-

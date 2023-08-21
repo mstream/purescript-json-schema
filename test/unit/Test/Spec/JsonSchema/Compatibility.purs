@@ -4,6 +4,8 @@ import Prelude
 
 import Data.Foldable (foldMap, traverse_)
 import Data.List (List(..))
+import Data.Markdown (Document)
+import Data.Markdown as M
 import Data.Maybe (Maybe(..))
 import Data.Set (Set)
 import Data.Set as Set
@@ -19,12 +21,11 @@ import Test.Utils (exampleTestCase)
 
 type DiffExample = Example (Set Difference) Compatibility
 
-renderInput ∷ Set Difference → String
+renderInput ∷ Set Difference → Document
 renderInput differences =
-  "##### JSON schema differences\n"
-    <> "```\n"
-    <> String.joinWith "\n" renderDifferences
-    <> "\n```"
+  [ M.heading5 "JSON schema differences"
+  , M.codeBlock' $ String.joinWith "\n" renderDifferences
+  ]
   where
   renderDifferences ∷ Array String
   renderDifferences =
@@ -36,11 +37,9 @@ renderInput differences =
       )
       differences
 
-renderOutput ∷ Compatibility → String
+renderOutput ∷ Compatibility → Document
 renderOutput compatibility =
-  "```\n"
-    <> Compatibility.renderCompatibility compatibility
-    <> "\n```"
+  [ M.codeBlock' $ Compatibility.renderCompatibility compatibility ]
 
 transform ∷ Set Difference → Compatibility
 transform = Compatibility.calculate
