@@ -3,10 +3,11 @@ module Test.Docs where
 import Prelude
 
 import Data.Array as Array
-import Data.Foldable (class Foldable, foldMap, foldl)
+import Data.Foldable (class Foldable, foldMap, foldl, traverse_)
 import Data.FoldableWithIndex
   ( class FoldableWithIndex
   , foldMapWithIndex
+  , traverseWithIndex_
   )
 import Data.Map (Map)
 import Data.Map as Map
@@ -14,10 +15,11 @@ import Data.Markdown (CodeBlockType(..), Document, Node)
 import Data.Markdown as M
 import Data.Mermaid.FlowChart (FlowChartDef(..), Orientation(..))
 import Data.Mermaid.FlowChart as FlowChart
+import Data.Set (Set)
 import Data.String (Pattern(..), Replacement(..))
 import Data.String as String
 import Effect (Effect)
-import Effect.Aff (launchAff_)
+import Effect.Aff (Aff, launchAff_)
 import Node.Encoding (Encoding(..))
 import Node.FS.Aff as FS
 import Test.Spec.JsonSchema.Compatibility as Compatibility
@@ -91,9 +93,7 @@ renderMermaid flowChartDef =
 
 main ∷ Effect Unit
 main = launchAff_
-  $ FS.writeTextFile UTF8 "docs/src/examples/README.generated.md"
-  $ M.render
-  $ printExamples
+  $ saveExamples
   $ groupExamplesByCategory examples
   where
   examples ∷ Array PrintableExample
@@ -134,49 +134,83 @@ groupExamplesByCategory = foldl
   )
   Map.empty
 
-printExamples
-  ∷ ∀ f
-  . FoldableWithIndex Category f
-  ⇒ f (Array PrintableExample)
-  → Document
-printExamples examplesByCategory =
-  [ M.heading1 "Examples" ]
-    <>
-      ( printTableOfContents
-          $ foldMapWithIndex
-              (\category _ → [ category ])
-              examplesByCategory
-      )
-    <> foldMapWithIndex printCategory examplesByCategory
+saveExamples ∷ Map Category (Array PrintableExample) → Aff Unit
+saveExamples examplesByCategory = do
+  saveTableOfContents prefix $ Map.keys examplesByCategory
+  traverseWithIndex_ (saveCategory prefix) examplesByCategory
   where
-  printTableOfContents ∷ Array Category → Document
-  printTableOfContents = Array.singleton
+  prefix ∷ String
+  prefix = "docs/src"
+
+saveTableOfContents ∷ String → Set Category → Aff Unit
+saveTableOfContents prefix =
+  FS.writeTextFile UTF8 (prefix <> "/SUMMARY.md")
+    <<< M.render
+    <<< printTableOfContents
+
+saveCategory
+  ∷ String
+  → Category
+  → Array PrintableExample
+  → Aff Unit
+saveCategory prefix category examples =
+  FS.writeTextFile UTF8 path
+    $ M.render
+    $ printCategory category examples
+  where
+  path ∷ String
+  path = prefix
+    <> "/examples/"
+    <> (formatAnchor $ renderCategory category)
+    <> ".md"
+
+printTableOfContents ∷ Set Category → Document
+printTableOfContents = foldMap f
+  where
+  f ∷ Category → Document
+  f = Array.singleton
     <<< M.list
-    <<< map printTableOfContentsEntry
+    <<< Array.singleton
+    <<< printTableOfContentsEntry
 
-  printTableOfContentsEntry ∷ Category → Node
-  printTableOfContentsEntry category = M.link
-    (renderCategory category)
-    ("#" <> (formatAnchor $ renderCategory category))
+printTableOfContentsEntry ∷ Category → Node
+printTableOfContentsEntry category = M.link
+  (renderCategory category)
+  ((formatAnchor $ "examples/" <> renderCategory category) <> ".md")
 
-  printCategory ∷ Category → Array PrintableExample → Document
-  printCategory category examples =
-    [ M.rule
-    , M.heading2 $ renderCategory category
-    , M.paragraph $ printCategoryDescription category
-    ]
-      <> foldMap printExample examples
+formatAnchor ∷ String → String
+formatAnchor = String.replaceAll (Pattern " ") (Replacement "-")
+  <<< String.toLower
 
-  printExample ∷ PrintableExample → Document
-  printExample { description, input, output, title } =
-    [ M.heading3 $ "⌘ " <> title
-    , M.paragraph description
-    , M.heading4 "Input"
-    ]
-      <> input
-      <> [ M.heading4 "Output" ]
-      <> output
+printCategory ∷ Category → Array PrintableExample → Document
+printCategory category examples =
+  [ M.rule
+  , M.heading2 $ renderCategory category
+  , M.paragraph $ printCategoryDescription category
+  , M.paragraph "Examples:"
+  ]
+    <> printCategoryTableOfContents examples
+    <> foldMap printExample examples
 
-  formatAnchor ∷ String → String
-  formatAnchor = String.replaceAll (Pattern " ") (Replacement "-")
-    <<< String.toLower
+printCategoryTableOfContents ∷ Array PrintableExample → Document
+printCategoryTableOfContents = foldMap f
+  where
+  f ∷ PrintableExample → Document
+  f = Array.singleton
+    <<< M.list
+    <<< Array.singleton
+    <<< printCategoryTableOfContentsEntry
+
+printCategoryTableOfContentsEntry ∷ PrintableExample → Node
+printCategoryTableOfContentsEntry { title } = M.link title
+  $ "#" <> formatAnchor title
+
+printExample ∷ PrintableExample → Document
+printExample { description, input, output, title } =
+  [ M.heading3 title
+  , M.paragraph description
+  , M.heading4 "Input"
+  ]
+    <> input
+    <> [ M.heading4 "Output" ]
+    <> output

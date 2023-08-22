@@ -1,3 +1,3 @@
-# Summary
-
-- [Examples](./examples/README.generated.md)
+- [JSON Schema Change Compatibility Checks](examples/json-schema-change-compatibility-checks.md)
+- [JSON Schema Difference Calculation](examples/json-schema-difference-calculation.md)
+- [JSON Values Validation](examples/json-values-validation.md)
