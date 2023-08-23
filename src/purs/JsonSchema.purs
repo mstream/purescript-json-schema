@@ -27,6 +27,7 @@ instance Show JsonSchema where
 
 type Keywords =
   { items ∷ Maybe JsonSchema
+  , multipleOf ∷ Maybe Number
   , not ∷ Maybe JsonSchema
   , required ∷ Set String
   , typeKeyword ∷ Maybe (Set JsonValueType)
@@ -36,6 +37,7 @@ type Keywords =
 defaultKeywords ∷ Keywords
 defaultKeywords =
   { items: Nothing
+  , multipleOf: Nothing
   , not: Nothing
   , required: Set.empty
   , typeKeyword: Nothing

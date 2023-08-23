@@ -13,7 +13,6 @@ import Data.Array as Array
 import Data.Foldable (foldMap, foldl)
 import Data.FoldableWithIndex (foldMapWithIndex)
 import Data.Generic.Rep (class Generic)
-import Data.Int as Int
 import Data.List (List(..), (:))
 import Data.Map (Map)
 import Data.Map as Map
@@ -33,6 +32,7 @@ import JsonSchema.JsonPath (JsonPath, JsonPathSegment(..))
 import JsonSchema.JsonPath as JsonPath
 import JsonSchema.SchemaPath (SchemaPath, SchemaPathSegment(..))
 import JsonSchema.SchemaPath as SchemaPath
+import Utils (isInteger)
 
 type Violation =
   { jsonPath ∷ JsonPath
@@ -43,6 +43,7 @@ type Violation =
 data ViolationReason
   = AlwaysFailingSchema
   | InvalidArray (Set Violation)
+  | InvalidMultiple { expectedMultiple ∷ Number, value ∷ Number }
   | NonUniqueArrayItem
   | TypeMismatch
       { actualJsonValueType ∷ JsonValueType
@@ -74,6 +75,8 @@ renderViolationReason = case _ of
           [ "-" ] <> (("  " <> _) <$> renderViolation violation)
       )
       itemViolations
+  InvalidMultiple { expectedMultiple, value } →
+    [ show value <> " is not a multiple of " <> show expectedMultiple ]
   NonUniqueArrayItem →
     [ "Non-unique array item." ]
   TypeMismatch { actualJsonValueType, allowedJsonValueTypes } →
@@ -115,7 +118,13 @@ validateAgainst = go Nil Nil
     notViolations <> typeKeywordViolations <> A.caseJson
       (const Set.empty)
       (const Set.empty)
-      (const Set.empty)
+      ( \number →
+          validateMultipleOf
+            schemaPath
+            jsonPath
+            number
+            keywords.multipleOf
+      )
       (const Set.empty)
       ( \array →
           let
@@ -219,10 +228,26 @@ validateUniqueItems schemaPath jsonPath itemJsons =
     Map.empty
     itemJsons
 
+validateMultipleOf
+  ∷ SchemaPath → JsonPath → Number → Maybe Number → Set Violation
+validateMultipleOf schemaPath jsonPath x = case _ of
+  Just expectedMultiple →
+    if isInteger $ x / expectedMultiple then
+      Set.empty
+    else Set.singleton
+      { jsonPath
+      , reason: InvalidMultiple { expectedMultiple, value: x }
+      , schemaPath: MultipleOf : schemaPath
+      }
+  Nothing →
+    Set.empty
+
 validateTypeKeyword
   ∷ SchemaPath → JsonPath → Json → Set JsonValueType → Set Violation
 validateTypeKeyword schemaPath jsonPath json allowedJsonValueTypes =
-  if jsonValueType `Set.member` allowedJsonValueTypes then Set.empty
+  if jsonValueType == JsonInteger && integersAreAllowed then Set.empty
+  else if jsonValueType `Set.member` allowedJsonValueTypes then
+    Set.empty
   else Set.singleton
     { jsonPath
     , reason: TypeMismatch
@@ -230,12 +255,17 @@ validateTypeKeyword schemaPath jsonPath json allowedJsonValueTypes =
     , schemaPath: TypeKeyword : schemaPath
     }
   where
+  integersAreAllowed ∷ Boolean
+  integersAreAllowed =
+    JsonInteger `Set.member` allowedJsonValueTypes
+      || JsonNumber `Set.member` allowedJsonValueTypes
+
   jsonValueType ∷ JsonValueType
   jsonValueType = A.caseJson
     (const JsonNull)
     (const JsonBoolean)
     ( \x →
-        if (Int.toNumber $ Int.trunc x) == x then JsonInteger
+        if isInteger x then JsonInteger
         else JsonNumber
     )
     (const JsonString)

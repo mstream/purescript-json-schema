@@ -11,8 +11,10 @@ import Data.Maybe (Maybe(..), maybe)
 import Data.Set (Set)
 import Data.Set as Set
 import Data.Traversable (traverse)
+import Foreign.Object (Object)
 import Foreign.Object as Object
 import JsonSchema (JsonSchema(..), JsonValueType(..))
+import JsonSchema as Schema
 
 parseSchema ∷ Json → String \/ JsonSchema
 parseSchema json = parseBooleanSchema json <|> parseObjectSchema json
@@ -30,15 +32,17 @@ parseObjectSchema keywordsJson = do
     (parsingErrorMessage "schema is not a JSON object")
     (A.toObject keywordsJson)
 
-  items ← maybe (Right Nothing)
+  items ← maybe (Right Schema.defaultKeywords.items)
     (map Just <<< parseSchema)
     (Object.lookup "items" schemaObject)
 
-  not ← maybe (Right Nothing)
+  multipleOf ← parseMultipleOf schemaObject
+
+  not ← maybe (Right Schema.defaultKeywords.not)
     (map Just <<< parseSchema)
     (Object.lookup "not" schemaObject)
 
-  required ← maybe (Right Set.empty)
+  required ← maybe (Right Schema.defaultKeywords.required)
     parseRequiredKeywordSpec
     (Object.lookup "required" schemaObject)
 
@@ -46,17 +50,33 @@ parseObjectSchema keywordsJson = do
     Just typeKeywordSpecJson →
       Just <$> parseTypeKeywordSpec typeKeywordSpecJson
     Nothing →
-      Right Nothing
+      Right Schema.defaultKeywords.typeKeyword
 
-  uniqueItems ← maybe (Right false)
+  uniqueItems ← maybe (Right Schema.defaultKeywords.uniqueItems)
     ( \json →
-        if A.isNull json then Right false
+        if A.isNull json then Right Schema.defaultKeywords.uniqueItems
         else note "Unique items is not a boolean." $ A.toBoolean json
     )
     (Object.lookup "uniqueItems" schemaObject)
 
   pure $ ObjectSchema
-    { items, not, required, typeKeyword, uniqueItems }
+    { items, multipleOf, not, required, typeKeyword, uniqueItems }
+
+parseMultipleOf ∷ Object Json → String \/ Maybe Number
+parseMultipleOf = Object.lookup "multipleOf" >>> case _ of
+  Just json →
+    if A.isNull json then Right default
+    else case A.toNumber json of
+      Just x →
+        if x > zero then Right $ Just x
+        else Left "multipleOf must be greater than zero."
+      Nothing →
+        Left "multipleOf is not a number."
+  Nothing →
+    Right default
+  where
+  default ∷ Maybe Number
+  default = Schema.defaultKeywords.multipleOf
 
 parseTypeKeywordSpec ∷ Json → String \/ Set JsonValueType
 parseTypeKeywordSpec specJson = do

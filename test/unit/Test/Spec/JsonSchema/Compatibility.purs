@@ -162,6 +162,33 @@ examples =
           }
       )
       Forward
+  , scenario
+      "the new value of multipleOf is divisible by the old one"
+      "Because every multiple the new value is also a multiple of the old value, such a change is backward compatible"
+      ( Set.singleton
+          { differenceType: MultipleOfChange (Just 2.0) (Just 4.0)
+          , path: Nil
+          }
+      )
+      Backward
+  , scenario
+      "the old value of multipleOf is divisible by the new one"
+      "Because every multiple the old value is also a multiple of the new value, such a change is forward compatible"
+      ( Set.singleton
+          { differenceType: MultipleOfChange (Just 4.0) (Just 2.0)
+          , path: Nil
+          }
+      )
+      Forward
+  , scenario
+      "old and new value of multipleOf are not each other's factors"
+      "In this situation, there are potentially some numbers that are not divisible by neither of multipleOf values. Therefore, such a change is incompatible."
+      ( Set.singleton
+          { differenceType: MultipleOfChange (Just 2.0) (Just 5.0)
+          , path: Nil
+          }
+      )
+      None
   ]
 
 spec ∷ TestSpec

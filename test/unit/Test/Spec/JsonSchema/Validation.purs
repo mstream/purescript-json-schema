@@ -110,6 +110,29 @@ examples =
           , schemaPath: TypeKeyword : Nil
           }
       )
+  , positiveScenario
+      "An whole number value against a schema accepting only numbers"
+      "All whole number values conform to the schema as every integer is a number."
+      { json: A.fromNumber 1.0
+      , schema: ObjectSchema $ Schema.defaultKeywords
+          { typeKeyword = Just $ Set.fromFoldable [ JsonNumber ] }
+      }
+  , negativeScenario
+      "A fractional number value against a schema accepting only integers"
+      "Not all number values conform to the schema as not every number is a integer."
+      { json: A.fromNumber 1.5
+      , schema: ObjectSchema $ Schema.defaultKeywords
+          { typeKeyword = Just $ Set.fromFoldable [ JsonInteger ] }
+      }
+      ( Set.singleton $
+          { jsonPath: Nil
+          , reason: TypeMismatch
+              { allowedJsonValueTypes: Set.fromFoldable [ JsonInteger ]
+              , actualJsonValueType: JsonNumber
+              }
+          , schemaPath: TypeKeyword : Nil
+          }
+      )
   , negativeScenario
       "A boolean value against a schema accepting only null and string values"
       "A boolean value does not conform to the schema as only null or string values do."
@@ -202,6 +225,32 @@ examples =
                 }
               ]
           , schemaPath: Nil
+          }
+      )
+  , positiveScenario
+      "Number 7.5 against a schema accepting only multiples of 2.5"
+      "Number 7.5 conforms to the schema as 7.5 is 2.5 times 3."
+      { json: A.fromNumber 7.5
+      , schema: ObjectSchema $ Schema.defaultKeywords
+          { multipleOf = Just 2.5
+          , typeKeyword = Just $ Set.fromFoldable [ JsonNumber ]
+          }
+      }
+  , negativeScenario
+      "Number 7 against a schema accepting only multiples of 2.5"
+      "Number 7 does not conform the schema as 7.5 is not a multiple of 2.5."
+      { json: A.fromNumber 7.0
+      , schema:
+          ObjectSchema $ Schema.defaultKeywords
+            { multipleOf = Just 2.5
+            , typeKeyword = Just $ Set.fromFoldable [ JsonNumber ]
+            }
+      }
+      ( Set.singleton $
+          { jsonPath: Nil
+          , reason: InvalidMultiple
+              { expectedMultiple: 2.5, value: 7.0 }
+          , schemaPath: MultipleOf : Nil
           }
       )
   ]

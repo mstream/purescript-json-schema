@@ -1,4 +1,3 @@
----
 ## JSON Schema Change Compatibility Checks
 **Backward compatibility** - an ability of a system to understand input intended for previous versions of itself
 
@@ -39,6 +38,10 @@ Examples:
 - [Expected JSON value types including integer is extended by number](#expected-json-value-types-including-integer-is-extended-by-number)
 - [Expected JSON value types including integer and number is reduced by integer](#expected-json-value-types-including-integer-and-number-is-reduced-by-integer)
 - [Expected JSON value types including integer and number is reuced by number](#expected-json-value-types-including-integer-and-number-is-reuced-by-number)
+- [the new value of multipleOf is divisible by the old one](#the-new-value-of-multipleof-is-divisible-by-the-old-one)
+- [the old value of multipleOf is divisible by the new one](#the-old-value-of-multipleof-is-divisible-by-the-new-one)
+- [old and new value of multipleOf are not each other's factors](#old-and-new-value-of-multipleof-are-not-each-other's-factors)
+---
 ### No JSON schema differences
 When there is not JSON schema differences, schema change is fully compatible.
 
@@ -51,6 +54,7 @@ no differences
 ```
 full
 ```
+---
 ### Expected JSON value type changes from null to boolean
 Because no boolean value can satisfy null JSON type constraint, and vice versa, such a change is incompatible.
 
@@ -68,6 +72,7 @@ Because no boolean value can satisfy null JSON type constraint, and vice versa, 
 ```
 none
 ```
+---
 ### Expected JSON value type changes from integer to number
 Because every integer is a number, but not vice versa, such a change is backward compatible.
 
@@ -85,6 +90,7 @@ Because every integer is a number, but not vice versa, such a change is backward
 ```
 backward
 ```
+---
 ### Expected JSON value type changes from number to integer
 Because every integer is a number, but not vice versa, such a change is forward compatible.
 
@@ -102,6 +108,7 @@ Because every integer is a number, but not vice versa, such a change is forward 
 ```
 forward
 ```
+---
 ### Expected JSON value types is extended
 Because more value types than before are accepted, this change is backward compatible.
 
@@ -120,6 +127,7 @@ Because more value types than before are accepted, this change is backward compa
 ```
 backward
 ```
+---
 ### Expected JSON value types is reduced
 Because less value types than before are accepted, this change is forward compatible.
 
@@ -138,6 +146,7 @@ Because less value types than before are accepted, this change is forward compat
 ```
 forward
 ```
+---
 ### Expected JSON value types including number is extended by integer
 Because every integer is a number, such a change is fully compatible.
 
@@ -156,6 +165,7 @@ Because every integer is a number, such a change is fully compatible.
 ```
 full
 ```
+---
 ### Expected JSON value types including integer is extended by number
 Because not every integer is a number, such a change is backward compatible.
 
@@ -174,6 +184,7 @@ Because not every integer is a number, such a change is backward compatible.
 ```
 backward
 ```
+---
 ### Expected JSON value types including integer and number is reduced by integer
 Because every integer is a number, such a change is fully compatible.
 
@@ -192,6 +203,7 @@ Because every integer is a number, such a change is fully compatible.
 ```
 full
 ```
+---
 ### Expected JSON value types including integer and number is reuced by number
 Because not every integer is a number, such a change is forward compatible.
 
@@ -209,4 +221,49 @@ Because not every integer is a number, such a change is forward compatible.
 #### Output
 ```
 forward
+```
+---
+### the new value of multipleOf is divisible by the old one
+Because every multiple the new value is also a multiple of the old value, such a change is backward compatible
+
+#### Input
+##### JSON schema differences
+```
+-
+  Schema path: #
+  multipleOf changed from 2.0 to 4.0
+```
+#### Output
+```
+backward
+```
+---
+### the old value of multipleOf is divisible by the new one
+Because every multiple the old value is also a multiple of the new value, such a change is forward compatible
+
+#### Input
+##### JSON schema differences
+```
+-
+  Schema path: #
+  multipleOf changed from 4.0 to 2.0
+```
+#### Output
+```
+forward
+```
+---
+### old and new value of multipleOf are not each other's factors
+In this situation, there are potentially some numbers that are not divisible by neither of multipleOf values. Therefore, such a change is incompatible.
+
+#### Input
+##### JSON schema differences
+```
+-
+  Schema path: #
+  multipleOf changed from 2.0 to 5.0
+```
+#### Output
+```
+none
 ```

@@ -3,12 +3,8 @@ module Test.Docs where
 import Prelude
 
 import Data.Array as Array
-import Data.Foldable (class Foldable, foldMap, foldl, traverse_)
-import Data.FoldableWithIndex
-  ( class FoldableWithIndex
-  , foldMapWithIndex
-  , traverseWithIndex_
-  )
+import Data.Foldable (class Foldable, foldMap, foldl)
+import Data.FoldableWithIndex (traverseWithIndex_)
 import Data.Map (Map)
 import Data.Map as Map
 import Data.Markdown (CodeBlockType(..), Document, Node)
@@ -184,8 +180,7 @@ formatAnchor = String.replaceAll (Pattern " ") (Replacement "-")
 
 printCategory ∷ Category → Array PrintableExample → Document
 printCategory category examples =
-  [ M.rule
-  , M.heading2 $ renderCategory category
+  [ M.heading2 $ renderCategory category
   , M.paragraph $ printCategoryDescription category
   , M.paragraph "Examples:"
   ]
@@ -207,7 +202,8 @@ printCategoryTableOfContentsEntry { title } = M.link title
 
 printExample ∷ PrintableExample → Document
 printExample { description, input, output, title } =
-  [ M.heading3 title
+  [ M.rule
+  , M.heading3 title
   , M.paragraph description
   , M.heading4 "Input"
   ]

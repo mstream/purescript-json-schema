@@ -32,49 +32,19 @@ genObjectSchema = Lazy.defer \_ →
   ObjectSchema <$>
     do
       items ← GenCommon.genMaybe genSchema
+      multipleOf ← GenCommon.genMaybe $ Gen.chooseFloat 0.1 10.0
       not ← GenCommon.genMaybe genSchema
       required ← genSet StringGen.genAlphaString
       typeKeyword ← GenCommon.genMaybe $ genSet genJsonValueType
       uniqueItems ← Gen.chooseBool
-      pure { items, not, required, typeKeyword, uniqueItems }
+      pure
+        { items, multipleOf, not, required, typeKeyword, uniqueItems }
 
 genSet ∷ ∀ a m. MonadGen m ⇒ MonadRec m ⇒ Ord a ⇒ m a → m (Set a)
 genSet genItem = Set.fromFoldable <$> genItems
   where
   genItems ∷ m (List a)
   genItems = Gen.unfoldable genItem
-
-{-
-genKeyword = Gen.resize (min 3) (Gen.sized go)
-  where
-  go ∷ Int → m Keyword
-  go size = if size == 0 then genLeaf else Gen.resize (_ - 1) genBranch
-
-  genBranch ∷ m Keyword
-  genBranch = Gen.oneOf $ genItemsKeyword :| [ genNotKeyword ]
-
-  genLeaf ∷ m Keyword
-  genLeaf = Gen.oneOf $ genTypeKeyword :| []
--}
-
-{-
-genItemsKeyword
-  ∷ ∀ m. Lazy (m JsonSchema) ⇒ MonadGen m ⇒ MonadRec m ⇒ m Keyword
-genItemsKeyword = ItemsKeyword <$> genSchema
-
-genNotKeyword
-  ∷ ∀ m. Lazy (m JsonSchema) ⇒ MonadGen m ⇒ MonadRec m ⇒ m Keyword
-genNotKeyword = NotKeyword <$> genSchema
--}
-
-{-
-genTypeKeyword ∷ ∀ m. MonadGen m ⇒ MonadRec m ⇒ m Keyword
-genTypeKeyword = (TypeKeyword <<< Set.fromFoldable)
-  <$> genJsonValueTypes
-  where
-  genJsonValueTypes ∷ m (List JsonValueType)
-  genJsonValueTypes = Gen.unfoldable genJsonValueType
--}
 
 genJsonValueType ∷ ∀ m. MonadGen m ⇒ m JsonValueType
 genJsonValueType = Gen.elements

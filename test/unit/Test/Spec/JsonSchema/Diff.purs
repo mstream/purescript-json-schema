@@ -95,6 +95,27 @@ examples =
           , path: Nil
           }
       )
+  , scenario
+      "Changing multipleOf value"
+      "TODO"
+      { nextSchema: ObjectSchema
+          $ Schema.defaultKeywords
+              { multipleOf = Just 4.0
+              , typeKeyword = Just $ Set.singleton JsonNumber
+              }
+      , previousSchema: ObjectSchema
+          $ Schema.defaultKeywords
+              { multipleOf = Just 2.0
+              , typeKeyword = Just $ Set.singleton JsonNumber
+              }
+      }
+      ( Set.singleton
+          { differenceType: MultipleOfChange
+              (Just 2.0)
+              (Just 4.0)
+          , path: Nil
+          }
+      )
   ]
 
 spec ∷ TestSpec

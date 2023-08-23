@@ -11,6 +11,7 @@ import Data.Set as Set
 import Data.Tuple.Nested (type (/\), (/\))
 import Foreign.Object as Object
 import JsonSchema (JsonSchema(..), JsonValueType(..), Keywords)
+import JsonSchema as Schema
 
 printSchema ∷ JsonSchema → Json
 printSchema = case _ of
@@ -24,6 +25,7 @@ printObjectSchema keywords = A.fromObject
   $ Object.fromFoldable
   $
     printItems keywords.items
+      <> printMultipleOf keywords.multipleOf
       <> printNot keywords.not
       <> printRequired keywords.required
       <> printTypeKeyword keywords.typeKeyword
@@ -38,6 +40,12 @@ printObjectSchema keywords = A.fromObject
   printNot mbSchema = maybe []
     (Array.singleton <<< ("not" /\ _) <<< printSchema)
     mbSchema
+
+printMultipleOf ∷ Maybe Number → Array (String /\ Json)
+printMultipleOf = case _ of
+  Just x →
+    [ "multipleOf" /\ A.fromNumber x ]
+  Nothing → []
 
 printRequired ∷ Set String → Array (String /\ Json)
 printRequired propertyNames =
@@ -55,7 +63,8 @@ printTypeKeyword = case _ of
 
 printUniqueItems ∷ Boolean → Array (String /\ Json)
 printUniqueItems bool =
-  if bool then [ "uniqueItems" /\ A.jsonTrue ] else []
+  if bool == Schema.defaultKeywords.uniqueItems then []
+  else [ "uniqueItems" /\ A.fromBoolean bool ]
 
 printTypeKeywordSpec ∷ Set JsonValueType → Json
 printTypeKeywordSpec = A.fromArray

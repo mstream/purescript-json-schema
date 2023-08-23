@@ -7,6 +7,7 @@ module JsonSchema.Diff
 
 import Prelude
 
+import Data.Array as Array
 import Data.Foldable (foldMap)
 import Data.Generic.Rep (class Generic)
 import Data.List (List(..))
@@ -23,6 +24,7 @@ type Difference = { differenceType ∷ DifferenceType, path ∷ SchemaPath }
 
 data DifferenceType
   = BooleanSchemaChange Boolean
+  | MultipleOfChange (Maybe Number) (Maybe Number)
   | SchemaChangeFromBooleanToObject Boolean Keywords
   | SchemaChangeFromObjectToBoolean Keywords Boolean
   | TypeChange (Maybe (Set JsonValueType)) (Maybe (Set JsonValueType))
@@ -51,15 +53,34 @@ calculate = go Nil
   calculateObjectSchemataDiff
     ∷ SchemaPath → Keywords → Keywords → Set Difference
   calculateObjectSchemataDiff path previousKeywords nextKeywords =
-    if previousKeywords.typeKeyword == nextKeywords.typeKeyword then
-      Set.empty
-    else
-      Set.singleton
-        { differenceType: TypeChange
-            previousKeywords.typeKeyword
-            nextKeywords.typeKeyword
-        , path
-        }
+    foldMap
+      (\f → f path previousKeywords nextKeywords)
+      [ calculateMultipleOfDiff, calculateTypeKeywordDiff ]
+
+calculateMultipleOfDiff
+  ∷ SchemaPath → Keywords → Keywords → Set Difference
+calculateMultipleOfDiff path previousKeywords nextKeywords =
+  if previousKeywords.multipleOf == nextKeywords.multipleOf then
+    Set.empty
+  else Set.singleton
+    { differenceType: MultipleOfChange
+        previousKeywords.multipleOf
+        nextKeywords.multipleOf
+    , path
+    }
+
+calculateTypeKeywordDiff
+  ∷ SchemaPath → Keywords → Keywords → Set Difference
+calculateTypeKeywordDiff path previousKeywords nextKeywords =
+  if previousKeywords.typeKeyword == nextKeywords.typeKeyword then
+    Set.empty
+  else
+    Set.singleton
+      { differenceType: TypeChange
+          previousKeywords.typeKeyword
+          nextKeywords.typeKeyword
+      , path
+      }
 
 renderDifference ∷ Difference → Array String
 renderDifference { differenceType, path } =
@@ -72,6 +93,12 @@ renderDifference { differenceType, path } =
       [ "Boolean schema changed to reject-all" ]
     BooleanSchemaChange true →
       [ "Boolean schema changed to allow-all" ]
+    MultipleOfChange before after →
+      [ "multipleOf changed from "
+          <> renderOptionalNumber before
+          <> " to "
+          <> renderOptionalNumber after
+      ]
     SchemaChangeFromBooleanToObject _ _ →
       [ "Boolean schema changed to object schema" ]
     SchemaChangeFromObjectToBoolean _ _ →
@@ -81,6 +108,9 @@ renderDifference { differenceType, path } =
         <> renderJsonValueTypes typesBefore
         <> [ "to" ]
         <> renderJsonValueTypes typesAfter
+
+  renderOptionalNumber ∷ Maybe Number → String
+  renderOptionalNumber = maybe "unspecified" show
 
   renderJsonValueTypes ∷ Maybe (Set JsonValueType) → Array String
   renderJsonValueTypes = maybe
