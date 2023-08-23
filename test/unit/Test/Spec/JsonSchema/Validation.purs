@@ -7,6 +7,7 @@ import Data.Argonaut.Core (Json)
 import Data.Argonaut.Core as A
 import Data.Argonaut.Gen as AGen
 import Data.Foldable (foldMap, traverse_)
+import Data.Int as Int
 import Data.List (List(..), (:))
 import Data.List as List
 import Data.Markdown (CodeBlockType(..), Document)
@@ -15,7 +16,10 @@ import Data.Maybe (Maybe(..))
 import Data.Set (Set)
 import Data.Set as Set
 import Data.String as String
-import JsonSchema (JsonSchema(..), JsonValueType(..))
+import Data.String.Gen as StringGen
+import Data.Tuple.Nested ((/\))
+import Foreign.Object as Object
+import JsonSchema (JsonSchema(..), JsonValueType(..), Keywords)
 import JsonSchema as Schema
 import JsonSchema.Codec.Printing as Printing
 import JsonSchema.Gen as SchemaGen
@@ -24,6 +28,7 @@ import JsonSchema.SchemaPath (SchemaPathSegment(..))
 import JsonSchema.Validation (Violation, ViolationReason(..))
 import JsonSchema.Validation as Validation
 import Test.QuickCheck (Result(..))
+import Test.QuickCheck.Gen (Gen)
 import Test.Spec (describe)
 import Test.Types (Example, TestLength(..), TestSpec)
 import Test.Utils (exampleTestCase, failWithDetails, generativeTestCase)
@@ -262,6 +267,71 @@ spec = describe "Validation" do
 
     traverse_ exampleTestCase examples
 
+    keywordAppliesOnlyToProperty
+      { genNonApplicableJson: AGen.genJson `Gen.suchThat`
+          (not A.isArray)
+      , genValidApplicableJson: A.fromArray <$>
+          (Gen.unfoldable $ pure A.jsonNull)
+      , jsonDescription: "array"
+      , keywordName: "items"
+      , keywords:
+          Schema.defaultKeywords
+            { items = Just $ ObjectSchema $
+                Schema.defaultKeywords
+                  { typeKeyword = Just $ Set.singleton JsonNull }
+            }
+      }
+
+    keywordAppliesOnlyToProperty
+      { genNonApplicableJson: AGen.genJson `Gen.suchThat`
+          (not A.isNumber)
+      , genValidApplicableJson: A.fromNumber <$> do
+          i ← Gen.chooseInt (-1000) 1000
+          pure $ Int.toNumber $ 2 * i
+      , jsonDescription: "numeric"
+      , keywordName: "multipleOf"
+      , keywords: Schema.defaultKeywords { multipleOf = Just 2.0 }
+      }
+
+    keywordAppliesOnlyToProperty
+      { genNonApplicableJson: AGen.genJson `Gen.suchThat`
+          (not A.isObject)
+      , genValidApplicableJson: do
+          otherProperties ← Gen.unfoldable do
+            propertyName ← StringGen.genAlphaString
+            json ← AGen.genJson
+            pure $ propertyName /\ json
+
+          requiredProperty ← do
+            json ← AGen.genJson
+            pure $ "requiredProperty" /\ json
+
+          pure
+            $ A.fromObject
+            $ Object.fromFoldable
+            $ [ requiredProperty ] <> otherProperties
+      , jsonDescription: "object"
+      , keywordName: "required"
+      , keywords:
+          Schema.defaultKeywords
+            { required = Set.singleton "requiredProperty"
+            }
+      }
+
+    keywordAppliesOnlyToProperty
+      { genNonApplicableJson: AGen.genJson `Gen.suchThat`
+          (not A.isArray)
+      , genValidApplicableJson: pure $ A.fromArray [ A.jsonNull ]
+      , jsonDescription: "array"
+      , keywordName: "uniqueItems"
+      , keywords:
+          Schema.defaultKeywords
+            { items = Just
+                $ ObjectSchema
+                $ Schema.defaultKeywords { uniqueItems = true }
+            }
+      }
+
     generativeTestCase Short
       "null type accepts only null JSON values"
       do
@@ -346,3 +416,40 @@ spec = describe "Validation" do
                       $ Printing.printSchema originalSchema
                   , originalSchemaViolations
                   }
+
+keywordAppliesOnlyToProperty
+  ∷ { genNonApplicableJson ∷ Gen Json
+    , genValidApplicableJson ∷ Gen Json
+    , jsonDescription ∷ String
+    , keywordName ∷ String
+    , keywords ∷ Keywords
+    }
+  → TestSpec
+keywordAppliesOnlyToProperty spec =
+  generativeTestCase Long
+    ( spec.keywordName
+        <> " applies only to "
+        <> spec.jsonDescription
+        <>
+          " JSON values"
+    )
+    do
+      json ← Gen.choose
+        spec.genNonApplicableJson
+        spec.genValidApplicableJson
+
+      let
+        schema = ObjectSchema spec.keywords
+        violations = json `Validation.validateAgainst` schema
+
+      pure
+        if Set.isEmpty violations then
+          Success
+        else
+          failWithDetails
+            ( "validation has failed even though the only keyword was constraining only "
+                <> spec.jsonDescription
+            )
+            { json: A.stringify json
+            , schema: A.stringify $ Printing.printSchema schema
+            }

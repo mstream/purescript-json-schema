@@ -21,7 +21,10 @@ generativeTestCase testLength title property = do
   shouldRun ← liftEffect $ not <$> checkShouldSkip
   when
     shouldRun
-    (it title (liftEffect $ quickCheckGen' iterations property))
+    ( it
+        ("Property: " <> title)
+        (liftEffect $ quickCheckGen' iterations property)
+    )
   where
   checkShouldSkip ∷ Effect Boolean
   checkShouldSkip = maybe false (_ == "true")
