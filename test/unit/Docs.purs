@@ -176,6 +176,7 @@ printTableOfContentsEntry category = M.link
 
 formatAnchor ∷ String → String
 formatAnchor = String.replaceAll (Pattern " ") (Replacement "-")
+  <<< String.replaceAll (Pattern ".") (Replacement "")
   <<< String.toLower
 
 printCategory ∷ Category → Array PrintableExample → Document
