@@ -41,6 +41,9 @@ Examples:
 - [the new value of multipleOf is divisible by the old one](#the-new-value-of-multipleof-is-divisible-by-the-old-one)
 - [the old value of multipleOf is divisible by the new one](#the-old-value-of-multipleof-is-divisible-by-the-new-one)
 - [old and new value of multipleOf are not each other's factors](#old-and-new-value-of-multipleof-are-not-each-other's-factors)
+- [the range of allowed number values gets extended](#the-range-of-allowed-number-values-gets-extended)
+- [the range of allowed number values gets reduced](#the-range-of-allowed-number-values-gets-reduced)
+- [the range of allowed number values gets extended and reduced at the same time](#the-range-of-allowed-number-values-gets-extended-and-reduced-at-the-same-time)
 ---
 ### No JSON schema differences
 When there is not JSON schema differences, schema change is fully compatible.
@@ -262,6 +265,60 @@ In this situation, there are potentially some numbers that are not divisible by 
 -
   Schema path: #
   multipleOf changed from 2.0 to 5.0
+```
+#### Output
+```
+none
+```
+---
+### the range of allowed number values gets extended
+In this situation, all numbers from the new, longer range fall into the old, shorter range. Therefore, such a change is backward compatible.
+
+#### Input
+##### JSON schema differences
+```
+-
+  Schema path: #
+  maximum changed from 15.0to20.0
+-
+  Schema path: #
+  minimum changed from 10.0to5.0
+```
+#### Output
+```
+backward
+```
+---
+### the range of allowed number values gets reduced
+In this situation, all numbers from the new, shorted range fall into the old, longer range. Therefore, such a change is forward compatible.
+
+#### Input
+##### JSON schema differences
+```
+-
+  Schema path: #
+  maximum changed from 20.0to15.0
+-
+  Schema path: #
+  minimum changed from 5.0to10.0
+```
+#### Output
+```
+forward
+```
+---
+### the range of allowed number values gets extended and reduced at the same time
+In this situation, there are some numbers which do not fall into neither old nor new range. Therefore, such a change is incompatible.
+
+#### Input
+##### JSON schema differences
+```
+-
+  Schema path: #
+  maximum changed from 15.0to20.0
+-
+  Schema path: #
+  minimum changed from 5.0to10.0
 ```
 #### Output
 ```

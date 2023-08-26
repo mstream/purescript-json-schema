@@ -26,9 +26,10 @@ instance Show Compatibility where
   show = genericShow
 
 calculate ∷ Set Difference → Compatibility
-calculate = foldl
+calculate differences = foldl
   (\acc diff → mergeCompatibility acc $ f diff.differenceType)
-  Full
+  (calculateRangeChange differences)
+  differences
   where
   f ∷ DifferenceType → Compatibility
   f = case _ of
@@ -37,7 +38,66 @@ calculate = foldl
     TypeChange mbTypesBefore mbTypesAfter →
       calculateTypeChange mbTypesBefore mbTypesAfter
     _ →
-      None
+      Full
+
+calculateRangeChange ∷ Set Difference → Compatibility
+calculateRangeChange differences =
+  if rangeExtended && rangeReduced then None
+  else if rangeExtended then Backward
+  else if rangeReduced then Forward
+  else Full
+  where
+  rangeExtended ∷ Boolean
+  rangeExtended = foldl
+    ( \acc difference →
+        acc || case difference.differenceType of
+          ExclusiveMaximumChange (Just _) Nothing →
+            true
+          ExclusiveMaximumChange (Just before) (Just after) →
+            after > before
+          ExclusiveMinimumChange (Just _) Nothing →
+            true
+          ExclusiveMinimumChange (Just before) (Just after) →
+            after < before
+          MaximumChange (Just _) Nothing →
+            true
+          MaximumChange (Just before) (Just after) →
+            after > before
+          MinimumChange (Just _) Nothing →
+            true
+          MinimumChange (Just before) (Just after) →
+            after < before
+          _ →
+            false
+    )
+    false
+    differences
+
+  rangeReduced ∷ Boolean
+  rangeReduced = foldl
+    ( \acc difference →
+        acc || case difference.differenceType of
+          ExclusiveMaximumChange Nothing (Just _) →
+            true
+          ExclusiveMaximumChange (Just before) (Just after) →
+            after < before
+          ExclusiveMinimumChange Nothing (Just _) →
+            true
+          ExclusiveMinimumChange (Just before) (Just after) →
+            after > before
+          MaximumChange Nothing (Just _) →
+            true
+          MaximumChange (Just before) (Just after) →
+            after < before
+          MinimumChange Nothing (Just _) →
+            true
+          MinimumChange (Just before) (Just after) →
+            after > before
+          _ →
+            false
+    )
+    false
+    differences
 
 calculateMultipleOfChange ∷ Maybe Number → Maybe Number → Compatibility
 calculateMultipleOfChange = case _, _ of
@@ -102,6 +162,8 @@ mergeCompatibility = case _, _ of
   Forward, Forward →
     Forward
   Full, other →
+    other
+  other, Full →
     other
   _, _ →
     None

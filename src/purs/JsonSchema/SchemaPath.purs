@@ -19,8 +19,16 @@ render = ("#" <> _) <<< foldMap f <<< List.reverse
   where
   f ∷ SchemaPathSegment → String
   f = case _ of
+    ExclusiveMinimum →
+      "/exclusiveMinimum"
+    ExclusiveMaximum →
+      "/exclusiveMaximum"
     Items →
       "/items"
+    Maximum →
+      "/maximum"
+    Minimum →
+      "/minimum"
     MultipleOf →
       "/multipleOf"
     TypeKeyword →
@@ -29,7 +37,11 @@ render = ("#" <> _) <<< foldMap f <<< List.reverse
       "/uniqueItems"
 
 data SchemaPathSegment
-  = Items
+  = ExclusiveMaximum
+  | ExclusiveMinimum
+  | Items
+  | Maximum
+  | Minimum
   | MultipleOf
   | TypeKeyword
   | UniqueItems

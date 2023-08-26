@@ -4,7 +4,7 @@ import Prelude
 
 import Data.Argonaut.Core as A
 import Data.Foldable (foldMap, traverse_)
-import Data.List (List(..))
+import Data.List (List(..), (:))
 import Data.Markdown (CodeBlockType(..), Document)
 import Data.Markdown as M
 import Data.Maybe (Maybe(..))
@@ -17,6 +17,7 @@ import JsonSchema.Codec.Printing as Printing
 import JsonSchema.Diff (Difference, DifferenceType(..))
 import JsonSchema.Diff as Diff
 import JsonSchema.Gen as SchemaGen
+import JsonSchema.SchemaPath (SchemaPathSegment(..))
 import Test.QuickCheck ((===))
 import Test.Spec (describe)
 import Test.Types (Example, TestLength(..), TestSpec)
@@ -92,7 +93,7 @@ examples =
           { differenceType: TypeChange
               (Just $ Set.singleton JsonNull)
               (Just $ Set.singleton JsonBoolean)
-          , path: Nil
+          , path: TypeKeyword : Nil
           }
       )
   , scenario
@@ -101,19 +102,85 @@ examples =
       { nextSchema: ObjectSchema
           $ Schema.defaultKeywords
               { multipleOf = Just 4.0
-              , typeKeyword = Just $ Set.singleton JsonNumber
               }
       , previousSchema: ObjectSchema
           $ Schema.defaultKeywords
               { multipleOf = Just 2.0
-              , typeKeyword = Just $ Set.singleton JsonNumber
               }
       }
       ( Set.singleton
-          { differenceType: MultipleOfChange
+          { differenceType: MultipleOfChange (Just 2.0) (Just 4.0)
+          , path: MultipleOf : Nil
+          }
+      )
+  , scenario
+      "Changing exclusiveMaximum value"
+      "TODO"
+      { nextSchema: ObjectSchema
+          $ Schema.defaultKeywords
+              { exclusiveMaximum = Just 4.0
+              }
+      , previousSchema: ObjectSchema
+          $ Schema.defaultKeywords
+              { exclusiveMaximum = Just 2.0
+              }
+      }
+      ( Set.singleton
+          { differenceType: ExclusiveMaximumChange
               (Just 2.0)
               (Just 4.0)
-          , path: Nil
+          , path: ExclusiveMaximum : Nil
+          }
+      )
+  , scenario
+      "Changing exclusiveMinimum value"
+      "TODO"
+      { nextSchema: ObjectSchema
+          $ Schema.defaultKeywords
+              { exclusiveMinimum = Just 4.0
+              }
+      , previousSchema: ObjectSchema
+          $ Schema.defaultKeywords
+              { exclusiveMinimum = Just 2.0
+              }
+      }
+      ( Set.singleton
+          { differenceType: ExclusiveMinimumChange (Just 2.0) (Just 4.0)
+          , path: ExclusiveMinimum : Nil
+          }
+      )
+  , scenario
+      "Changing maximum value"
+      "TODO"
+      { nextSchema: ObjectSchema
+          $ Schema.defaultKeywords
+              { maximum = Just 4.0
+              }
+      , previousSchema: ObjectSchema
+          $ Schema.defaultKeywords
+              { maximum = Just 2.0
+              }
+      }
+      ( Set.singleton
+          { differenceType: MaximumChange (Just 2.0) (Just 4.0)
+          , path: Maximum : Nil
+          }
+      )
+  , scenario
+      "Changing minimum value"
+      "TODO"
+      { nextSchema: ObjectSchema
+          $ Schema.defaultKeywords
+              { minimum = Just 4.0
+              }
+      , previousSchema: ObjectSchema
+          $ Schema.defaultKeywords
+              { minimum = Just 2.0
+              }
+      }
+      ( Set.singleton
+          { differenceType: MinimumChange (Just 2.0) (Just 4.0)
+          , path: Minimum : Nil
           }
       )
   ]

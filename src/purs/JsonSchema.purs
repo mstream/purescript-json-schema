@@ -26,7 +26,11 @@ instance Show JsonSchema where
   show schema = genericShow schema
 
 type Keywords =
-  { items ∷ Maybe JsonSchema
+  { exclusiveMaximum ∷ Maybe Number
+  , exclusiveMinimum ∷ Maybe Number
+  , items ∷ Maybe JsonSchema
+  , maximum ∷ Maybe Number
+  , minimum ∷ Maybe Number
   , multipleOf ∷ Maybe Number
   , not ∷ Maybe JsonSchema
   , required ∷ Set String
@@ -36,7 +40,11 @@ type Keywords =
 
 defaultKeywords ∷ Keywords
 defaultKeywords =
-  { items: Nothing
+  { exclusiveMaximum: Nothing
+  , exclusiveMinimum: Nothing
+  , items: Nothing
+  , maximum: Nothing
+  , minimum: Nothing
   , multipleOf: Nothing
   , not: Nothing
   , required: Set.empty

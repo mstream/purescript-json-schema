@@ -189,6 +189,45 @@ examples =
           }
       )
       None
+  , scenario
+      "the range of allowed number values gets extended"
+      "In this situation, all numbers from the new, longer range fall into the old, shorter range. Therefore, such a change is backward compatible."
+      ( Set.fromFoldable
+          [ { differenceType: MaximumChange (Just 15.0) (Just 20.0)
+            , path: Nil
+            }
+          , { differenceType: MinimumChange (Just 10.0) (Just 5.0)
+            , path: Nil
+            }
+          ]
+      )
+      Backward
+  , scenario
+      "the range of allowed number values gets reduced"
+      "In this situation, all numbers from the new, shorted range fall into the old, longer range. Therefore, such a change is forward compatible."
+      ( Set.fromFoldable
+          [ { differenceType: MaximumChange (Just 20.0) (Just 15.0)
+            , path: Nil
+            }
+          , { differenceType: MinimumChange (Just 5.0) (Just 10.0)
+            , path: Nil
+            }
+          ]
+      )
+      Forward
+  , scenario
+      "the range of allowed number values gets extended and reduced at the same time"
+      "In this situation, there are some numbers which do not fall into neither old nor new range. Therefore, such a change is incompatible."
+      ( Set.fromFoldable
+          [ { differenceType: MaximumChange (Just 15.0) (Just 20.0)
+            , path: Nil
+            }
+          , { differenceType: MinimumChange (Just 5.0) (Just 10.0)
+            , path: Nil
+            }
+          ]
+      )
+      None
   ]
 
 spec ∷ TestSpec

@@ -24,8 +24,12 @@ import JsonSchema as Schema
 import JsonSchema.Codec.Printing as Printing
 import JsonSchema.Gen as SchemaGen
 import JsonSchema.JsonPath (JsonPathSegment(..))
+import JsonSchema.Range (Boundary(..))
 import JsonSchema.SchemaPath (SchemaPathSegment(..))
-import JsonSchema.Validation (Violation, ViolationReason(..))
+import JsonSchema.Validation
+  ( Violation
+  , ViolationReason(..)
+  )
 import JsonSchema.Validation as Validation
 import Test.QuickCheck (Result(..))
 import Test.QuickCheck.Gen (Gen)
@@ -258,6 +262,102 @@ examples =
           , schemaPath: MultipleOf : Nil
           }
       )
+  , positiveScenario
+      "A JSON number value is matches exactly the maximum keyword value"
+      "Because maximum constraint is inclusive, such a value is valid."
+      { json: A.fromNumber 4.0
+      , schema:
+          ObjectSchema $ Schema.defaultKeywords { maximum = Just 4.0 }
+      }
+  , negativeScenario
+      "A JSON number value is greater than the maximum keyword value"
+      "Because the value is out of the valid range, it is invalid."
+      { json: A.fromNumber 5.0
+      , schema:
+          ObjectSchema $ Schema.defaultKeywords { maximum = Just 4.0 }
+      }
+      ( Set.singleton $
+          { jsonPath: Nil
+          , reason: InvalidRange
+              { validRange: { from: Open bottom, to: Closed 4.0 }
+              , value: 5.0
+              }
+          , schemaPath: Maximum : Nil
+          }
+      )
+  , positiveScenario
+      "A JSON number value is less than the exclusiveMaximum keyword value"
+      "Because the value is within the valid range, it is valid."
+      { json: A.fromNumber 3.0
+      , schema:
+          ObjectSchema $ Schema.defaultKeywords
+            { exclusiveMaximum = Just 4.0 }
+      }
+  , negativeScenario
+      "A JSON number value is matches exactly the exclusiveMaximum keyword value"
+      "Because the exclusiveMaximum constraint is exclusive, such a value is invalid."
+      { json: A.fromNumber 4.0
+      , schema:
+          ObjectSchema $ Schema.defaultKeywords
+            { exclusiveMaximum = Just 4.0 }
+      }
+      ( Set.singleton $
+          { jsonPath: Nil
+          , reason: InvalidRange
+              { validRange: { from: Open bottom, to: Open 4.0 }
+              , value: 4.0
+              }
+          , schemaPath: ExclusiveMaximum : Nil
+          }
+      )
+  , positiveScenario
+      "A JSON number value is matches exactly the minimum keyword value"
+      "Because the minimum constraint is inclusive, such a value is invalid."
+      { json: A.fromNumber 4.0
+      , schema:
+          ObjectSchema $ Schema.defaultKeywords { minimum = Just 4.0 }
+      }
+  , negativeScenario
+      "A JSON number value is less than the minimum keyword value"
+      "Because the value is out of the valid range, it is invalid."
+      { json: A.fromNumber 3.0
+      , schema:
+          ObjectSchema $ Schema.defaultKeywords { minimum = Just 4.0 }
+      }
+      ( Set.singleton $
+          { jsonPath: Nil
+          , reason: InvalidRange
+              { validRange: { from: Closed 4.0, to: Open top }
+              , value: 3.0
+              }
+          , schemaPath: Minimum : Nil
+          }
+      )
+  , positiveScenario
+      "A JSON number value is greater than the exclusiveMinimum keyword value"
+      "Because the value is within the valid range, it is valid."
+      { json: A.fromNumber 5.0
+      , schema:
+          ObjectSchema $ Schema.defaultKeywords
+            { exclusiveMinimum = Just 4.0 }
+      }
+  , negativeScenario
+      "A JSON number value is matches exactly the exclusiveMinimum keyword value"
+      "Because the exclusiveMinimum constraint is exclusive, such a value is not valid."
+      { json: A.fromNumber 4.0
+      , schema:
+          ObjectSchema $ Schema.defaultKeywords
+            { exclusiveMinimum = Just 4.0 }
+      }
+      ( Set.singleton $
+          { jsonPath: Nil
+          , reason: InvalidRange
+              { validRange: { from: Open 4.0, to: Open top }
+              , value: 4.0
+              }
+          , schemaPath: ExclusiveMinimum : Nil
+          }
+      )
   ]
 
 spec ∷ TestSpec
@@ -417,6 +517,92 @@ spec = describe "Validation" do
                   , originalSchemaViolations
                   }
 
+    generativeTestCase Short
+      "both maximum and exclusiveMinimum defined with the same value"
+      do
+        x ← Gen.chooseFloat (-1000.0) 1000.0
+
+        let
+          schema = ObjectSchema
+            $ Schema.defaultKeywords
+                { exclusiveMaximum = Just x, maximum = Just x }
+          json = A.fromNumber x
+          schemaViolations = json `Validation.validateAgainst` schema
+          expectedViolation =
+            { jsonPath: Nil
+            , reason: InvalidRange
+                { validRange: { from: Open bottom, to: Open x }
+                , value: x
+                }
+            , schemaPath: ExclusiveMaximum : Nil
+            }
+
+        pure case Set.toUnfoldable schemaViolations of
+          [] →
+            failWithDetails
+              "validation has passed even though it should fail because of the exclusiveMinimum constraint"
+              { json: A.stringify json
+              , schema: A.stringify $ Printing.printSchema schema
+              }
+          [ violation ] →
+            if violation == expectedViolation then Success
+            else
+              failWithDetails
+                "violation is not as expected"
+                { expectedViolation
+                , json: A.stringify json
+                , schema: A.stringify $ Printing.printSchema schema
+                }
+          violations →
+            failWithDetails
+              "validation has failed for more than one reason"
+              { json: A.stringify json
+              , schema: A.stringify $ Printing.printSchema schema
+              , violations
+              }
+
+    generativeTestCase Short
+      "both minimum and exclusiveMinimum defined with the same value"
+      do
+        x ← Gen.chooseFloat (-1000.0) 1000.0
+
+        let
+          schema = ObjectSchema
+            $ Schema.defaultKeywords
+                { exclusiveMinimum = Just x, minimum = Just x }
+          json = A.fromNumber x
+          schemaViolations = json `Validation.validateAgainst` schema
+          expectedViolation =
+            { jsonPath: Nil
+            , reason: InvalidRange
+                { validRange: { from: Open x, to: Open top }, value: x }
+            , schemaPath: ExclusiveMinimum : Nil
+            }
+
+        pure case Set.toUnfoldable schemaViolations of
+          [] →
+            failWithDetails
+              "validation has passed even though it should fail because of the exclusiveMinimum constraint"
+              { json: A.stringify json
+              , schema: A.stringify $ Printing.printSchema schema
+              }
+          [ violation ] →
+            if violation == expectedViolation then Success
+            else
+              failWithDetails
+                "violation is not as expected"
+                { expectedViolation
+                , json: A.stringify json
+                , schema: A.stringify $ Printing.printSchema schema
+                }
+          violations →
+            failWithDetails
+              "validation has failed for more than one reason"
+              { json: A.stringify json
+              , schema: A.stringify $ Printing.printSchema schema
+              , violations
+              }
+
 keywordAppliesOnlyToProperty
   ∷ { genNonApplicableJson ∷ Gen Json
     , genValidApplicableJson ∷ Gen Json
@@ -425,21 +611,21 @@ keywordAppliesOnlyToProperty
     , keywords ∷ Keywords
     }
   → TestSpec
-keywordAppliesOnlyToProperty spec =
+keywordAppliesOnlyToProperty conf =
   generativeTestCase Long
-    ( spec.keywordName
+    ( conf.keywordName
         <> " applies only to "
-        <> spec.jsonDescription
+        <> conf.jsonDescription
         <>
           " JSON values"
     )
     do
       json ← Gen.choose
-        spec.genNonApplicableJson
-        spec.genValidApplicableJson
+        conf.genNonApplicableJson
+        conf.genValidApplicableJson
 
       let
-        schema = ObjectSchema spec.keywords
+        schema = ObjectSchema conf.keywords
         violations = json `Validation.validateAgainst` schema
 
       pure
@@ -448,7 +634,7 @@ keywordAppliesOnlyToProperty spec =
         else
           failWithDetails
             ( "validation has failed even though the only keyword was constraining only "
-                <> spec.jsonDescription
+                <> conf.jsonDescription
             )
             { json: A.stringify json
             , schema: A.stringify $ Printing.printSchema schema

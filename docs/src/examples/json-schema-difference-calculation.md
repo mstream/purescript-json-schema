@@ -8,6 +8,10 @@ Examples:
 - [Comparing identical schemata](#comparing-identical-schemata)
 - [Changing expected JSON value type from null to boolean](#changing-expected-json-value-type-from-null-to-boolean)
 - [Changing multipleOf value](#changing-multipleof-value)
+- [Changing exclusiveMaximum value](#changing-exclusivemaximum-value)
+- [Changing exclusiveMinimum value](#changing-exclusiveminimum-value)
+- [Changing maximum value](#changing-maximum-value)
+- [Changing minimum value](#changing-minimum-value)
 ---
 ### Comparing identical schemata
 When two identical schemata are compared, no difference should be found.
@@ -41,7 +45,7 @@ Any change in expected JSON value type should be accounted as a difference.
 #### Output
 ```
 -
-  Schema path: #
+  Schema path: #/type
   Change of accepted JSON value types from 
   - null
   to
@@ -54,15 +58,91 @@ TODO
 #### Input
 ##### Previous JSON schema
 ```json
-{"multipleOf":2,"type":["number"]}
+{"multipleOf":2}
 ```
 ##### Next JSON schema
 ```json
-{"multipleOf":4,"type":["number"]}
+{"multipleOf":4}
 ```
 #### Output
 ```
 -
-  Schema path: #
+  Schema path: #/multipleOf
   multipleOf changed from 2.0 to 4.0
+```
+---
+### Changing exclusiveMaximum value
+TODO
+
+#### Input
+##### Previous JSON schema
+```json
+{"exclusiveMaximum":2}
+```
+##### Next JSON schema
+```json
+{"exclusiveMaximum":4}
+```
+#### Output
+```
+-
+  Schema path: #/exclusiveMaximum
+  exclusiveMaximum changed from 2.0to4.0
+```
+---
+### Changing exclusiveMinimum value
+TODO
+
+#### Input
+##### Previous JSON schema
+```json
+{"exclusiveMinimum":2}
+```
+##### Next JSON schema
+```json
+{"exclusiveMinimum":4}
+```
+#### Output
+```
+-
+  Schema path: #/exclusiveMinimum
+  exclusiveMinimum changed from 2.0to4.0
+```
+---
+### Changing maximum value
+TODO
+
+#### Input
+##### Previous JSON schema
+```json
+{"maximum":2}
+```
+##### Next JSON schema
+```json
+{"maximum":4}
+```
+#### Output
+```
+-
+  Schema path: #/maximum
+  maximum changed from 2.0to4.0
+```
+---
+### Changing minimum value
+TODO
+
+#### Input
+##### Previous JSON schema
+```json
+{"minimum":2}
+```
+##### Next JSON schema
+```json
+{"minimum":4}
+```
+#### Output
+```
+-
+  Schema path: #/minimum
+  minimum changed from 2.0to4.0
 ```

@@ -14,6 +14,14 @@ Examples:
 - [An array with forbidden duplicate value.](#an-array-with-forbidden-duplicate-value.)
 - [Number 7.5 against a schema accepting only multiples of 2.5](#number-7.5-against-a-schema-accepting-only-multiples-of-2.5)
 - [Number 7 against a schema accepting only multiples of 2.5](#number-7-against-a-schema-accepting-only-multiples-of-2.5)
+- [A JSON number value is matches exactly the maximum keyword value](#a-json-number-value-is-matches-exactly-the-maximum-keyword-value)
+- [A JSON number value is greater than the maximum keyword value](#a-json-number-value-is-greater-than-the-maximum-keyword-value)
+- [A JSON number value is less than the exclusiveMaximum keyword value](#a-json-number-value-is-less-than-the-exclusivemaximum-keyword-value)
+- [A JSON number value is matches exactly the exclusiveMaximum keyword value](#a-json-number-value-is-matches-exactly-the-exclusivemaximum-keyword-value)
+- [A JSON number value is matches exactly the minimum keyword value](#a-json-number-value-is-matches-exactly-the-minimum-keyword-value)
+- [A JSON number value is less than the minimum keyword value](#a-json-number-value-is-less-than-the-minimum-keyword-value)
+- [A JSON number value is greater than the exclusiveMinimum keyword value](#a-json-number-value-is-greater-than-the-exclusiveminimum-keyword-value)
+- [A JSON number value is matches exactly the exclusiveMinimum keyword value](#a-json-number-value-is-matches-exactly-the-exclusiveminimum-keyword-value)
 ---
 ### A null value against a schema accepting only null values
 A null value conforms to the schema.
@@ -208,4 +216,152 @@ Number 7 does not conform the schema as 7.5 is not a multiple of 2.5.
   Schema path: #/multipleOf
   JSON path: $
   7.0 is not a multiple of 2.5
+```
+---
+### A JSON number value is matches exactly the maximum keyword value
+Because maximum constraint is inclusive, such a value is valid.
+
+#### Input
+##### JSON schema
+```json
+{"maximum":4}
+```
+##### JSON
+```json
+4
+```
+#### Output
+```
+✓ no violations
+```
+---
+### A JSON number value is greater than the maximum keyword value
+Because the value is out of the valid range, it is invalid.
+
+#### Input
+##### JSON schema
+```json
+{"maximum":4}
+```
+##### JSON
+```json
+5
+```
+#### Output
+```
+✗
+  Schema path: #/maximum
+  JSON path: $
+  5.0 is outside of the valid range of (-Infinity,4.0]
+```
+---
+### A JSON number value is less than the exclusiveMaximum keyword value
+Because the value is within the valid range, it is valid.
+
+#### Input
+##### JSON schema
+```json
+{"exclusiveMaximum":4}
+```
+##### JSON
+```json
+3
+```
+#### Output
+```
+✓ no violations
+```
+---
+### A JSON number value is matches exactly the exclusiveMaximum keyword value
+Because the exclusiveMaximum constraint is exclusive, such a value is invalid.
+
+#### Input
+##### JSON schema
+```json
+{"exclusiveMaximum":4}
+```
+##### JSON
+```json
+4
+```
+#### Output
+```
+✗
+  Schema path: #/exclusiveMaximum
+  JSON path: $
+  4.0 is outside of the valid range of (-Infinity,4.0)
+```
+---
+### A JSON number value is matches exactly the minimum keyword value
+Because the minimum constraint is inclusive, such a value is invalid.
+
+#### Input
+##### JSON schema
+```json
+{"minimum":4}
+```
+##### JSON
+```json
+4
+```
+#### Output
+```
+✓ no violations
+```
+---
+### A JSON number value is less than the minimum keyword value
+Because the value is out of the valid range, it is invalid.
+
+#### Input
+##### JSON schema
+```json
+{"minimum":4}
+```
+##### JSON
+```json
+3
+```
+#### Output
+```
+✗
+  Schema path: #/minimum
+  JSON path: $
+  3.0 is outside of the valid range of [4.0,Infinity)
+```
+---
+### A JSON number value is greater than the exclusiveMinimum keyword value
+Because the value is within the valid range, it is valid.
+
+#### Input
+##### JSON schema
+```json
+{"exclusiveMinimum":4}
+```
+##### JSON
+```json
+5
+```
+#### Output
+```
+✓ no violations
+```
+---
+### A JSON number value is matches exactly the exclusiveMinimum keyword value
+Because the exclusiveMinimum constraint is exclusive, such a value is not valid.
+
+#### Input
+##### JSON schema
+```json
+{"exclusiveMinimum":4}
+```
+##### JSON
+```json
+4
+```
+#### Output
+```
+✗
+  Schema path: #/exclusiveMinimum
+  JSON path: $
+  4.0 is outside of the valid range of (4.0,Infinity)
 ```

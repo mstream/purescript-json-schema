@@ -5,6 +5,7 @@ import Prelude
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Core as A
 import Data.Array as Array
+import Data.Foldable (foldMap)
 import Data.Maybe (Maybe(..), maybe)
 import Data.Set (Set)
 import Data.Set as Set
@@ -23,14 +24,22 @@ printSchema = case _ of
 printObjectSchema ∷ Keywords → Json
 printObjectSchema keywords = A.fromObject
   $ Object.fromFoldable
-  $
-    printItems keywords.items
+  $ printKeywords
+  where
+  printKeywords ∷ Array (String /\ Json)
+  printKeywords =
+    printOptionalNumber "exclusiveMaximum" keywords.exclusiveMaximum
+      <> printOptionalNumber "exclusiveMinimum"
+        keywords.exclusiveMinimum
+      <> printItems keywords.items
+      <> printOptionalNumber "maximum" keywords.maximum
+      <> printOptionalNumber "minimum" keywords.minimum
       <> printMultipleOf keywords.multipleOf
       <> printNot keywords.not
       <> printRequired keywords.required
       <> printTypeKeyword keywords.typeKeyword
       <> printUniqueItems keywords.uniqueItems
-  where
+
   printItems ∷ Maybe JsonSchema → Array (String /\ Json)
   printItems mbSchema = maybe []
     (Array.singleton <<< ("items" /\ _) <<< printSchema)
@@ -40,6 +49,12 @@ printObjectSchema keywords = A.fromObject
   printNot mbSchema = maybe []
     (Array.singleton <<< ("not" /\ _) <<< printSchema)
     mbSchema
+
+printOptionalNumber ∷ String → Maybe Number → Array (String /\ Json)
+printOptionalNumber name = case _ of
+  Just x →
+    [ name /\ A.fromNumber x ]
+  Nothing → []
 
 printMultipleOf ∷ Maybe Number → Array (String /\ Json)
 printMultipleOf = case _ of

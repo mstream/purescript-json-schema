@@ -7,23 +7,26 @@ module JsonSchema.Diff
 
 import Prelude
 
-import Data.Array as Array
 import Data.Foldable (foldMap)
 import Data.Generic.Rep (class Generic)
-import Data.List (List(..))
+import Data.List (List(..), (:))
 import Data.Maybe (Maybe, maybe)
 import Data.Set (Set)
 import Data.Set as Set
 import Data.Show.Generic (genericShow)
 import JsonSchema (JsonSchema(..), JsonValueType, Keywords)
 import JsonSchema as Schema
-import JsonSchema.SchemaPath (SchemaPath)
+import JsonSchema.SchemaPath (SchemaPath, SchemaPathSegment(..))
 import JsonSchema.SchemaPath as SchemaPath
 
 type Difference = { differenceType ∷ DifferenceType, path ∷ SchemaPath }
 
 data DifferenceType
   = BooleanSchemaChange Boolean
+  | ExclusiveMaximumChange (Maybe Number) (Maybe Number)
+  | ExclusiveMinimumChange (Maybe Number) (Maybe Number)
+  | MaximumChange (Maybe Number) (Maybe Number)
+  | MinimumChange (Maybe Number) (Maybe Number)
   | MultipleOfChange (Maybe Number) (Maybe Number)
   | SchemaChangeFromBooleanToObject Boolean Keywords
   | SchemaChangeFromObjectToBoolean Keywords Boolean
@@ -55,10 +58,17 @@ calculate = go Nil
   calculateObjectSchemataDiff path previousKeywords nextKeywords =
     foldMap
       (\f → f path previousKeywords nextKeywords)
-      [ calculateMultipleOfDiff, calculateTypeKeywordDiff ]
+      [ calculateMultipleOfDiff
+      , calculateRangeDiff
+      , calculateTypeKeywordDiff
+      ]
 
 calculateMultipleOfDiff
-  ∷ SchemaPath → Keywords → Keywords → Set Difference
+  ∷ ∀ r
+  . SchemaPath
+  → { multipleOf ∷ Maybe Number | r }
+  → { multipleOf ∷ Maybe Number | r }
+  → Set Difference
 calculateMultipleOfDiff path previousKeywords nextKeywords =
   if previousKeywords.multipleOf == nextKeywords.multipleOf then
     Set.empty
@@ -66,8 +76,63 @@ calculateMultipleOfDiff path previousKeywords nextKeywords =
     { differenceType: MultipleOfChange
         previousKeywords.multipleOf
         nextKeywords.multipleOf
-    , path
+    , path: MultipleOf : path
     }
+
+calculateRangeDiff ∷ SchemaPath → Keywords → Keywords → Set Difference
+calculateRangeDiff path previousKeywords nextKeywords =
+  exclusiveMaximumDiff
+    <> exclusiveMinimumDiff
+    <> maximumDiff
+    <> minimumDiff
+  where
+  exclusiveMaximumDiff ∷ Set Difference
+  exclusiveMaximumDiff =
+    if
+      previousKeywords.exclusiveMaximum == nextKeywords.exclusiveMaximum then
+      Set.empty
+    else Set.singleton
+      { differenceType: ExclusiveMaximumChange
+          previousKeywords.exclusiveMaximum
+          nextKeywords.exclusiveMaximum
+      , path: ExclusiveMaximum : path
+      }
+
+  exclusiveMinimumDiff ∷ Set Difference
+  exclusiveMinimumDiff =
+    if
+      previousKeywords.exclusiveMinimum == nextKeywords.exclusiveMinimum then
+      Set.empty
+    else Set.singleton
+      { differenceType: ExclusiveMinimumChange
+          previousKeywords.exclusiveMinimum
+          nextKeywords.exclusiveMinimum
+      , path: ExclusiveMinimum : path
+      }
+
+  maximumDiff ∷ Set Difference
+  maximumDiff =
+    if
+      previousKeywords.maximum == nextKeywords.maximum then
+      Set.empty
+    else Set.singleton
+      { differenceType: MaximumChange
+          previousKeywords.maximum
+          nextKeywords.maximum
+      , path: Maximum : path
+      }
+
+  minimumDiff ∷ Set Difference
+  minimumDiff =
+    if
+      previousKeywords.minimum == nextKeywords.minimum then
+      Set.empty
+    else Set.singleton
+      { differenceType: MinimumChange
+          previousKeywords.minimum
+          nextKeywords.minimum
+      , path: Minimum : path
+      }
 
 calculateTypeKeywordDiff
   ∷ SchemaPath → Keywords → Keywords → Set Difference
@@ -79,7 +144,7 @@ calculateTypeKeywordDiff path previousKeywords nextKeywords =
       { differenceType: TypeChange
           previousKeywords.typeKeyword
           nextKeywords.typeKeyword
-      , path
+      , path: TypeKeyword : path
       }
 
 renderDifference ∷ Difference → Array String
@@ -93,6 +158,30 @@ renderDifference { differenceType, path } =
       [ "Boolean schema changed to reject-all" ]
     BooleanSchemaChange true →
       [ "Boolean schema changed to allow-all" ]
+    ExclusiveMaximumChange before after →
+      [ "exclusiveMaximum changed from "
+          <> renderOptionalNumber before
+          <> "to"
+          <> renderOptionalNumber after
+      ]
+    ExclusiveMinimumChange before after →
+      [ "exclusiveMinimum changed from "
+          <> renderOptionalNumber before
+          <> "to"
+          <> renderOptionalNumber after
+      ]
+    MaximumChange before after →
+      [ "maximum changed from "
+          <> renderOptionalNumber before
+          <> "to"
+          <> renderOptionalNumber after
+      ]
+    MinimumChange before after →
+      [ "minimum changed from "
+          <> renderOptionalNumber before
+          <> "to"
+          <> renderOptionalNumber after
+      ]
     MultipleOfChange before after →
       [ "multipleOf changed from "
           <> renderOptionalNumber before

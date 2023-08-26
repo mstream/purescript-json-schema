@@ -31,14 +31,32 @@ genObjectSchema
 genObjectSchema = Lazy.defer \_ →
   ObjectSchema <$>
     do
+      exclusiveMaximum ← GenCommon.genMaybe
+        $ Gen.chooseFloat (-1000.0) 1000000.0
+      exclusiveMinimum ← GenCommon.genMaybe
+        $ Gen.chooseFloat (-1000000.0) 1000.0
       items ← GenCommon.genMaybe genSchema
+      maximum ← GenCommon.genMaybe
+        $ Gen.chooseFloat (-1000.0) 1000000.0
+      minimum ← GenCommon.genMaybe
+        $ Gen.chooseFloat (-1000000.0) 1000.0
       multipleOf ← GenCommon.genMaybe $ Gen.chooseFloat 0.1 10.0
       not ← GenCommon.genMaybe genSchema
       required ← genSet StringGen.genAlphaString
       typeKeyword ← GenCommon.genMaybe $ genSet genJsonValueType
       uniqueItems ← Gen.chooseBool
       pure
-        { items, multipleOf, not, required, typeKeyword, uniqueItems }
+        { exclusiveMaximum
+        , exclusiveMinimum
+        , items
+        , maximum
+        , minimum
+        , multipleOf
+        , not
+        , required
+        , typeKeyword
+        , uniqueItems
+        }
 
 genSet ∷ ∀ a m. MonadGen m ⇒ MonadRec m ⇒ Ord a ⇒ m a → m (Set a)
 genSet genItem = Set.fromFoldable <$> genItems

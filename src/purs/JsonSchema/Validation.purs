@@ -30,6 +30,8 @@ import JsonSchema
 import JsonSchema as Schema
 import JsonSchema.JsonPath (JsonPath, JsonPathSegment(..))
 import JsonSchema.JsonPath as JsonPath
+import JsonSchema.Range (Boundary(..), Range)
+import JsonSchema.Range as Range
 import JsonSchema.SchemaPath (SchemaPath, SchemaPathSegment(..))
 import JsonSchema.SchemaPath as SchemaPath
 import Utils (isInteger)
@@ -44,6 +46,7 @@ data ViolationReason
   = AlwaysFailingSchema
   | InvalidArray (Set Violation)
   | InvalidMultiple { expectedMultiple ∷ Number, value ∷ Number }
+  | InvalidRange { validRange ∷ Range, value ∷ Number }
   | NonUniqueArrayItem
   | TypeMismatch
       { actualJsonValueType ∷ JsonValueType
@@ -77,6 +80,11 @@ renderViolationReason = case _ of
       itemViolations
   InvalidMultiple { expectedMultiple, value } →
     [ show value <> " is not a multiple of " <> show expectedMultiple ]
+  InvalidRange { validRange, value } →
+    [ show value
+        <> " is outside of the valid range of "
+        <> Range.renderRange validRange
+    ]
   NonUniqueArrayItem →
     [ "Non-unique array item." ]
   TypeMismatch { actualJsonValueType, allowedJsonValueTypes } →
@@ -118,13 +126,7 @@ validateAgainst = go Nil Nil
     notViolations <> typeKeywordViolations <> A.caseJson
       (const Set.empty)
       (const Set.empty)
-      ( \number →
-          validateMultipleOf
-            schemaPath
-            jsonPath
-            number
-            keywords.multipleOf
-      )
+      (validateNumber schemaPath jsonPath keywords)
       (const Set.empty)
       ( \array →
           let
@@ -203,6 +205,118 @@ validateAgainst = go Nil Nil
       (ItemIndex itemIndex : jsonPath)
       itemJson
       schema
+
+validateNumber
+  ∷ ∀ r
+  . SchemaPath
+  → JsonPath
+  → { exclusiveMaximum ∷ Maybe Number
+    , exclusiveMinimum ∷ Maybe Number
+    , maximum ∷ Maybe Number
+    , minimum ∷ Maybe Number
+    , multipleOf ∷ Maybe Number
+    | r
+    }
+  → Number
+  → Set Violation
+validateNumber schemaPath jsonPath constraints x =
+  validateMultipleOf schemaPath jsonPath x constraints.multipleOf
+    <> rangeViolations
+  where
+  rangeViolations ∷ Set Violation
+  rangeViolations = exclusiveMaximumViolations
+    <> exclusiveMinimumViolations
+    <> maximumViolations
+    <> minimumViolations
+
+  exclusiveMaximumViolations ∷ Set Violation
+  exclusiveMaximumViolations = maybe
+    Set.empty
+    ( \exclusiveMaximum →
+        if x < exclusiveMaximum then Set.empty
+        else Set.singleton
+          { jsonPath
+          , reason: InvalidRange { validRange, value: x }
+          , schemaPath: ExclusiveMaximum : schemaPath
+          }
+    )
+    constraints.exclusiveMaximum
+
+  exclusiveMinimumViolations ∷ Set Violation
+  exclusiveMinimumViolations = maybe
+    Set.empty
+    ( \exclusiveMinimum →
+        if x > exclusiveMinimum then Set.empty
+        else Set.singleton
+          { jsonPath
+          , reason: InvalidRange { validRange, value: x }
+          , schemaPath: ExclusiveMinimum : schemaPath
+          }
+    )
+    constraints.exclusiveMinimum
+
+  maximumViolations ∷ Set Violation
+  maximumViolations = maybe
+    Set.empty
+    ( \maximum →
+        if x <= maximum then Set.empty
+        else Set.singleton
+          { jsonPath
+          , reason: InvalidRange { validRange, value: x }
+          , schemaPath: Maximum : schemaPath
+          }
+    )
+    constraints.maximum
+
+  minimumViolations ∷ Set Violation
+  minimumViolations = maybe
+    Set.empty
+    ( \minimum →
+        if x >= minimum then Set.empty
+        else Set.singleton
+          { jsonPath
+          , reason: InvalidRange { validRange, value: x }
+          , schemaPath: Minimum : schemaPath
+          }
+    )
+    constraints.minimum
+
+  validRange ∷ Range
+  validRange = { from: validLowerBoundary, to: validUpperBoundary }
+
+  validLowerBoundary ∷ Boundary
+  validLowerBoundary =
+    case constraints.exclusiveMinimum, constraints.minimum of
+      Nothing, Nothing →
+        Open bottom
+      Nothing, Just minimum →
+        Closed minimum
+      Just exclusiveMinimum, Nothing →
+        Open exclusiveMinimum
+      Just exclusiveMinimum, Just minimum →
+        if minimum < exclusiveMinimum then Closed minimum
+        else Open exclusiveMinimum
+
+  validUpperBoundary ∷ Boundary
+  validUpperBoundary =
+    case constraints.exclusiveMaximum, constraints.maximum of
+      Nothing, Nothing →
+        Open top
+      Nothing, Just maximum →
+        Closed maximum
+      Just exclusiveMaximum, Nothing →
+        Open exclusiveMaximum
+      Just exclusiveMaximum, Just maximum →
+        if maximum > exclusiveMaximum then Closed maximum
+        else Open exclusiveMaximum
+
+conformsMinimum
+  ∷ SchemaPath → JsonPath → Number → Maybe Number → Boolean
+conformsMinimum schemaPath jsonPath x = case _ of
+  Just minimum →
+    x >= minimum
+  Nothing →
+    true
 
 validateUniqueItems
   ∷ SchemaPath → JsonPath → Array Json → Set Violation

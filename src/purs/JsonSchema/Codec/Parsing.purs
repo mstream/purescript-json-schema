@@ -32,9 +32,25 @@ parseObjectSchema keywordsJson = do
     (parsingErrorMessage "schema is not a JSON object")
     (A.toObject keywordsJson)
 
+  exclusiveMaximum ← parseOptionalNumber
+    "exclusiveMaximum"
+    schemaObject
+
+  exclusiveMinimum ← parseOptionalNumber
+    "exclusiveMinimum"
+    schemaObject
+
   items ← maybe (Right Schema.defaultKeywords.items)
     (map Just <<< parseSchema)
     (Object.lookup "items" schemaObject)
+
+  maximum ← parseOptionalNumber
+    "maximum"
+    schemaObject
+
+  minimum ← parseOptionalNumber
+    "minimum"
+    schemaObject
 
   multipleOf ← parseMultipleOf schemaObject
 
@@ -60,7 +76,28 @@ parseObjectSchema keywordsJson = do
     (Object.lookup "uniqueItems" schemaObject)
 
   pure $ ObjectSchema
-    { items, multipleOf, not, required, typeKeyword, uniqueItems }
+    { exclusiveMaximum
+    , exclusiveMinimum
+    , items
+    , maximum
+    , minimum
+    , multipleOf
+    , not
+    , required
+    , typeKeyword
+    , uniqueItems
+    }
+
+parseOptionalNumber ∷ String → Object Json → String \/ Maybe Number
+parseOptionalNumber name = Object.lookup name >>> case _ of
+  Just json →
+    case A.toNumber json of
+      Just x →
+        Right $ Just x
+      Nothing →
+        Left $ name <> " is not a number."
+  Nothing →
+    Right Nothing
 
 parseMultipleOf ∷ Object Json → String \/ Maybe Number
 parseMultipleOf = Object.lookup "multipleOf" >>> case _ of
