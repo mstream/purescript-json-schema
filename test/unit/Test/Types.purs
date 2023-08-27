@@ -1,19 +1,56 @@
-module Test.Types (Example, TestLength(..), TestSpec) where
+module Test.Types
+  ( Computation
+  , Example
+  , ExpectedOutput
+  , Input
+  , InputGenerator
+  , Property
+  , TestLength(..)
+  , TestSpec
+  ) where
 
 import Prelude
 
 import Data.Markdown (Document)
 import Effect.Aff (Aff)
+import Test.QuickCheck.Gen (Gen)
 import Test.Spec (SpecT)
 
-type Example i o =
+type ExpectedOutput o =
   { description ∷ String
-  , expectedOutput ∷ o
-  , input ∷ i
-  , renderInput ∷ i → Document
-  , renderOutput ∷ o → Document
-  , title ∷ String
-  , transform ∷ i → o
+  , value ∷ o
+  }
+
+type Example i o =
+  { computation ∷ Computation i o
+  , description ∷ String
+  , expectedOutput ∷ ExpectedOutput o
+  , input ∷ Input i
+  , renderInput ∷ Input i → Document
+  , renderOutput ∷ ExpectedOutput o → Document
+  }
+
+type Property i o =
+  { computation ∷ Computation i o
+  , expectedOutput ∷ ExpectedOutput o
+  , input ∷ InputGenerator i
+  , renderInput ∷ InputGenerator i → Document
+  , renderOutput ∷ ExpectedOutput o → Document
+  }
+
+type Input a =
+  { description ∷ String
+  , value ∷ a
+  }
+
+type InputGenerator a =
+  { description ∷ String
+  , gen ∷ Gen a
+  }
+
+type Computation i o =
+  { description ∷ String
+  , execute ∷ i → o
   }
 
 data TestLength = Long | Medium | Short

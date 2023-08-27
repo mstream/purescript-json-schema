@@ -155,45 +155,45 @@ renderDifference { differenceType, path } =
   renderDifferenceType ∷ Array String
   renderDifferenceType = case differenceType of
     BooleanSchemaChange false →
-      [ "Boolean schema changed to reject-all" ]
+      [ "change of boolean schema from allow-all to reject-all" ]
     BooleanSchemaChange true →
-      [ "Boolean schema changed to allow-all" ]
+      [ "change of boolean schema from reject-all to allow-all" ]
     ExclusiveMaximumChange before after →
-      [ "exclusiveMaximum changed from "
+      [ "change of exclusiveMaximum from "
           <> renderOptionalNumber before
-          <> "to"
+          <> " to "
           <> renderOptionalNumber after
       ]
     ExclusiveMinimumChange before after →
-      [ "exclusiveMinimum changed from "
+      [ "change of exclusiveMinimum from "
           <> renderOptionalNumber before
-          <> "to"
+          <> " to "
           <> renderOptionalNumber after
       ]
     MaximumChange before after →
-      [ "maximum changed from "
+      [ "change of maximum from "
           <> renderOptionalNumber before
-          <> "to"
+          <> " to "
           <> renderOptionalNumber after
       ]
     MinimumChange before after →
-      [ "minimum changed from "
+      [ "change of minimum from "
           <> renderOptionalNumber before
-          <> "to"
+          <> " to "
           <> renderOptionalNumber after
       ]
     MultipleOfChange before after →
-      [ "multipleOf changed from "
+      [ "change of multipleOf from "
           <> renderOptionalNumber before
           <> " to "
           <> renderOptionalNumber after
       ]
     SchemaChangeFromBooleanToObject _ _ →
-      [ "Boolean schema changed to object schema" ]
+      [ "change of boolean schema to object schema" ]
     SchemaChangeFromObjectToBoolean _ _ →
-      [ "Object schema changed to boolean schema" ]
+      [ "change of object schema to boolean schema" ]
     TypeChange typesBefore typesAfter →
-      [ "Change of accepted JSON value types from " ]
+      [ "change of accepted JSON value types from " ]
         <> renderJsonValueTypes typesBefore
         <> [ "to" ]
         <> renderJsonValueTypes typesAfter

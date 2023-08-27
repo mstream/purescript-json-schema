@@ -19,7 +19,8 @@ module Data.Markdown
 
 import Prelude
 
-import Data.Foldable (foldMap)
+import Data.Array as Array
+import Data.Foldable (class Foldable, foldMap)
 import Data.String as String
 
 type Document = Array Node
@@ -80,9 +81,18 @@ data Node
   | Paragraph String
   | Rule
 
+derive instance Eq Node
+derive instance Ord Node
+
 data CodeBlockType = Json | Mermaid | Text
 
+derive instance Eq CodeBlockType
+derive instance Ord CodeBlockType
+
 data HeadingLevel = L1 | L2 | L3 | L4 | L5 | L6
+
+derive instance Eq HeadingLevel
+derive instance Ord HeadingLevel
 
 renderCodeBlockType ∷ CodeBlockType → String
 renderCodeBlockType = case _ of
@@ -120,8 +130,8 @@ heading6 = Heading L6
 link ∷ String → String → Node
 link = Link
 
-list ∷ Array Node → Node
-list = List
+list ∷ ∀ f. Foldable f ⇒ f Node → Node
+list = List <<< Array.fromFoldable
 
 paragraph ∷ String → Node
 paragraph = Paragraph

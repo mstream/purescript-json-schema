@@ -1,4 +1,4 @@
-module Test.Spec.JsonSchema.Validation (examples, spec) where
+module Test.Spec.JsonSchema.Validation (doc, spec) where
 
 import Prelude
 
@@ -18,6 +18,7 @@ import Data.Set as Set
 import Data.String as String
 import Data.String.Gen as StringGen
 import Data.Tuple.Nested ((/\))
+import Docs.Types (Doc)
 import Foreign.Object as Object
 import JsonSchema (JsonSchema(..), JsonValueType(..), Keywords)
 import JsonSchema as Schema
@@ -26,31 +27,59 @@ import JsonSchema.Gen as SchemaGen
 import JsonSchema.JsonPath (JsonPathSegment(..))
 import JsonSchema.Range (Boundary(..))
 import JsonSchema.SchemaPath (SchemaPathSegment(..))
-import JsonSchema.Validation
-  ( Violation
-  , ViolationReason(..)
-  )
+import JsonSchema.Validation (Violation, ViolationReason(..))
 import JsonSchema.Validation as Validation
 import Test.QuickCheck (Result(..))
 import Test.QuickCheck.Gen (Gen)
 import Test.Spec (describe)
-import Test.Types (Example, TestLength(..), TestSpec)
-import Test.Utils (exampleTestCase, failWithDetails, generativeTestCase)
+import Test.Types
+  ( Computation
+  , Example
+  , ExpectedOutput
+  , Input
+  , Property
+  , TestLength(..)
+  , TestSpec
+  )
+import Test.Utils
+  ( exampleTestCase
+  , exampleTitle
+  , failWithDetails
+  , generativeTestCase
+  , propertyTitle
+  )
 
-type ValidationExampleInput = { json ∷ Json, schema ∷ JsonSchema }
+type ValidationInput = { json ∷ Json, schema ∷ JsonSchema }
+type ValidationOutput = Set Violation
 
-type ValidationExample = Example ValidationExampleInput (Set Violation)
+type ValidationExample = Example ValidationInput ValidationOutput
+type ValidationProperty = Property ValidationInput ValidationOutput
 
-renderInput ∷ ValidationExampleInput → Document
-renderInput { json, schema } =
+doc ∷ Doc
+doc =
+  { computationDescription: computation.description
+  , examples: Set.fromFoldable $ examples <#> \example →
+      { description: example.description
+      , output: example.renderOutput example.expectedOutput
+      , input: example.renderInput example.input
+      , title: exampleTitle example
+      }
+  , properties: Set.fromFoldable $ properties <#> \property →
+      { title: propertyTitle property
+      }
+  }
+
+renderInput ∷ Input ValidationInput → Document
+renderInput { value: { json, schema } } =
   [ M.heading5 "JSON schema"
-  , M.codeBlock Json $ (A.stringify <<< Printing.printSchema) schema
+  , M.codeBlock Json
+      $ (A.stringifyWithIndent 2 <<< Printing.printSchema) schema
   , M.heading5 "JSON"
-  , M.codeBlock Json $ A.stringify json
+  , M.codeBlock Json $ A.stringifyWithIndent 2 json
   ]
 
-renderOutput ∷ Set Violation → Document
-renderOutput violations =
+renderOutput ∷ ExpectedOutput (Set Violation) → Document
+renderOutput { value: violations } =
   [ M.codeBlock' $ String.joinWith "\n" renderViolations ]
   where
   renderViolations ∷ Array String
@@ -63,52 +92,63 @@ renderOutput violations =
       )
       violations
 
-transform ∷ ValidationExampleInput → Set Violation
-transform { json, schema } = json `Validation.validateAgainst` schema
+computation ∷ Computation ValidationInput ValidationOutput
+computation =
+  { description: "validation of"
+  , execute: \{ json, schema } →
+      json `Validation.validateAgainst` schema
+  }
 
 positiveScenario
-  ∷ String → String → ValidationExampleInput → ValidationExample
-positiveScenario title description input =
-  { description
-  , expectedOutput: Set.empty
+  ∷ String → Input ValidationInput → ValidationExample
+positiveScenario description input =
+  { computation
+  , description
+  , expectedOutput: { description: "no violations", value: Set.empty }
   , input
   , renderInput
   , renderOutput
-  , title
-  , transform
   }
 
 negativeScenario
   ∷ String
-  → String
-  → ValidationExampleInput
+  → Input ValidationInput
   → Set Violation
   → ValidationExample
-negativeScenario title description input expectedViolations =
-  { description
-  , expectedOutput: expectedViolations
+negativeScenario description input expectedViolations =
+  { computation
+  , description
+  , expectedOutput:
+      { description: "violations", value: expectedViolations }
   , input
   , renderInput
   , renderOutput
-  , title
-  , transform
   }
+
+properties ∷ Array ValidationProperty
+properties = []
 
 examples ∷ Array ValidationExample
 examples =
   [ positiveScenario
-      "A null value against a schema accepting only null values"
       "A null value conforms to the schema."
-      { json: A.jsonNull
-      , schema: ObjectSchema $ Schema.defaultKeywords
-          { typeKeyword = Just $ Set.fromFoldable [ JsonNull ] }
+      { description:
+          "the null value against a schema accepting only nulls"
+      , value:
+          { json: A.jsonNull
+          , schema: ObjectSchema $ Schema.defaultKeywords
+              { typeKeyword = Just $ Set.fromFoldable [ JsonNull ] }
+          }
       }
   , negativeScenario
-      "A boolean value against a schema accepting only null values"
       "A boolean value does not conform to the schema as only null values do."
-      { json: A.jsonTrue
-      , schema: ObjectSchema $ Schema.defaultKeywords
-          { typeKeyword = Just $ Set.fromFoldable [ JsonNull ] }
+      { description:
+          "a boolean value against a schema accepting only nulls"
+      , value:
+          { json: A.jsonTrue
+          , schema: ObjectSchema $ Schema.defaultKeywords
+              { typeKeyword = Just $ Set.fromFoldable [ JsonNull ] }
+          }
       }
       ( Set.singleton $
           { jsonPath: Nil
@@ -120,18 +160,24 @@ examples =
           }
       )
   , positiveScenario
-      "An whole number value against a schema accepting only numbers"
       "All whole number values conform to the schema as every integer is a number."
-      { json: A.fromNumber 1.0
-      , schema: ObjectSchema $ Schema.defaultKeywords
-          { typeKeyword = Just $ Set.fromFoldable [ JsonNumber ] }
+      { description:
+          "a whole number against a schema which accepts any numbers"
+      , value:
+          { json: A.fromNumber 1.0
+          , schema: ObjectSchema $ Schema.defaultKeywords
+              { typeKeyword = Just $ Set.fromFoldable [ JsonNumber ] }
+          }
       }
   , negativeScenario
-      "A fractional number value against a schema accepting only integers"
       "Not all number values conform to the schema as not every number is a integer."
-      { json: A.fromNumber 1.5
-      , schema: ObjectSchema $ Schema.defaultKeywords
-          { typeKeyword = Just $ Set.fromFoldable [ JsonInteger ] }
+      { description:
+          "a fractional number against a schema accepting only whole numbers"
+      , value:
+          { json: A.fromNumber 1.5
+          , schema: ObjectSchema $ Schema.defaultKeywords
+              { typeKeyword = Just $ Set.fromFoldable [ JsonInteger ] }
+          }
       }
       ( Set.singleton $
           { jsonPath: Nil
@@ -143,12 +189,15 @@ examples =
           }
       )
   , negativeScenario
-      "A boolean value against a schema accepting only null and string values"
       "A boolean value does not conform to the schema as only null or string values do."
-      { json: A.jsonTrue
-      , schema: ObjectSchema $ Schema.defaultKeywords
-          { typeKeyword = Just $ Set.fromFoldable
-              [ JsonNull, JsonString ]
+      { description:
+          "a boolean value against a schema accepting only nulls and strings"
+      , value:
+          { json: A.jsonTrue
+          , schema: ObjectSchema $ Schema.defaultKeywords
+              { typeKeyword = Just $ Set.fromFoldable
+                  [ JsonNull, JsonString ]
+              }
           }
       }
       ( Set.singleton $
@@ -162,19 +211,22 @@ examples =
           }
       )
   , negativeScenario
-      "An array with 2 out of 5 items not matching the desired item type"
       "When schema requires items to conform to a certain schema, every single value in the array has to."
-      { json: A.fromArray
-          [ A.jsonNull
-          , A.jsonFalse
-          , A.jsonNull
-          , A.jsonTrue
-          , A.jsonNull
-          ]
-      , schema: ObjectSchema $ Schema.defaultKeywords
-          { items = Just $ ObjectSchema $ Schema.defaultKeywords
-              { typeKeyword = Just $ Set.singleton JsonNull }
-          , typeKeyword = Just $ Set.singleton JsonArray
+      { description:
+          "an array containing a mixture of null and boolean values to a schema accepting only arrays of nulls"
+      , value:
+          { json: A.fromArray
+              [ A.jsonNull
+              , A.jsonFalse
+              , A.jsonNull
+              , A.jsonTrue
+              , A.jsonNull
+              ]
+          , schema: ObjectSchema $ Schema.defaultKeywords
+              { items = Just $ ObjectSchema $ Schema.defaultKeywords
+                  { typeKeyword = Just $ Set.singleton JsonNull }
+              , typeKeyword = Just $ Set.singleton JsonArray
+              }
           }
       }
       ( Set.singleton $
@@ -199,19 +251,22 @@ examples =
           }
       )
   , negativeScenario
-      "An array with forbidden duplicate value."
       "When schema requires items to be unique, any duplicate occurrence of any value will cause a validation failure."
-      { json: A.fromArray
-          [ A.fromString "a"
-          , A.fromString "b"
-          , A.fromString "b"
-          , A.fromString "c"
-          , A.fromString "d"
-          , A.fromString "d"
-          , A.fromString "e"
-          ]
-      , schema: ObjectSchema
-          $ Schema.defaultKeywords { uniqueItems = true }
+      { description:
+          "an array containing duplicated strings against a schema not accepting duplicates"
+      , value:
+          { json: A.fromArray
+              [ A.fromString "a"
+              , A.fromString "b"
+              , A.fromString "b"
+              , A.fromString "c"
+              , A.fromString "d"
+              , A.fromString "d"
+              , A.fromString "e"
+              ]
+          , schema: ObjectSchema
+              $ Schema.defaultKeywords { uniqueItems = true }
+          }
       }
       ( Set.singleton $
           { jsonPath: Nil
@@ -237,23 +292,29 @@ examples =
           }
       )
   , positiveScenario
-      "Number 7.5 against a schema accepting only multiples of 2.5"
       "Number 7.5 conforms to the schema as 7.5 is 2.5 times 3."
-      { json: A.fromNumber 7.5
-      , schema: ObjectSchema $ Schema.defaultKeywords
-          { multipleOf = Just 2.5
-          , typeKeyword = Just $ Set.fromFoldable [ JsonNumber ]
+      { description:
+          "a number which is a multiple of the factor desired by the schema"
+      , value:
+          { json: A.fromNumber 7.5
+          , schema: ObjectSchema $ Schema.defaultKeywords
+              { multipleOf = Just 2.5
+              , typeKeyword = Just $ Set.fromFoldable [ JsonNumber ]
+              }
           }
       }
   , negativeScenario
-      "Number 7 against a schema accepting only multiples of 2.5"
       "Number 7 does not conform the schema as 7.5 is not a multiple of 2.5."
-      { json: A.fromNumber 7.0
-      , schema:
-          ObjectSchema $ Schema.defaultKeywords
-            { multipleOf = Just 2.5
-            , typeKeyword = Just $ Set.fromFoldable [ JsonNumber ]
-            }
+      { description:
+          "a number which is not a multiple of the factor desired by the schema"
+      , value:
+          { json: A.fromNumber 7.0
+          , schema:
+              ObjectSchema $ Schema.defaultKeywords
+                { multipleOf = Just 2.5
+                , typeKeyword = Just $ Set.fromFoldable [ JsonNumber ]
+                }
+          }
       }
       ( Set.singleton $
           { jsonPath: Nil
@@ -263,18 +324,26 @@ examples =
           }
       )
   , positiveScenario
-      "A JSON number value is matches exactly the maximum keyword value"
       "Because maximum constraint is inclusive, such a value is valid."
-      { json: A.fromNumber 4.0
-      , schema:
-          ObjectSchema $ Schema.defaultKeywords { maximum = Just 4.0 }
+      { description:
+          "a number which is equal to the maximum value specified by the schema"
+      , value:
+          { json: A.fromNumber 4.0
+          , schema:
+              ObjectSchema $ Schema.defaultKeywords
+                { maximum = Just 4.0 }
+          }
       }
   , negativeScenario
-      "A JSON number value is greater than the maximum keyword value"
       "Because the value is out of the valid range, it is invalid."
-      { json: A.fromNumber 5.0
-      , schema:
-          ObjectSchema $ Schema.defaultKeywords { maximum = Just 4.0 }
+      { description:
+          "a number which is greater than the maximum value specified by the schema"
+      , value:
+          { json: A.fromNumber 5.0
+          , schema:
+              ObjectSchema $ Schema.defaultKeywords
+                { maximum = Just 4.0 }
+          }
       }
       ( Set.singleton $
           { jsonPath: Nil
@@ -286,20 +355,26 @@ examples =
           }
       )
   , positiveScenario
-      "A JSON number value is less than the exclusiveMaximum keyword value"
       "Because the value is within the valid range, it is valid."
-      { json: A.fromNumber 3.0
-      , schema:
-          ObjectSchema $ Schema.defaultKeywords
-            { exclusiveMaximum = Just 4.0 }
+      { description:
+          "a number which is less than the exclusive maximum value specified by the schema"
+      , value:
+          { json: A.fromNumber 3.0
+          , schema:
+              ObjectSchema $ Schema.defaultKeywords
+                { exclusiveMaximum = Just 4.0 }
+          }
       }
   , negativeScenario
-      "A JSON number value is matches exactly the exclusiveMaximum keyword value"
       "Because the exclusiveMaximum constraint is exclusive, such a value is invalid."
-      { json: A.fromNumber 4.0
-      , schema:
-          ObjectSchema $ Schema.defaultKeywords
-            { exclusiveMaximum = Just 4.0 }
+      { description:
+          "a number which is equal to the exclusive maximum value specified by the schema"
+      , value:
+          { json: A.fromNumber 4.0
+          , schema:
+              ObjectSchema $ Schema.defaultKeywords
+                { exclusiveMaximum = Just 4.0 }
+          }
       }
       ( Set.singleton $
           { jsonPath: Nil
@@ -311,18 +386,26 @@ examples =
           }
       )
   , positiveScenario
-      "A JSON number value is matches exactly the minimum keyword value"
       "Because the minimum constraint is inclusive, such a value is invalid."
-      { json: A.fromNumber 4.0
-      , schema:
-          ObjectSchema $ Schema.defaultKeywords { minimum = Just 4.0 }
+      { description:
+          "a number which is equal to the minimum value specified by the schema"
+      , value:
+          { json: A.fromNumber 4.0
+          , schema:
+              ObjectSchema $ Schema.defaultKeywords
+                { minimum = Just 4.0 }
+          }
       }
   , negativeScenario
-      "A JSON number value is less than the minimum keyword value"
       "Because the value is out of the valid range, it is invalid."
-      { json: A.fromNumber 3.0
-      , schema:
-          ObjectSchema $ Schema.defaultKeywords { minimum = Just 4.0 }
+      { description:
+          "a number which is less than the minimum value specified by the schema"
+      , value:
+          { json: A.fromNumber 3.0
+          , schema:
+              ObjectSchema $ Schema.defaultKeywords
+                { minimum = Just 4.0 }
+          }
       }
       ( Set.singleton $
           { jsonPath: Nil
@@ -334,20 +417,26 @@ examples =
           }
       )
   , positiveScenario
-      "A JSON number value is greater than the exclusiveMinimum keyword value"
       "Because the value is within the valid range, it is valid."
-      { json: A.fromNumber 5.0
-      , schema:
-          ObjectSchema $ Schema.defaultKeywords
-            { exclusiveMinimum = Just 4.0 }
+      { description:
+          "a number which is greater than the minimum value specified by the schema"
+      , value:
+          { json: A.fromNumber 5.0
+          , schema:
+              ObjectSchema $ Schema.defaultKeywords
+                { exclusiveMinimum = Just 4.0 }
+          }
       }
   , negativeScenario
-      "A JSON number value is matches exactly the exclusiveMinimum keyword value"
       "Because the exclusiveMinimum constraint is exclusive, such a value is not valid."
-      { json: A.fromNumber 4.0
-      , schema:
-          ObjectSchema $ Schema.defaultKeywords
-            { exclusiveMinimum = Just 4.0 }
+      { description:
+          "a number which is equal to the exclusive minimum value specified by the schema"
+      , value:
+          { json: A.fromNumber 4.0
+          , schema:
+              ObjectSchema $ Schema.defaultKeywords
+                { exclusiveMinimum = Just 4.0 }
+          }
       }
       ( Set.singleton $
           { jsonPath: Nil
@@ -362,9 +451,7 @@ examples =
 
 spec ∷ TestSpec
 spec = describe "Validation" do
-
   describe "validateAgainst" do
-
     traverse_ exampleTestCase examples
 
     keywordAppliesOnlyToProperty
@@ -438,8 +525,7 @@ spec = describe "Validation" do
         nonNullJsons ← Gen.unfoldable
           $ AGen.genJson `Gen.suchThat` (not A.isNull)
 
-        nullJsons ← Gen.unfoldable
-          $ pure A.jsonNull
+        nullJsons ← Gen.unfoldable $ pure A.jsonNull
 
         let
           schema = ObjectSchema $ Schema.defaultKeywords
