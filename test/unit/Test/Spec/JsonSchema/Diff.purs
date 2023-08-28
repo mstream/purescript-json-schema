@@ -158,7 +158,7 @@ examples =
   , scenario
       "changes of exclusiveMaximum keyword should be reported"
       { description:
-          "schema expecting maximum value of 2 (exclusively) to schema expecting maximum value of 4 (exclusively)"
+          "schema expecting lower (exclusive) maximum value to schema expecting higher (exclusive) maximum value"
       , value:
           { nextSchema: ObjectSchema
               $ Schema.defaultKeywords
@@ -180,7 +180,7 @@ examples =
   , scenario
       "changes of minimum keyword should be reported"
       { description:
-          "schema expecting minimum value of 2 (exclusively) to schema expecting minimum value of 4 (exclusively)"
+          "schema expecting lower (exclusive) minimum value to schema expecting higher (exclusive) minimum value"
       , value:
           { nextSchema: ObjectSchema
               $ Schema.defaultKeywords
@@ -200,7 +200,7 @@ examples =
   , scenario
       "changes of maximum keyword should be reported"
       { description:
-          "schema expecting maximum value of 2 (inclusively) to schema expecting maximum value of 4 (inclusively)"
+          "schema expecting lower (inclusive) maximum value to schema expecting higher (inclusive) maximum value"
       , value:
           { nextSchema: ObjectSchema
               $ Schema.defaultKeywords
@@ -220,7 +220,7 @@ examples =
   , scenario
       "changes of minimum keyword should be reported"
       { description:
-          "schema expecting minimum value of 2 (inclusively) to schema expecting minimum value of 4 (inclusively)"
+          "schema expecting lower (inclusive) minimum value to schema expecting higher (inclusive) minimum value"
       , value:
           { nextSchema: ObjectSchema
               $ Schema.defaultKeywords
@@ -255,7 +255,7 @@ scenario description input expectedDifferences =
   }
 
 renderInput ∷ Input DiffInput → Document
-renderInput { description, value: { nextSchema, previousSchema } } =
+renderInput { value: { nextSchema, previousSchema } } =
   [ M.heading5 "Previous JSON schema"
   , M.codeBlock Json
       $ (A.stringifyWithIndent 2 <<< Printing.printSchema)
@@ -266,7 +266,7 @@ renderInput { description, value: { nextSchema, previousSchema } } =
   ]
 
 renderOutput ∷ ExpectedOutput (Set Difference) → Document
-renderOutput { description, value: differences } =
+renderOutput { value: differences } =
   [ M.codeBlock' $ String.joinWith "\n" renderDifferences ]
   where
   renderDifferences ∷ Array String

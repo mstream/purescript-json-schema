@@ -48,6 +48,8 @@ printCategoryDescription = M.render <<< case _ of
         "**Full compatibility** - backward and forward compatibility combined"
     , M.paragraph
         "**No compatibility** - neither level of compatibility"
+    , M.paragraph
+        "Maintaining backward and forward compatibility is important for minimizing disruption and ensuring smooth transitions when updating JSON schemas."
     , renderMermaid $ FlowChartDef LeftToRight
         [ FlowChart.subGraph "data writers"
             [ FlowChart.capsule "current_writer" "writer"
@@ -71,10 +73,12 @@ printCategoryDescription = M.render <<< case _ of
         ]
     ]
   Diff →
-    [ M.paragraph "TODO"
+    [ M.paragraph
+        "Calculating JSON Schema Difference is a process used to identify the changes between two JSON schemata. It is used to to see what has been added, removed, or changed. This is useful for tracking changes over time, understanding the impact of changes, and managing versions of a schema. It can also be used to generate a diff report or to automate the process of updating dependent systems or documentation when a schema changes."
     ]
   Validation →
-    [ M.paragraph "TODO"
+    [ M.paragraph
+        "JSON validation is a specification for validating the structure and data types of JSON values. It allows you to specify the required properties, the types of values, the format of the data, and other constraints for a JSON object. This is useful for ensuring that the data received or sent in a JSON format is as expected and can be processed correctly. It helps to catch errors early, improve data quality, and reduce the amount of code needed for data validation."
     ]
 
 renderMermaid ∷ FlowChartDef → Node

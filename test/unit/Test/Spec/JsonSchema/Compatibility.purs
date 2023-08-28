@@ -52,7 +52,7 @@ doc =
   }
 
 renderInput ∷ Input (Set Difference) → Document
-renderInput { description, value: differences } =
+renderInput { value: differences } =
   [ M.heading5 "JSON schema differences"
   , M.codeBlock' $ String.joinWith "\n" renderDifferences
   ]
@@ -68,7 +68,7 @@ renderInput { description, value: differences } =
       differences
 
 renderOutput ∷ ExpectedOutput Compatibility → Document
-renderOutput { description, value: compatibility } =
+renderOutput { value: compatibility } =
   [ M.codeBlock' $ Compatibility.renderCompatibility compatibility ]
 
 computation ∷ Computation CompatibilityInput CompatibilityOutput
