@@ -310,14 +310,6 @@ validateNumber schemaPath jsonPath constraints x =
         if maximum > exclusiveMaximum then Closed maximum
         else Open exclusiveMaximum
 
-conformsMinimum
-  ∷ SchemaPath → JsonPath → Number → Maybe Number → Boolean
-conformsMinimum schemaPath jsonPath x = case _ of
-  Just minimum →
-    x >= minimum
-  Nothing →
-    true
-
 validateUniqueItems
   ∷ SchemaPath → JsonPath → Array Json → Set Violation
 validateUniqueItems schemaPath jsonPath itemJsons =

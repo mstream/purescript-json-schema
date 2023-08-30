@@ -116,10 +116,17 @@ parseMultipleOf = Object.lookup "multipleOf" >>> case _ of
   default = Schema.defaultKeywords.multipleOf
 
 parseTypeKeywordSpec ∷ Json → String \/ Set JsonValueType
-parseTypeKeywordSpec specJson = do
-  typeJsons ← note "Types are not an array." $ A.toArray specJson
-  types ← traverse parseJsonValueType typeJsons
-  pure $ Set.fromFoldable types
+parseTypeKeywordSpec specJson =
+  parseStringSpec specJson <|> parseArraySpec specJson
+  where
+  parseStringSpec ∷ Json → String \/ Set JsonValueType
+  parseStringSpec = map Set.singleton <<< parseJsonValueType
+
+  parseArraySpec ∷ Json → String \/ Set JsonValueType
+  parseArraySpec json = do
+    typeJsons ← note "Types are not an array." $ A.toArray json
+    types ← traverse parseJsonValueType typeJsons
+    pure $ Set.fromFoldable types
 
 parseRequiredKeywordSpec ∷ Json → String \/ Set String
 parseRequiredKeywordSpec specJson = do

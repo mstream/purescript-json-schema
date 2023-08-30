@@ -12,10 +12,15 @@ import Data.Set as Set
 import Data.String as String
 import Docs.Types (Doc)
 import JsonSchema (JsonValueType(..))
-import JsonSchema.Compatibility (Compatibility(..))
+import JsonSchema.Compatibility
+  ( BackwardIncompatibility(..)
+  , Compatibility(..)
+  , ForwardIncompatibility(..)
+  )
 import JsonSchema.Compatibility as Compatibility
 import JsonSchema.Diff (Difference, DifferenceType(..))
 import JsonSchema.Diff as Diff
+import JsonSchema.Range (Boundary(..))
 import Test.Spec (describe)
 import Test.Types
   ( Computation
@@ -53,7 +58,7 @@ doc =
 
 renderInput ∷ Input (Set Difference) → Document
 renderInput { value: differences } =
-  [ M.heading5 "JSON schema differences"
+  [ M.paragraph "*JSON schema differences:*"
   , M.codeBlock' $ String.joinWith "\n" renderDifferences
   ]
   where
@@ -96,13 +101,13 @@ scenario description input expectedCompatibility =
 
 describeCompatibility ∷ Compatibility → String
 describeCompatibility = case _ of
-  Backward →
+  Backward _ →
     "backward compatible"
-  Forward →
+  Forward _ →
     "forward compatible"
   Full →
     "fully compatible"
-  None →
+  None _ →
     "incompatible"
 
 properties ∷ Array CompatibilityProperty
@@ -125,7 +130,19 @@ examples =
           , path: Nil
           }
       }
-      None
+      ( None
+          { backwardIncompatibilities: Set.singleton
+              { incompatibilityType: SetOfAllowedTypesReduced
+                  $ Set.singleton JsonNull
+              , path: Nil
+              }
+          , forwardIncompatibilities: Set.singleton
+              { incompatibilityType: SetOfAllowedTypesExtended $
+                  Set.singleton JsonBoolean
+              , path: Nil
+              }
+          }
+      )
   , scenario
       "Because every integer is a number, but not vice versa, such a change is backward compatible."
       { description:
@@ -137,7 +154,14 @@ examples =
           , path: Nil
           }
       }
-      Backward
+      ( Backward
+          { forwardIncompatibilities: Set.singleton
+              { incompatibilityType: SetOfAllowedTypesExtended $
+                  Set.singleton JsonNumber
+              , path: Nil
+              }
+          }
+      )
   , scenario
       "Because every integer is a number, but not vice versa, such a change is forward compatible."
       { description:
@@ -149,7 +173,14 @@ examples =
           , path: Nil
           }
       }
-      Forward
+      ( Forward
+          { backwardIncompatibilities: Set.singleton
+              { incompatibilityType: SetOfAllowedTypesReduced $
+                  Set.singleton JsonNumber
+              , path: Nil
+              }
+          }
+      )
   , scenario
       "Because more value types than before are accepted, this change is backward compatible."
       { description:
@@ -161,7 +192,14 @@ examples =
           , path: Nil
           }
       }
-      Backward
+      ( Backward
+          { forwardIncompatibilities: Set.singleton
+              { incompatibilityType: SetOfAllowedTypesExtended $
+                  Set.singleton JsonBoolean
+              , path: Nil
+              }
+          }
+      )
   , scenario
       "Because less value types than before are accepted, this change is forward compatible."
       { description:
@@ -173,7 +211,14 @@ examples =
           , path: Nil
           }
       }
-      Forward
+      ( Forward
+          { backwardIncompatibilities: Set.singleton
+              { incompatibilityType: SetOfAllowedTypesReduced $
+                  Set.singleton JsonBoolean
+              , path: Nil
+              }
+          }
+      )
   , scenario
       "Because every integer is a number, such a change is fully compatible."
       { description:
@@ -197,7 +242,14 @@ examples =
           , path: Nil
           }
       }
-      Backward
+      ( Backward
+          { forwardIncompatibilities: Set.singleton
+              { incompatibilityType: SetOfAllowedTypesExtended $
+                  Set.singleton JsonNumber
+              , path: Nil
+              }
+          }
+      )
   , scenario
       "Because every integer is a number, such a change is fully compatible."
       { description:
@@ -221,7 +273,14 @@ examples =
           , path: Nil
           }
       }
-      Forward
+      ( Forward
+          { backwardIncompatibilities: Set.singleton
+              { incompatibilityType: SetOfAllowedTypesReduced $
+                  Set.singleton JsonNumber
+              , path: Nil
+              }
+          }
+      )
   , scenario
       "Because every multiple the new value is also a multiple of the old value, such a change is backward compatible"
       { description:
@@ -231,7 +290,14 @@ examples =
           , path: Nil
           }
       }
-      Backward
+      ( Backward
+          { forwardIncompatibilities: Set.singleton
+              { incompatibilityType: NewMultipleIsNotFactorOfOldMultiple
+                  { new: 4.0, old: 2.0 }
+              , path: Nil
+              }
+          }
+      )
   , scenario
       "Because every multiple the old value is also a multiple of the new value, such a change is forward compatible"
       { description:
@@ -241,7 +307,15 @@ examples =
           , path: Nil
           }
       }
-      Forward
+      ( Forward
+          { backwardIncompatibilities: Set.singleton
+              { incompatibilityType: OldMultipleIsNotFactorOfNewMultiple
+                  { new: 2.0, old: 4.0 }
+              , path: Nil
+              }
+          }
+      )
+
   , scenario
       "In this situation, there are potentially some numbers that are not divisible by neither of multipleOf values. Therefore, such a change is incompatible."
       { description:
@@ -252,7 +326,67 @@ examples =
             , path: Nil
             }
       }
-      None
+      ( None
+          { backwardIncompatibilities: Set.singleton
+              { incompatibilityType: OldMultipleIsNotFactorOfNewMultiple
+                  { new: 5.0, old: 2.0 }
+              , path: Nil
+              }
+          , forwardIncompatibilities:
+              Set.singleton
+                { incompatibilityType:
+                    NewMultipleIsNotFactorOfOldMultiple
+                      { new: 5.0, old: 2.0 }
+                , path: Nil
+                }
+          }
+      )
+  , scenario
+      "In this situation, all numbers from the new range fall into the old, unconstrained one. Therefore, such a change if forward compatible."
+      { description: "the range gets constrained"
+      , value:
+          Set.fromFoldable
+            [ { differenceType: MaximumChange Nothing (Just 20.0)
+              , path: Nil
+              }
+            , { differenceType: MinimumChange Nothing (Just 5.0)
+              , path: Nil
+              }
+            ]
+      }
+      ( Forward
+          { backwardIncompatibilities: Set.singleton
+              { incompatibilityType: RangeOfAllowedNumbersReduced
+                  { lower: Just { from: Open bottom, to: Open 5.0 }
+                  , upper: Just { from: Open 20.0, to: Open top }
+                  }
+              , path: Nil
+              }
+          }
+      )
+  , scenario
+      "In this situation, all numbers from the old range fall into the new, unconstrained one. Therefore, such a change if forward backward compatible."
+      { description: "the range gets unconstrained"
+      , value:
+          Set.fromFoldable
+            [ { differenceType: MaximumChange (Just 20.0) Nothing
+              , path: Nil
+              }
+            , { differenceType: MinimumChange (Just 5.0) Nothing
+              , path: Nil
+              }
+            ]
+      }
+      ( Backward
+          { forwardIncompatibilities: Set.singleton
+              { incompatibilityType: RangeOfAllowedNumbersExtended
+                  { lower: Just { from: Open bottom, to: Closed 5.0 }
+                  , upper: Just { from: Open 20.0, to: Open top }
+                  }
+              , path: Nil
+              }
+          }
+      )
   , scenario
       "In this situation, all numbers from the new, longer range fall into the old, shorter range. Therefore, such a change is backward compatible."
       { description: "the range of allowed number values being extended"
@@ -266,7 +400,42 @@ examples =
               }
             ]
       }
-      Backward
+      ( Backward
+          { forwardIncompatibilities: Set.singleton
+              { incompatibilityType: RangeOfAllowedNumbersExtended
+                  { lower: Just { from: Closed 5.0, to: Open 10.0 }
+                  , upper: Just { from: Open 15.0, to: Closed 20.0 }
+                  }
+              , path: Nil
+              }
+          }
+      )
+  , scenario
+      "In this situation, all numbers from the new, longer range fall into the old, shorter range. Therefore, such a change is backward compatible."
+      { description:
+          "the range of allowed number values being extended using exclusive versions of constraints"
+      , value:
+          Set.fromFoldable
+            [ { differenceType: ExclusiveMaximumChange (Just 15.0)
+                  (Just 20.0)
+              , path: Nil
+              }
+            , { differenceType: ExclusiveMinimumChange (Just 10.0)
+                  (Just 5.0)
+              , path: Nil
+              }
+            ]
+      }
+      ( Backward
+          { forwardIncompatibilities: Set.singleton
+              { incompatibilityType: RangeOfAllowedNumbersExtended
+                  { lower: Just { from: Open 5.0, to: Closed 10.0 }
+                  , upper: Just { from: Closed 15.0, to: Open 20.0 }
+                  }
+              , path: Nil
+              }
+          }
+      )
   , scenario
       "In this situation, all numbers from the new, shorted range fall into the old, longer range. Therefore, such a change is forward compatible."
       { description: "the range of allowed number values being reduced"
@@ -280,7 +449,42 @@ examples =
               }
             ]
       }
-      Forward
+      ( Forward
+          { backwardIncompatibilities: Set.singleton
+              { incompatibilityType: RangeOfAllowedNumbersReduced
+                  { lower: Just { from: Closed 5.0, to: Open 10.0 }
+                  , upper: Just { from: Open 15.0, to: Closed 20.0 }
+                  }
+              , path: Nil
+              }
+          }
+      )
+  , scenario
+      "In this situation, all numbers from the new, shorted range fall into the old, longer range. Therefore, such a change is forward compatible."
+      { description:
+          "the range of allowed number values being reduced using exclusive versions of constraints"
+      , value:
+          Set.fromFoldable
+            [ { differenceType: ExclusiveMaximumChange (Just 20.0)
+                  (Just 15.0)
+              , path: Nil
+              }
+            , { differenceType: ExclusiveMinimumChange (Just 5.0)
+                  (Just 10.0)
+              , path: Nil
+              }
+            ]
+      }
+      ( Forward
+          { backwardIncompatibilities: Set.singleton
+              { incompatibilityType: RangeOfAllowedNumbersReduced
+                  { lower: Just { from: Open 5.0, to: Closed 10.0 }
+                  , upper: Just { from: Closed 15.0, to: Open 20.0 }
+                  }
+              , path: Nil
+              }
+          }
+      )
   , scenario
       "In this situation, there are some numbers which do not fall into neither old nor new range. Therefore, such a change is incompatible."
       { description:
@@ -294,7 +498,57 @@ examples =
             }
           ]
       }
-      None
+      ( None
+          { backwardIncompatibilities: Set.singleton
+              { incompatibilityType: RangeOfAllowedNumbersReduced
+                  { lower: Just { from: Closed 5.0, to: Open 10.0 }
+                  , upper: Nothing
+                  }
+              , path: Nil
+              }
+          , forwardIncompatibilities: Set.singleton
+              { incompatibilityType: RangeOfAllowedNumbersExtended
+                  { lower: Nothing
+                  , upper: Just { from: Open 15.0, to: Closed 20.0 }
+                  }
+              , path: Nil
+              }
+
+          }
+      )
+  , scenario
+      "In this situation, there are some numbers which do not fall into neither old nor new range. Therefore, such a change is incompatible."
+      { description:
+          "the range of allowed number values being extended and reduced at the same time using exclusive versions of constraints"
+      , value: Set.fromFoldable
+          [ { differenceType: ExclusiveMaximumChange (Just 15.0)
+                (Just 20.0)
+            , path: Nil
+            }
+          , { differenceType: ExclusiveMinimumChange (Just 5.0)
+                (Just 10.0)
+            , path: Nil
+            }
+          ]
+      }
+      ( None
+          { backwardIncompatibilities: Set.singleton
+              { incompatibilityType: RangeOfAllowedNumbersReduced
+                  { lower: Just { from: Open 5.0, to: Closed 10.0 }
+                  , upper: Nothing
+                  }
+              , path: Nil
+              }
+          , forwardIncompatibilities: Set.singleton
+              { incompatibilityType: RangeOfAllowedNumbersExtended
+                  { lower: Nothing
+                  , upper: Just { from: Closed 15.0, to: Open 20.0 }
+                  }
+              , path: Nil
+              }
+
+          }
+      )
   ]
 
 spec ∷ TestSpec

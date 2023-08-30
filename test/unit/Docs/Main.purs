@@ -15,6 +15,8 @@ import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
 import Node.Encoding (Encoding(..))
 import Node.FS.Aff as FS
+import Node.FS.Perms as FSP
+import Test.Spec.JsonSchema.Codec.Parsing as Parsing
 import Test.Spec.JsonSchema.Compatibility as Compatibility
 import Test.Spec.JsonSchema.Diff as Diff
 import Test.Spec.JsonSchema.Validation as Validation
@@ -26,34 +28,61 @@ main = launchAff_ $ saveDocumentation docByCategory
   docByCategory = Map.fromFoldable
     [ Compatibility /\ Compatibility.doc
     , Diff /\ Diff.doc
+    , Parsing /\ Parsing.doc
     , Validation /\ Validation.doc
     ]
 
 saveDocumentation ∷ Map Category Doc → Aff Unit
 saveDocumentation specByCategory = do
-  saveTableOfContents prefix $ Map.keys specByCategory
-  traverseWithIndex_ (saveCategory prefix) specByCategory
+  FS.mkdir' (prefix <> "/" <> categoriesDirectory)
+    { mode: FSP.mkPerms
+        FSP.all
+        (FSP.execute + FSP.read)
+        (FSP.execute + FSP.read)
+    , recursive: true
+    }
+
+  saveTableOfContents
+    (prefix <> "/" <> "SUMMARY.md")
+    categoryFilePath
+    (Map.keys specByCategory)
+
+  traverseWithIndex_
+    ( \category doc →
+        saveCategory
+          (prefix <> "/" <> categoryFilePath category)
+          category
+          doc
+    )
+    specByCategory
+
   where
   prefix ∷ String
   prefix = "docs/src"
 
-saveTableOfContents ∷ String → Set Category → Aff Unit
-saveTableOfContents prefix =
-  FS.writeTextFile UTF8 (prefix <> "/SUMMARY.md")
+  categoryFilePath ∷ Category → String
+  categoryFilePath category =
+    categoriesDirectory
+      <> "/"
+      <>
+        ( DocsPrinting.formatAnchor
+            $ DocsPrinting.renderCategory category
+        )
+      <> ".md"
+
+  categoriesDirectory ∷ String
+  categoriesDirectory = "categories"
+
+saveTableOfContents
+  ∷ String → (Category → String) → Set Category → Aff Unit
+saveTableOfContents path categoryFilePath =
+  FS.writeTextFile UTF8 path
     <<< M.render
-    <<< DocsPrinting.printTableOfContents
+    <<< ([ M.heading1 "Summary" ] <> _)
+    <<< DocsPrinting.printTableOfContents categoryFilePath
 
 saveCategory ∷ String → Category → Doc → Aff Unit
-saveCategory prefix category doc =
+saveCategory path category doc = do
   FS.writeTextFile UTF8 path
     $ M.render
     $ DocsPrinting.printCategory category doc
-  where
-  path ∷ String
-  path = prefix
-    <> "/examples/"
-    <>
-      ( DocsPrinting.formatAnchor $ DocsPrinting.renderCategory
-          category
-      )
-    <> ".md"

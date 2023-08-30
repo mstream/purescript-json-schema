@@ -1,9 +1,18 @@
-## JSON Values Validation
-TODO
+
+# JSON Values Validation
+
+JSON validation is a specification for validating the structure and data types of JSON values.
+
+It allows you to specify the required properties, the types of values, the format of the data, and other constraints for a JSON object.
+
+This is useful for ensuring that the data received or sent in a JSON format is as expected and can be processed correctly.
+
+It helps to catch errors early, improve data quality, and reduce the amount of code needed for data validation.
 
 
 
-Examples of validation of:
+
+## Examples of validation of
 
 - [a boolean value against a schema accepting only nulls](#a-boolean-value-against-a-schema-accepting-only-nulls)
 - [a boolean value against a schema accepting only nulls and strings](#a-boolean-value-against-a-schema-accepting-only-nulls-and-strings)
@@ -23,11 +32,16 @@ Examples of validation of:
 - [an array containing duplicated strings against a schema not accepting duplicates](#an-array-containing-duplicated-strings-against-a-schema-not-accepting-duplicates)
 - [the null value against a schema accepting only nulls](#the-null-value-against-a-schema-accepting-only-nulls)
 ---
+
 ### a boolean value against a schema accepting only nulls and strings
+
 A boolean value does not conform to the schema as only null or string values do.
 
-#### Input
-##### JSON schema
+**Input:**
+
+*JSON schema:*
+
+
 ```json
 {
   "type": [
@@ -36,23 +50,31 @@ A boolean value does not conform to the schema as only null or string values do.
   ]
 }
 ```
-##### JSON
+*JSON:*
+
+
 ```json
 true
 ```
-#### Output
-```
+**Output:**
+
+```text
 ✗
   Schema path: #/type
   JSON path: $
   Invalid type. Expected null or string but got boolean.
 ```
 ---
+
 ### a boolean value against a schema accepting only nulls
+
 A boolean value does not conform to the schema as only null values do.
 
-#### Input
-##### JSON schema
+**Input:**
+
+*JSON schema:*
+
+
 ```json
 {
   "type": [
@@ -60,23 +82,31 @@ A boolean value does not conform to the schema as only null values do.
   ]
 }
 ```
-##### JSON
+*JSON:*
+
+
 ```json
 true
 ```
-#### Output
-```
+**Output:**
+
+```text
 ✗
   Schema path: #/type
   JSON path: $
   Invalid type. Expected null but got boolean.
 ```
 ---
+
 ### the null value against a schema accepting only nulls
+
 A null value conforms to the schema.
 
-#### Input
-##### JSON schema
+**Input:**
+
+*JSON schema:*
+
+
 ```json
 {
   "type": [
@@ -84,20 +114,28 @@ A null value conforms to the schema.
   ]
 }
 ```
-##### JSON
+*JSON:*
+
+
 ```json
 null
 ```
-#### Output
-```
+**Output:**
+
+```text
 ✓ no violations
 ```
 ---
+
 ### a whole number against a schema which accepts any numbers
+
 All whole number values conform to the schema as every integer is a number.
 
-#### Input
-##### JSON schema
+**Input:**
+
+*JSON schema:*
+
+
 ```json
 {
   "type": [
@@ -105,184 +143,256 @@ All whole number values conform to the schema as every integer is a number.
   ]
 }
 ```
-##### JSON
+*JSON:*
+
+
 ```json
 1
 ```
-#### Output
-```
+**Output:**
+
+```text
 ✓ no violations
 ```
 ---
+
 ### a number which is equal to the maximum value specified by the schema
+
 Because maximum constraint is inclusive, such a value is valid.
 
-#### Input
-##### JSON schema
+**Input:**
+
+*JSON schema:*
+
+
 ```json
 {
   "maximum": 4
 }
 ```
-##### JSON
+*JSON:*
+
+
 ```json
 4
 ```
-#### Output
-```
+**Output:**
+
+```text
 ✓ no violations
 ```
 ---
+
 ### a number which is equal to the exclusive maximum value specified by the schema
+
 Because the exclusiveMaximum constraint is exclusive, such a value is invalid.
 
-#### Input
-##### JSON schema
+**Input:**
+
+*JSON schema:*
+
+
 ```json
 {
   "exclusiveMaximum": 4
 }
 ```
-##### JSON
+*JSON:*
+
+
 ```json
 4
 ```
-#### Output
-```
+**Output:**
+
+```text
 ✗
   Schema path: #/exclusiveMaximum
   JSON path: $
   4.0 is outside of the valid range of (-Infinity,4.0)
 ```
 ---
+
 ### a number which is equal to the exclusive minimum value specified by the schema
+
 Because the exclusiveMinimum constraint is exclusive, such a value is not valid.
 
-#### Input
-##### JSON schema
+**Input:**
+
+*JSON schema:*
+
+
 ```json
 {
   "exclusiveMinimum": 4
 }
 ```
-##### JSON
+*JSON:*
+
+
 ```json
 4
 ```
-#### Output
-```
+**Output:**
+
+```text
 ✗
   Schema path: #/exclusiveMinimum
   JSON path: $
   4.0 is outside of the valid range of (4.0,Infinity)
 ```
 ---
+
 ### a number which is equal to the minimum value specified by the schema
+
 Because the minimum constraint is inclusive, such a value is invalid.
 
-#### Input
-##### JSON schema
+**Input:**
+
+*JSON schema:*
+
+
 ```json
 {
   "minimum": 4
 }
 ```
-##### JSON
+*JSON:*
+
+
 ```json
 4
 ```
-#### Output
-```
+**Output:**
+
+```text
 ✓ no violations
 ```
 ---
+
 ### a number which is greater than the maximum value specified by the schema
+
 Because the value is out of the valid range, it is invalid.
 
-#### Input
-##### JSON schema
+**Input:**
+
+*JSON schema:*
+
+
 ```json
 {
   "maximum": 4
 }
 ```
-##### JSON
+*JSON:*
+
+
 ```json
 5
 ```
-#### Output
-```
+**Output:**
+
+```text
 ✗
   Schema path: #/maximum
   JSON path: $
   5.0 is outside of the valid range of (-Infinity,4.0]
 ```
 ---
+
 ### a number which is less than the minimum value specified by the schema
+
 Because the value is out of the valid range, it is invalid.
 
-#### Input
-##### JSON schema
+**Input:**
+
+*JSON schema:*
+
+
 ```json
 {
   "minimum": 4
 }
 ```
-##### JSON
+*JSON:*
+
+
 ```json
 3
 ```
-#### Output
-```
+**Output:**
+
+```text
 ✗
   Schema path: #/minimum
   JSON path: $
   3.0 is outside of the valid range of [4.0,Infinity)
 ```
 ---
+
 ### a number which is less than the exclusive maximum value specified by the schema
+
 Because the value is within the valid range, it is valid.
 
-#### Input
-##### JSON schema
+**Input:**
+
+*JSON schema:*
+
+
 ```json
 {
   "exclusiveMaximum": 4
 }
 ```
-##### JSON
+*JSON:*
+
+
 ```json
 3
 ```
-#### Output
-```
+**Output:**
+
+```text
 ✓ no violations
 ```
 ---
+
 ### a number which is greater than the minimum value specified by the schema
+
 Because the value is within the valid range, it is valid.
 
-#### Input
-##### JSON schema
+**Input:**
+
+*JSON schema:*
+
+
 ```json
 {
   "exclusiveMinimum": 4
 }
 ```
-##### JSON
+*JSON:*
+
+
 ```json
 5
 ```
-#### Output
-```
+**Output:**
+
+```text
 ✓ no violations
 ```
 ---
+
 ### a fractional number against a schema accepting only whole numbers
+
 Not all number values conform to the schema as not every number is a integer.
 
-#### Input
-##### JSON schema
+**Input:**
+
+*JSON schema:*
+
+
 ```json
 {
   "type": [
@@ -290,23 +400,31 @@ Not all number values conform to the schema as not every number is a integer.
   ]
 }
 ```
-##### JSON
+*JSON:*
+
+
 ```json
 1.5
 ```
-#### Output
-```
+**Output:**
+
+```text
 ✗
   Schema path: #/type
   JSON path: $
   Invalid type. Expected integer but got number.
 ```
 ---
+
 ### a number which is not a multiple of the factor desired by the schema
+
 Number 7 does not conform the schema as 7.5 is not a multiple of 2.5.
 
-#### Input
-##### JSON schema
+**Input:**
+
+*JSON schema:*
+
+
 ```json
 {
   "multipleOf": 2.5,
@@ -315,23 +433,31 @@ Number 7 does not conform the schema as 7.5 is not a multiple of 2.5.
   ]
 }
 ```
-##### JSON
+*JSON:*
+
+
 ```json
 7
 ```
-#### Output
-```
+**Output:**
+
+```text
 ✗
   Schema path: #/multipleOf
   JSON path: $
   7.0 is not a multiple of 2.5
 ```
 ---
+
 ### a number which is a multiple of the factor desired by the schema
+
 Number 7.5 conforms to the schema as 7.5 is 2.5 times 3.
 
-#### Input
-##### JSON schema
+**Input:**
+
+*JSON schema:*
+
+
 ```json
 {
   "multipleOf": 2.5,
@@ -340,26 +466,36 @@ Number 7.5 conforms to the schema as 7.5 is 2.5 times 3.
   ]
 }
 ```
-##### JSON
+*JSON:*
+
+
 ```json
 7.5
 ```
-#### Output
-```
+**Output:**
+
+```text
 ✓ no violations
 ```
 ---
+
 ### an array containing duplicated strings against a schema not accepting duplicates
+
 When schema requires items to be unique, any duplicate occurrence of any value will cause a validation failure.
 
-#### Input
-##### JSON schema
+**Input:**
+
+*JSON schema:*
+
+
 ```json
 {
   "uniqueItems": true
 }
 ```
-##### JSON
+*JSON:*
+
+
 ```json
 [
   "a",
@@ -371,8 +507,9 @@ When schema requires items to be unique, any duplicate occurrence of any value w
   "e"
 ]
 ```
-#### Output
-```
+**Output:**
+
+```text
 ✗
   Schema path: #
   JSON path: $
@@ -395,11 +532,16 @@ When schema requires items to be unique, any duplicate occurrence of any value w
     Non-unique array item.
 ```
 ---
+
 ### an array containing a mixture of null and boolean values to a schema accepting only arrays of nulls
+
 When schema requires items to conform to a certain schema, every single value in the array has to.
 
-#### Input
-##### JSON schema
+**Input:**
+
+*JSON schema:*
+
+
 ```json
 {
   "items": {
@@ -412,7 +554,9 @@ When schema requires items to conform to a certain schema, every single value in
   ]
 }
 ```
-##### JSON
+*JSON:*
+
+
 ```json
 [
   null,
@@ -422,8 +566,9 @@ When schema requires items to conform to a certain schema, every single value in
   null
 ]
 ```
-#### Output
-```
+**Output:**
+
+```text
 ✗
   Schema path: #
   JSON path: $

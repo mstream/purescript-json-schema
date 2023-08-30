@@ -71,14 +71,14 @@ doc =
 
 renderInput ∷ Input ValidationInput → Document
 renderInput { value: { json, schema } } =
-  [ M.heading5 "JSON schema"
+  [ M.paragraph "*JSON schema:*\n"
   , M.codeBlock Json
       $ (A.stringifyWithIndent 2 <<< Printing.printSchema) schema
-  , M.heading5 "JSON"
+  , M.paragraph "*JSON:*\n"
   , M.codeBlock Json $ A.stringifyWithIndent 2 json
   ]
 
-renderOutput ∷ ExpectedOutput (Set Violation) → Document
+renderOutput ∷ ExpectedOutput ValidationOutput → Document
 renderOutput { value: violations } =
   [ M.codeBlock' $ String.joinWith "\n" renderViolations ]
   where

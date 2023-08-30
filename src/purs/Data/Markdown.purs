@@ -53,7 +53,7 @@ renderCodeBlock codeBlockType code =
 
 renderHeading ∷ HeadingLevel → String → String
 renderHeading headingLevel text =
-  prefix <> " " <> text <> "\n"
+  "\n" <> prefix <> " " <> text <> "\n\n"
   where
   prefix ∷ String
   prefix = case headingLevel of
@@ -101,7 +101,7 @@ renderCodeBlockType = case _ of
   Mermaid →
     "mermaid"
   Text →
-    ""
+    "text"
 
 codeBlock ∷ CodeBlockType → String → Node
 codeBlock = CodeBlock

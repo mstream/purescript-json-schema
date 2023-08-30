@@ -23,6 +23,7 @@ import Docs.Types (Doc, PrintableExample, PrintableProperty)
 data Category
   = Compatibility
   | Diff
+  | Parsing
   | Validation
 
 derive instance Eq Category
@@ -34,6 +35,8 @@ renderCategory = case _ of
     "JSON Schema Change Compatibility Checks"
   Diff →
     "JSON Schema Difference Calculation"
+  Parsing →
+    "JSON Schema Parsing"
   Validation →
     "JSON Values Validation"
 
@@ -49,7 +52,9 @@ printCategoryDescription = M.render <<< case _ of
     , M.paragraph
         "**No compatibility** - neither level of compatibility"
     , M.paragraph
-        "Maintaining backward and forward compatibility is important for minimizing disruption and ensuring smooth transitions when updating JSON schemas."
+        "Maintaining backward and forward compatibility is important for minimizing disruption"
+    , M.paragraph
+        "and ensuring smooth transitions when updating JSON schemas."
     , renderMermaid $ FlowChartDef LeftToRight
         [ FlowChart.subGraph "data writers"
             [ FlowChart.capsule "current_writer" "writer"
@@ -73,13 +78,24 @@ printCategoryDescription = M.render <<< case _ of
         ]
     ]
   Diff →
+    M.paragraph <$>
+      [ "Calculating JSON Schema Difference is a process used to identify the changes between two JSON schemata."
+      , "It is used to to see what has been added, removed, or changed."
+      , "This is useful for tracking changes over time, understanding the impact of changes, and managing versions of a schema."
+      , "It can also be used to generate a diff report or to automate the process of updating dependent systems or documentation when a schema changes."
+      ]
+  Parsing →
     [ M.paragraph
-        "Calculating JSON Schema Difference is a process used to identify the changes between two JSON schemata. It is used to to see what has been added, removed, or changed. This is useful for tracking changes over time, understanding the impact of changes, and managing versions of a schema. It can also be used to generate a diff report or to automate the process of updating dependent systems or documentation when a schema changes."
+        "JSON schema is commonly expressed in a JSON format."
+    , M.paragraph "However, not every JSON is a valid JSON schema."
     ]
   Validation →
-    [ M.paragraph
-        "JSON validation is a specification for validating the structure and data types of JSON values. It allows you to specify the required properties, the types of values, the format of the data, and other constraints for a JSON object. This is useful for ensuring that the data received or sent in a JSON format is as expected and can be processed correctly. It helps to catch errors early, improve data quality, and reduce the amount of code needed for data validation."
-    ]
+    M.paragraph <$>
+      [ "JSON validation is a specification for validating the structure and data types of JSON values."
+      , "It allows you to specify the required properties, the types of values, the format of the data, and other constraints for a JSON object."
+      , "This is useful for ensuring that the data received or sent in a JSON format is as expected and can be processed correctly."
+      , "It helps to catch errors early, improve data quality, and reduce the amount of code needed for data validation."
+      ]
 
 renderMermaid ∷ FlowChartDef → Node
 renderMermaid flowChartDef =
@@ -88,41 +104,44 @@ renderMermaid flowChartDef =
   code ∷ String
   code = FlowChart.render flowChartDef
 
-printTableOfContents ∷ Set Category → Document
-printTableOfContents = foldMap f
+printTableOfContents ∷ (Category → String) → Set Category → Document
+printTableOfContents categoryFilePath = foldMap f
   where
   f ∷ Category → Document
   f = Array.singleton
     <<< M.list
     <<< Array.singleton
-    <<< printTableOfContentsEntry
+    <<< printTableOfContentsEntry categoryFilePath
 
-printTableOfContentsEntry ∷ Category → Node
-printTableOfContentsEntry category = M.link
+printTableOfContentsEntry ∷ (Category → String) → Category → Node
+printTableOfContentsEntry categoryFilePath category = M.link
   (renderCategory category)
-  ((formatAnchor $ "examples/" <> renderCategory category) <> ".md")
+  (categoryFilePath category)
 
 formatAnchor ∷ String → String
 formatAnchor = String.replaceAll (Pattern " ") (Replacement "-")
   <<< String.replaceAll (Pattern ".") (Replacement "")
+  <<< String.replaceAll (Pattern ",") (Replacement "")
+  <<< String.replaceAll (Pattern "'") (Replacement "")
+  <<< String.replaceAll (Pattern "(") (Replacement "")
+  <<< String.replaceAll (Pattern ")") (Replacement "")
   <<< String.toLower
 
 printCategory ∷ Category → Doc → Document
 printCategory category doc =
-  [ M.heading2 $ renderCategory category
+  [ M.heading1 $ renderCategory category
   , M.paragraph $ printCategoryDescription category
   ]
     <>
       ( if Set.isEmpty doc.properties then []
         else
-          [ M.paragraph "Properties:"
+          [ M.heading2 "Properties"
           ] <> printProperties doc.properties
       )
     <>
       ( if Set.isEmpty doc.examples then []
         else
-          [ M.paragraph
-              $ "Examples of " <> doc.computationDescription <> ":"
+          [ M.heading2 $ "Examples of " <> doc.computationDescription
           ]
             <> printCategoryTableOfContents doc.examples
             <> foldMap printExample doc.examples
@@ -147,8 +166,8 @@ printExample { description, input, output, title } =
   [ M.rule
   , M.heading3 title
   , M.paragraph description
-  , M.heading4 "Input"
+  , M.paragraph "**Input:**"
   ]
     <> input
-    <> [ M.heading4 "Output" ]
+    <> [ M.paragraph "**Output:**" ]
     <> output

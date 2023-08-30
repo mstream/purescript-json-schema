@@ -5,7 +5,6 @@ import Prelude
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Core as A
 import Data.Array as Array
-import Data.Foldable (foldMap)
 import Data.Maybe (Maybe(..), maybe)
 import Data.Set (Set)
 import Data.Set as Set

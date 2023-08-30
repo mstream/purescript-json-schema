@@ -256,11 +256,11 @@ scenario description input expectedDifferences =
 
 renderInput ∷ Input DiffInput → Document
 renderInput { value: { nextSchema, previousSchema } } =
-  [ M.heading5 "Previous JSON schema"
+  [ M.paragraph "*Previous JSON schema:*"
   , M.codeBlock Json
       $ (A.stringifyWithIndent 2 <<< Printing.printSchema)
           previousSchema
-  , M.heading5 "Next JSON schema"
+  , M.paragraph "*Next JSON schema:*"
   , M.codeBlock Json
       $ (A.stringifyWithIndent 2 <<< Printing.printSchema) nextSchema
   ]
