@@ -77,7 +77,9 @@ Because every integer is a number, but not vice versa, such a change is backward
 **Output:**
 
 ```text
-backward
+backward compatible:
+- at #
+  the set of allowed JSON value types has been extended by number
 ```
 ---
 
@@ -100,7 +102,9 @@ Because every integer is a number, but not vice versa, such a change is forward 
 **Output:**
 
 ```text
-forward
+forward compatible:
+- at #
+  the set of allowed JSON value types has been reduced by number
 ```
 ---
 
@@ -124,7 +128,7 @@ Because every integer is a number, such a change is fully compatible.
 **Output:**
 
 ```text
-full
+fully compatible
 ```
 ---
 
@@ -148,7 +152,7 @@ Because every integer is a number, such a change is fully compatible.
 **Output:**
 
 ```text
-full
+fully compatible
 ```
 ---
 
@@ -168,7 +172,9 @@ Because every multiple the new value is also a multiple of the old value, such a
 **Output:**
 
 ```text
-backward
+backward compatible:
+- at #
+  the new multiple constraint of 4.0 is not a factor of the olf multiple constraint of 2.0
 ```
 ---
 
@@ -188,7 +194,9 @@ Because every multiple the old value is also a multiple of the new value, such a
 **Output:**
 
 ```text
-forward
+forward compatible:
+- at #
+  the old multiple constraint of 4.0 is not a factor of the new multiple constraint of 2.0
 ```
 ---
 
@@ -212,7 +220,9 @@ Because less value types than before are accepted, this change is forward compat
 **Output:**
 
 ```text
-forward
+forward compatible:
+- at #
+  the set of allowed JSON value types has been reduced by boolean
 ```
 ---
 
@@ -236,7 +246,9 @@ Because more value types than before are accepted, this change is backward compa
 **Output:**
 
 ```text
-backward
+backward compatible:
+- at #
+  the set of allowed JSON value types has been extended by boolean
 ```
 ---
 
@@ -259,7 +271,10 @@ Because no boolean value can satisfy null JSON type constraint, and vice versa, 
 **Output:**
 
 ```text
-none
+incompatible:
+- at #
+  the set of allowed JSON value types has been extended by boolean- at #
+  the set of allowed JSON value types has been reduced by null
 ```
 ---
 
@@ -283,7 +298,9 @@ Because not every integer is a number, such a change is backward compatible.
 **Output:**
 
 ```text
-backward
+backward compatible:
+- at #
+  the set of allowed JSON value types has been extended by number
 ```
 ---
 
@@ -307,7 +324,9 @@ Because not every integer is a number, such a change is forward compatible.
 **Output:**
 
 ```text
-forward
+forward compatible:
+- at #
+  the set of allowed JSON value types has been reduced by number
 ```
 ---
 
@@ -330,7 +349,9 @@ In this situation, all numbers from the new range fall into the old, unconstrain
 **Output:**
 
 ```text
-forward
+forward compatible:
+- at #
+  the range of allowed values has been reduced by (-Infinity,5.0) and (20.0,Infinity)
 ```
 ---
 
@@ -353,7 +374,9 @@ In this situation, all numbers from the new, longer range fall into the old, sho
 **Output:**
 
 ```text
-backward
+backward compatible:
+- at #
+  the range of allowed values has been extended by (5.0,10.0] and [15.0,20.0)
 ```
 ---
 
@@ -376,7 +399,9 @@ In this situation, all numbers from the new, longer range fall into the old, sho
 **Output:**
 
 ```text
-backward
+backward compatible:
+- at #
+  the range of allowed values has been extended by [5.0,10.0) and (15.0,20.0]
 ```
 ---
 
@@ -399,7 +424,9 @@ In this situation, all numbers from the new, shorted range fall into the old, lo
 **Output:**
 
 ```text
-forward
+forward compatible:
+- at #
+  the range of allowed values has been reduced by (5.0,10.0] and [15.0,20.0)
 ```
 ---
 
@@ -422,7 +449,9 @@ In this situation, all numbers from the new, shorted range fall into the old, lo
 **Output:**
 
 ```text
-forward
+forward compatible:
+- at #
+  the range of allowed values has been reduced by [5.0,10.0) and (15.0,20.0]
 ```
 ---
 
@@ -445,7 +474,9 @@ In this situation, all numbers from the old range fall into the new, unconstrain
 **Output:**
 
 ```text
-backward
+backward compatible:
+- at #
+  the range of allowed values has been extended by (-Infinity,5.0] and (20.0,Infinity)
 ```
 ---
 
@@ -465,7 +496,10 @@ In this situation, there are potentially some numbers that are not divisible by 
 **Output:**
 
 ```text
-none
+incompatible:
+- at #
+  the new multiple constraint of 5.0 is not a factor of the olf multiple constraint of 2.0- at #
+  the old multiple constraint of 2.0 is not a factor of the new multiple constraint of 5.0
 ```
 ---
 
@@ -488,7 +522,10 @@ In this situation, there are some numbers which do not fall into neither old nor
 **Output:**
 
 ```text
-none
+incompatible:
+- at #
+  the range of allowed values has been extended by [15.0,20.0)- at #
+  the range of allowed values has been reduced by (5.0,10.0]
 ```
 ---
 
@@ -511,7 +548,10 @@ In this situation, there are some numbers which do not fall into neither old nor
 **Output:**
 
 ```text
-none
+incompatible:
+- at #
+  the range of allowed values has been extended by (15.0,20.0]- at #
+  the range of allowed values has been reduced by [5.0,10.0)
 ```
 ---
 
@@ -529,5 +569,5 @@ no differences
 **Output:**
 
 ```text
-full
+fully compatible
 ```

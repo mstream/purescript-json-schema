@@ -16,11 +16,14 @@ import JsonSchema.Compatibility
   ( BackwardIncompatibility(..)
   , Compatibility(..)
   , ForwardIncompatibility(..)
+  , Incompatibility
   )
 import JsonSchema.Compatibility as Compatibility
 import JsonSchema.Diff (Difference, DifferenceType(..))
 import JsonSchema.Diff as Diff
 import JsonSchema.Range (Boundary(..))
+import JsonSchema.SchemaPath (SchemaPath)
+import JsonSchema.SchemaPath as SchemaPath
 import Test.Spec (describe)
 import Test.Types
   ( Computation
@@ -73,8 +76,8 @@ renderInput { value: differences } =
       differences
 
 renderOutput ∷ ExpectedOutput Compatibility → Document
-renderOutput { value: compatibility } =
-  [ M.codeBlock' $ Compatibility.renderCompatibility compatibility ]
+renderOutput { description } =
+  [ M.codeBlock' description ]
 
 computation ∷ Computation CompatibilityInput CompatibilityOutput
 computation =
@@ -91,24 +94,14 @@ scenario description input expectedCompatibility =
   { computation
   , description
   , expectedOutput:
-      { description: describeCompatibility expectedCompatibility
+      { description: Compatibility.renderCompatibility
+          expectedCompatibility
       , value: expectedCompatibility
       }
   , input
   , renderInput
   , renderOutput
   }
-
-describeCompatibility ∷ Compatibility → String
-describeCompatibility = case _ of
-  Backward _ →
-    "backward compatible"
-  Forward _ →
-    "forward compatible"
-  Full →
-    "fully compatible"
-  None _ →
-    "incompatible"
 
 properties ∷ Array CompatibilityProperty
 properties = []

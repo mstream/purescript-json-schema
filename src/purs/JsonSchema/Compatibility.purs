@@ -9,6 +9,7 @@ module JsonSchema.Compatibility
 
 import Prelude
 
+import Data.Array as Array
 import Data.Foldable (foldl)
 import Data.Generic.Rep (class Generic)
 import Data.List (List(..))
@@ -16,10 +17,14 @@ import Data.Maybe (Maybe(..))
 import Data.Set (Set)
 import Data.Set as Set
 import Data.Show.Generic (genericShow)
+import Data.String as String
 import JsonSchema (JsonValueType(..))
+import JsonSchema as Schema
 import JsonSchema.Diff (Difference, DifferenceType(..))
 import JsonSchema.Range (Boundary(..), Range)
+import JsonSchema.Range as Range
 import JsonSchema.SchemaPath (SchemaPath)
+import JsonSchema.SchemaPath as SchemaPath
 import Utils (isInteger)
 
 data Compatibility
@@ -51,7 +56,7 @@ type Incompatibility a =
   }
 
 data BackwardIncompatibility
-  = MultpipleIntroduced Number
+  = MultipleIntroduced Number
   | OldMultipleIsNotFactorOfNewMultiple { new ∷ Number, old ∷ Number }
   | RangeOfAllowedNumbersReduced
       { lower ∷ Maybe Range, upper ∷ Maybe Range }
@@ -64,6 +69,38 @@ derive instance Ord BackwardIncompatibility
 
 instance Show BackwardIncompatibility where
   show = genericShow
+
+describeBackwardIncompatibility ∷ BackwardIncompatibility → String
+describeBackwardIncompatibility = case _ of
+  MultipleIntroduced multiple →
+    "numerical values must be multiples of "
+      <> show multiple
+      <> " now"
+  OldMultipleIsNotFactorOfNewMultiple { new, old } →
+    "the old multiple constraint of "
+      <> show old
+      <> " is not a factor of the new multiple constraint of "
+      <> show new
+  RangeOfAllowedNumbersReduced { lower, upper } →
+    "the range of allowed values has been reduced by"
+      <> case lower, upper of
+        Just l, Just u →
+          " "
+            <> Range.renderRange l
+            <> " and "
+            <> Range.renderRange u
+        Just l, Nothing →
+          " " <> Range.renderRange l
+        Nothing, Just u →
+          " " <> Range.renderRange u
+        Nothing, Nothing →
+          "FIXME: should never happen, inprove the data model"
+  SetOfAllowedTypesReduced removedTypes →
+    "the set of allowed JSON value types has been reduced by "
+      <> String.joinWith ", "
+        ( Schema.renderJsonValueType <$>
+            Array.fromFoldable removedTypes
+        )
 
 data ForwardIncompatibility
   = MultipleWithdrawn Number
@@ -79,6 +116,38 @@ derive instance Ord ForwardIncompatibility
 
 instance Show ForwardIncompatibility where
   show = genericShow
+
+describeForwardIncompatibility ∷ ForwardIncompatibility → String
+describeForwardIncompatibility = case _ of
+  MultipleWithdrawn multiple →
+    "numerical values must not be multiples of "
+      <> show multiple
+      <> " anymore"
+  NewMultipleIsNotFactorOfOldMultiple { new, old } →
+    "the new multiple constraint of "
+      <> show new
+      <> " is not a factor of the olf multiple constraint of "
+      <> show old
+  RangeOfAllowedNumbersExtended { lower, upper } →
+    "the range of allowed values has been extended by"
+      <> case lower, upper of
+        Just l, Just u →
+          " "
+            <> Range.renderRange l
+            <> " and "
+            <> Range.renderRange u
+        Just l, Nothing →
+          " " <> Range.renderRange l
+        Nothing, Just u →
+          " " <> Range.renderRange u
+        Nothing, Nothing →
+          "FIXME: should never happen, inprove the data model"
+  SetOfAllowedTypesExtended removedTypes →
+    "the set of allowed JSON value types has been extended by "
+      <> String.joinWith ", "
+        ( Schema.renderJsonValueType <$>
+            Array.fromFoldable removedTypes
+        )
 
 calculate ∷ Set Difference → Compatibility
 calculate differences = foldl
@@ -254,7 +323,7 @@ calculateMultipleOfChange = case _, _ of
   Nothing, Just after →
     Forward
       { backwardIncompatibilities: Set.singleton
-          { incompatibilityType: MultpipleIntroduced after, path: Nil }
+          { incompatibilityType: MultipleIntroduced after, path: Nil }
       }
   Nothing, Nothing →
     Full
@@ -390,11 +459,43 @@ mergeCompatibility = case _, _ of
 
 renderCompatibility ∷ Compatibility → String
 renderCompatibility = case _ of
-  Backward _ →
-    "backward"
-  Forward _ →
-    "forward"
+  Backward { forwardIncompatibilities } →
+    "backward compatible:\n"
+      <> String.joinWith "\n"
+        ( renderForwardIncompatibility
+            <$> Array.fromFoldable forwardIncompatibilities
+        )
+  Forward { backwardIncompatibilities } →
+    "forward compatible:\n"
+      <> String.joinWith "\n"
+        ( renderBackwardIncompatibility
+            <$> Array.fromFoldable backwardIncompatibilities
+        )
   Full →
-    "full"
-  None _ →
-    "none"
+    "fully compatible"
+  None { backwardIncompatibilities, forwardIncompatibilities } →
+    "incompatible:\n"
+      <> String.joinWith "\n"
+        ( renderForwardIncompatibility
+            <$> Array.fromFoldable forwardIncompatibilities
+        )
+      <> String.joinWith "\n"
+        ( renderBackwardIncompatibility
+            <$> Array.fromFoldable backwardIncompatibilities
+        )
+  where
+  renderBackwardIncompatibility
+    ∷ Incompatibility BackwardIncompatibility → String
+  renderBackwardIncompatibility { incompatibilityType, path } =
+    "- at "
+      <> SchemaPath.render path
+      <> "\n  "
+      <> describeBackwardIncompatibility incompatibilityType
+
+  renderForwardIncompatibility
+    ∷ Incompatibility ForwardIncompatibility → String
+  renderForwardIncompatibility { incompatibilityType, path } =
+    "- at "
+      <> SchemaPath.render path
+      <> "\n  "
+      <> describeForwardIncompatibility incompatibilityType
