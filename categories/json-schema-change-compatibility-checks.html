@@ -1,0 +1,588 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>JSON Schema Change Compatibility Checks - PureScript JSON Schema</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var html = document.querySelector('html');
+            var sidebar = null;
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../categories/json-schema-change-compatibility-checks.html" class="active"><strong aria-hidden="true">1.</strong> JSON Schema Change Compatibility Checks</a></li><li class="chapter-item expanded "><a href="../categories/json-schema-difference-calculation.html"><strong aria-hidden="true">2.</strong> JSON Schema Difference Calculation</a></li><li class="chapter-item expanded "><a href="../categories/json-schema-parsing.html"><strong aria-hidden="true">3.</strong> JSON Schema Parsing</a></li><li class="chapter-item expanded "><a href="../categories/json-values-validation.html"><strong aria-hidden="true">4.</strong> JSON Values Validation</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">PureScript JSON Schema</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="json-schema-change-compatibility-checks"><a class="header" href="#json-schema-change-compatibility-checks">JSON Schema Change Compatibility Checks</a></h1>
+<p><strong>Backward compatibility</strong> - an ability of a system to understand input intended for previous versions of itself</p>
+<p><strong>Forward compatibility</strong> - an ability of a system to understand input intended for future versions of itself</p>
+<p><strong>Full compatibility</strong> - backward and forward compatibility combined</p>
+<p><strong>No compatibility</strong> - neither level of compatibility</p>
+<p>Maintaining backward and forward compatibility is important for minimizing disruption</p>
+<p>and ensuring smooth transitions when updating JSON schemas.</p>
+<pre class="mermaid">flowchart LR
+    subgraph data writers
+        current_writer(&quot;writer&quot;)
+        next_writer(&quot;writer&lt;sub&gt;+1&lt;/sub&gt;&quot;)
+
+    end
+    subgraph data readers
+        current_reader(&quot;reader&quot;)
+        next_reader(&quot;reader&lt;sub&gt;+1&lt;/sub&gt;&quot;)
+
+    end
+    current_writer --&gt;  current_reader
+    current_writer --&gt; |backward compatibility| next_reader
+    next_writer --&gt; |forward compatibility| current_reader
+
+</pre>
+<h2 id="examples-of-calculating-compatibility-based-on"><a class="header" href="#examples-of-calculating-compatibility-based-on">Examples of calculating compatibility based on</a></h2>
+<ul>
+<li><a href="#expected-json-value-type-changing-from-integer-to-number">expected JSON value type changing from integer to number</a></li>
+<li><a href="#expected-json-value-type-changing-from-null-to-boolean">expected JSON value type changing from null to boolean</a></li>
+<li><a href="#expected-json-value-type-changing-from-number-to-integer">expected JSON value type changing from number to integer</a></li>
+<li><a href="#expected-json-value-types-being-extended-from-just-null-to-null-and-boolean">expected JSON value types being extended from just null to null and boolean</a></li>
+<li><a href="#expected-json-value-types-being-reduced-from-null-and-boolean-to-just-null">expected JSON value types being reduced from null and boolean to just null</a></li>
+<li><a href="#expected-json-value-types-including-integer-and-number-being-reduced-by-integer">expected JSON value types including integer and number being reduced by integer</a></li>
+<li><a href="#expected-json-value-types-including-integer-and-number-being-reuced-by-number">expected JSON value types including integer and number being reuced by number</a></li>
+<li><a href="#expected-json-value-types-including-integer-being-extended-by-number">expected JSON value types including integer being extended by number</a></li>
+<li><a href="#expected-json-value-types-including-number-being-extended-by-integer">expected JSON value types including number being extended by integer</a></li>
+<li><a href="#no-differences">no differences</a></li>
+<li><a href="#old-and-new-value-of-multipleof-being-not-each-others-factors">old and new value of multipleOf being not each other's factors</a></li>
+<li><a href="#the-new-value-of-multipleof-being-divisible-by-the-old-one">the new value of multipleOf being divisible by the old one</a></li>
+<li><a href="#the-old-value-of-multipleof-being-divisible-by-the-new-one">the old value of multipleOf being divisible by the new one</a></li>
+<li><a href="#the-range-gets-constrained">the range gets constrained</a></li>
+<li><a href="#the-range-gets-unconstrained">the range gets unconstrained</a></li>
+<li><a href="#the-range-of-allowed-number-values-being-extended">the range of allowed number values being extended</a></li>
+<li><a href="#the-range-of-allowed-number-values-being-extended-and-reduced-at-the-same-time">the range of allowed number values being extended and reduced at the same time</a></li>
+<li><a href="#the-range-of-allowed-number-values-being-extended-and-reduced-at-the-same-time-using-exclusive-versions-of-constraints">the range of allowed number values being extended and reduced at the same time using exclusive versions of constraints</a></li>
+<li><a href="#the-range-of-allowed-number-values-being-extended-using-exclusive-versions-of-constraints">the range of allowed number values being extended using exclusive versions of constraints</a></li>
+<li><a href="#the-range-of-allowed-number-values-being-reduced">the range of allowed number values being reduced</a></li>
+<li><a href="#the-range-of-allowed-number-values-being-reduced-using-exclusive-versions-of-constraints">the range of allowed number values being reduced using exclusive versions of constraints</a></li>
+</ul>
+<hr />
+<h3 id="expected-json-value-type-changing-from-integer-to-number"><a class="header" href="#expected-json-value-type-changing-from-integer-to-number">expected JSON value type changing from integer to number</a></h3>
+<p>Because every integer is a number, but not vice versa, such a change is backward compatible.</p>
+<p><strong>Input:</strong></p>
+<p><em>JSON schema differences:</em></p>
+<pre><code class="language-text">-
+  Schema path: #
+  change of accepted JSON value types from 
+  - integer
+  to
+  - number
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code class="language-text">backward compatible:
+- at #
+  the set of allowed JSON value types has been extended by number
+</code></pre>
+<hr />
+<h3 id="expected-json-value-type-changing-from-number-to-integer"><a class="header" href="#expected-json-value-type-changing-from-number-to-integer">expected JSON value type changing from number to integer</a></h3>
+<p>Because every integer is a number, but not vice versa, such a change is forward compatible.</p>
+<p><strong>Input:</strong></p>
+<p><em>JSON schema differences:</em></p>
+<pre><code class="language-text">-
+  Schema path: #
+  change of accepted JSON value types from 
+  - number
+  to
+  - integer
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code class="language-text">forward compatible:
+- at #
+  the set of allowed JSON value types has been reduced by number
+</code></pre>
+<hr />
+<h3 id="expected-json-value-types-including-integer-and-number-being-reduced-by-integer"><a class="header" href="#expected-json-value-types-including-integer-and-number-being-reduced-by-integer">expected JSON value types including integer and number being reduced by integer</a></h3>
+<p>Because every integer is a number, such a change is fully compatible.</p>
+<p><strong>Input:</strong></p>
+<p><em>JSON schema differences:</em></p>
+<pre><code class="language-text">-
+  Schema path: #
+  change of accepted JSON value types from 
+  - integer
+  - number
+  to
+  - number
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code class="language-text">fully compatible
+</code></pre>
+<hr />
+<h3 id="expected-json-value-types-including-number-being-extended-by-integer"><a class="header" href="#expected-json-value-types-including-number-being-extended-by-integer">expected JSON value types including number being extended by integer</a></h3>
+<p>Because every integer is a number, such a change is fully compatible.</p>
+<p><strong>Input:</strong></p>
+<p><em>JSON schema differences:</em></p>
+<pre><code class="language-text">-
+  Schema path: #
+  change of accepted JSON value types from 
+  - number
+  to
+  - integer
+  - number
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code class="language-text">fully compatible
+</code></pre>
+<hr />
+<h3 id="the-new-value-of-multipleof-being-divisible-by-the-old-one"><a class="header" href="#the-new-value-of-multipleof-being-divisible-by-the-old-one">the new value of multipleOf being divisible by the old one</a></h3>
+<p>Because every multiple the new value is also a multiple of the old value, such a change is backward compatible</p>
+<p><strong>Input:</strong></p>
+<p><em>JSON schema differences:</em></p>
+<pre><code class="language-text">-
+  Schema path: #
+  change of multipleOf from 2.0 to 4.0
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code class="language-text">backward compatible:
+- at #
+  the new multiple constraint of 4.0 is not a factor of the olf multiple constraint of 2.0
+</code></pre>
+<hr />
+<h3 id="the-old-value-of-multipleof-being-divisible-by-the-new-one"><a class="header" href="#the-old-value-of-multipleof-being-divisible-by-the-new-one">the old value of multipleOf being divisible by the new one</a></h3>
+<p>Because every multiple the old value is also a multiple of the new value, such a change is forward compatible</p>
+<p><strong>Input:</strong></p>
+<p><em>JSON schema differences:</em></p>
+<pre><code class="language-text">-
+  Schema path: #
+  change of multipleOf from 4.0 to 2.0
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code class="language-text">forward compatible:
+- at #
+  the old multiple constraint of 4.0 is not a factor of the new multiple constraint of 2.0
+</code></pre>
+<hr />
+<h3 id="expected-json-value-types-being-reduced-from-null-and-boolean-to-just-null"><a class="header" href="#expected-json-value-types-being-reduced-from-null-and-boolean-to-just-null">expected JSON value types being reduced from null and boolean to just null</a></h3>
+<p>Because less value types than before are accepted, this change is forward compatible.</p>
+<p><strong>Input:</strong></p>
+<p><em>JSON schema differences:</em></p>
+<pre><code class="language-text">-
+  Schema path: #
+  change of accepted JSON value types from 
+  - boolean
+  - null
+  to
+  - null
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code class="language-text">forward compatible:
+- at #
+  the set of allowed JSON value types has been reduced by boolean
+</code></pre>
+<hr />
+<h3 id="expected-json-value-types-being-extended-from-just-null-to-null-and-boolean"><a class="header" href="#expected-json-value-types-being-extended-from-just-null-to-null-and-boolean">expected JSON value types being extended from just null to null and boolean</a></h3>
+<p>Because more value types than before are accepted, this change is backward compatible.</p>
+<p><strong>Input:</strong></p>
+<p><em>JSON schema differences:</em></p>
+<pre><code class="language-text">-
+  Schema path: #
+  change of accepted JSON value types from 
+  - null
+  to
+  - boolean
+  - null
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code class="language-text">backward compatible:
+- at #
+  the set of allowed JSON value types has been extended by boolean
+</code></pre>
+<hr />
+<h3 id="expected-json-value-type-changing-from-null-to-boolean"><a class="header" href="#expected-json-value-type-changing-from-null-to-boolean">expected JSON value type changing from null to boolean</a></h3>
+<p>Because no boolean value can satisfy null JSON type constraint, and vice versa, such a change is incompatible.</p>
+<p><strong>Input:</strong></p>
+<p><em>JSON schema differences:</em></p>
+<pre><code class="language-text">-
+  Schema path: #
+  change of accepted JSON value types from 
+  - null
+  to
+  - boolean
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code class="language-text">incompatible:
+- at #
+  the set of allowed JSON value types has been extended by boolean- at #
+  the set of allowed JSON value types has been reduced by null
+</code></pre>
+<hr />
+<h3 id="expected-json-value-types-including-integer-being-extended-by-number"><a class="header" href="#expected-json-value-types-including-integer-being-extended-by-number">expected JSON value types including integer being extended by number</a></h3>
+<p>Because not every integer is a number, such a change is backward compatible.</p>
+<p><strong>Input:</strong></p>
+<p><em>JSON schema differences:</em></p>
+<pre><code class="language-text">-
+  Schema path: #
+  change of accepted JSON value types from 
+  - integer
+  to
+  - integer
+  - number
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code class="language-text">backward compatible:
+- at #
+  the set of allowed JSON value types has been extended by number
+</code></pre>
+<hr />
+<h3 id="expected-json-value-types-including-integer-and-number-being-reuced-by-number"><a class="header" href="#expected-json-value-types-including-integer-and-number-being-reuced-by-number">expected JSON value types including integer and number being reuced by number</a></h3>
+<p>Because not every integer is a number, such a change is forward compatible.</p>
+<p><strong>Input:</strong></p>
+<p><em>JSON schema differences:</em></p>
+<pre><code class="language-text">-
+  Schema path: #
+  change of accepted JSON value types from 
+  - integer
+  - number
+  to
+  - integer
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code class="language-text">forward compatible:
+- at #
+  the set of allowed JSON value types has been reduced by number
+</code></pre>
+<hr />
+<h3 id="the-range-gets-constrained"><a class="header" href="#the-range-gets-constrained">the range gets constrained</a></h3>
+<p>In this situation, all numbers from the new range fall into the old, unconstrained one. Therefore, such a change if forward compatible.</p>
+<p><strong>Input:</strong></p>
+<p><em>JSON schema differences:</em></p>
+<pre><code class="language-text">-
+  Schema path: #
+  change of maximum from unspecified to 20.0
+-
+  Schema path: #
+  change of minimum from unspecified to 5.0
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code class="language-text">forward compatible:
+- at #
+  the range of allowed values has been reduced by (-Infinity,5.0) and (20.0,Infinity)
+</code></pre>
+<hr />
+<h3 id="the-range-of-allowed-number-values-being-extended-using-exclusive-versions-of-constraints"><a class="header" href="#the-range-of-allowed-number-values-being-extended-using-exclusive-versions-of-constraints">the range of allowed number values being extended using exclusive versions of constraints</a></h3>
+<p>In this situation, all numbers from the new, longer range fall into the old, shorter range. Therefore, such a change is backward compatible.</p>
+<p><strong>Input:</strong></p>
+<p><em>JSON schema differences:</em></p>
+<pre><code class="language-text">-
+  Schema path: #
+  change of exclusiveMaximum from 15.0 to 20.0
+-
+  Schema path: #
+  change of exclusiveMinimum from 10.0 to 5.0
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code class="language-text">backward compatible:
+- at #
+  the range of allowed values has been extended by (5.0,10.0] and [15.0,20.0)
+</code></pre>
+<hr />
+<h3 id="the-range-of-allowed-number-values-being-extended"><a class="header" href="#the-range-of-allowed-number-values-being-extended">the range of allowed number values being extended</a></h3>
+<p>In this situation, all numbers from the new, longer range fall into the old, shorter range. Therefore, such a change is backward compatible.</p>
+<p><strong>Input:</strong></p>
+<p><em>JSON schema differences:</em></p>
+<pre><code class="language-text">-
+  Schema path: #
+  change of maximum from 15.0 to 20.0
+-
+  Schema path: #
+  change of minimum from 10.0 to 5.0
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code class="language-text">backward compatible:
+- at #
+  the range of allowed values has been extended by [5.0,10.0) and (15.0,20.0]
+</code></pre>
+<hr />
+<h3 id="the-range-of-allowed-number-values-being-reduced-using-exclusive-versions-of-constraints"><a class="header" href="#the-range-of-allowed-number-values-being-reduced-using-exclusive-versions-of-constraints">the range of allowed number values being reduced using exclusive versions of constraints</a></h3>
+<p>In this situation, all numbers from the new, shorted range fall into the old, longer range. Therefore, such a change is forward compatible.</p>
+<p><strong>Input:</strong></p>
+<p><em>JSON schema differences:</em></p>
+<pre><code class="language-text">-
+  Schema path: #
+  change of exclusiveMaximum from 20.0 to 15.0
+-
+  Schema path: #
+  change of exclusiveMinimum from 5.0 to 10.0
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code class="language-text">forward compatible:
+- at #
+  the range of allowed values has been reduced by (5.0,10.0] and [15.0,20.0)
+</code></pre>
+<hr />
+<h3 id="the-range-of-allowed-number-values-being-reduced"><a class="header" href="#the-range-of-allowed-number-values-being-reduced">the range of allowed number values being reduced</a></h3>
+<p>In this situation, all numbers from the new, shorted range fall into the old, longer range. Therefore, such a change is forward compatible.</p>
+<p><strong>Input:</strong></p>
+<p><em>JSON schema differences:</em></p>
+<pre><code class="language-text">-
+  Schema path: #
+  change of maximum from 20.0 to 15.0
+-
+  Schema path: #
+  change of minimum from 5.0 to 10.0
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code class="language-text">forward compatible:
+- at #
+  the range of allowed values has been reduced by [5.0,10.0) and (15.0,20.0]
+</code></pre>
+<hr />
+<h3 id="the-range-gets-unconstrained"><a class="header" href="#the-range-gets-unconstrained">the range gets unconstrained</a></h3>
+<p>In this situation, all numbers from the old range fall into the new, unconstrained one. Therefore, such a change if forward backward compatible.</p>
+<p><strong>Input:</strong></p>
+<p><em>JSON schema differences:</em></p>
+<pre><code class="language-text">-
+  Schema path: #
+  change of maximum from 20.0 to unspecified
+-
+  Schema path: #
+  change of minimum from 5.0 to unspecified
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code class="language-text">backward compatible:
+- at #
+  the range of allowed values has been extended by (-Infinity,5.0] and (20.0,Infinity)
+</code></pre>
+<hr />
+<h3 id="old-and-new-value-of-multipleof-being-not-each-others-factors"><a class="header" href="#old-and-new-value-of-multipleof-being-not-each-others-factors">old and new value of multipleOf being not each other's factors</a></h3>
+<p>In this situation, there are potentially some numbers that are not divisible by neither of multipleOf values. Therefore, such a change is incompatible.</p>
+<p><strong>Input:</strong></p>
+<p><em>JSON schema differences:</em></p>
+<pre><code class="language-text">-
+  Schema path: #
+  change of multipleOf from 2.0 to 5.0
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code class="language-text">incompatible:
+- at #
+  the new multiple constraint of 5.0 is not a factor of the olf multiple constraint of 2.0- at #
+  the old multiple constraint of 2.0 is not a factor of the new multiple constraint of 5.0
+</code></pre>
+<hr />
+<h3 id="the-range-of-allowed-number-values-being-extended-and-reduced-at-the-same-time-using-exclusive-versions-of-constraints"><a class="header" href="#the-range-of-allowed-number-values-being-extended-and-reduced-at-the-same-time-using-exclusive-versions-of-constraints">the range of allowed number values being extended and reduced at the same time using exclusive versions of constraints</a></h3>
+<p>In this situation, there are some numbers which do not fall into neither old nor new range. Therefore, such a change is incompatible.</p>
+<p><strong>Input:</strong></p>
+<p><em>JSON schema differences:</em></p>
+<pre><code class="language-text">-
+  Schema path: #
+  change of exclusiveMaximum from 15.0 to 20.0
+-
+  Schema path: #
+  change of exclusiveMinimum from 5.0 to 10.0
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code class="language-text">incompatible:
+- at #
+  the range of allowed values has been extended by [15.0,20.0)- at #
+  the range of allowed values has been reduced by (5.0,10.0]
+</code></pre>
+<hr />
+<h3 id="the-range-of-allowed-number-values-being-extended-and-reduced-at-the-same-time"><a class="header" href="#the-range-of-allowed-number-values-being-extended-and-reduced-at-the-same-time">the range of allowed number values being extended and reduced at the same time</a></h3>
+<p>In this situation, there are some numbers which do not fall into neither old nor new range. Therefore, such a change is incompatible.</p>
+<p><strong>Input:</strong></p>
+<p><em>JSON schema differences:</em></p>
+<pre><code class="language-text">-
+  Schema path: #
+  change of maximum from 15.0 to 20.0
+-
+  Schema path: #
+  change of minimum from 5.0 to 10.0
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code class="language-text">incompatible:
+- at #
+  the range of allowed values has been extended by (15.0,20.0]- at #
+  the range of allowed values has been reduced by [5.0,10.0)
+</code></pre>
+<hr />
+<h3 id="no-differences"><a class="header" href="#no-differences">no differences</a></h3>
+<p>When there is no JSON schema differences, schema change is fully compatible.</p>
+<p><strong>Input:</strong></p>
+<p><em>JSON schema differences:</em></p>
+<pre><code class="language-text">no differences
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code class="language-text">fully compatible
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+                            <a rel="next" href="../categories/json-schema-difference-calculation.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+                    <a rel="next" href="../categories/json-schema-difference-calculation.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../mermaid.min.js"></script>
+        <script src="../mermaid-init.js"></script>
+
+
+    </div>
+    </body>
+</html>
