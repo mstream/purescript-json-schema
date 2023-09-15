@@ -31,6 +31,8 @@ render = ("#" <> _) <<< foldMap f <<< List.reverse
       "/minimum"
     MultipleOf →
       "/multipleOf"
+    Properties name →
+      "/properties/" <> name
     TypeKeyword →
       "/type"
     UniqueItems →
@@ -43,6 +45,7 @@ data SchemaPathSegment
   | Maximum
   | Minimum
   | MultipleOf
+  | Properties String
   | TypeKeyword
   | UniqueItems
 

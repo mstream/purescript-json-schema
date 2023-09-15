@@ -7,17 +7,17 @@
   , "control"
   , "effect"
   , "either"
-  , "exceptions"
   , "foldable-traversable"
   , "foreign-object"
   , "gen"
+  , "heterogeneous"
   , "integers"
   , "lists"
   , "maybe"
+  , "newtype"
   , "node-buffer"
   , "node-fs"
   , "node-fs-aff"
-  , "node-process"
   , "nonempty"
   , "optparse"
   , "ordered-collections"
@@ -30,5 +30,10 @@
   , "tuples"
   ]
 , packages = ./packages.dhall
-, sources = [ "src/purs/**/*.purs", "test/unit/**/*.purs" ]
+, sources =
+  [ "docs/purs/**/*.purs"
+  , "src/purs/**/*.purs"
+  , "test/snapshot/**/*.purs"
+  , "test/unit/purs/**/*.purs"
+  ]
 }

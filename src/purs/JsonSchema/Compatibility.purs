@@ -1,26 +1,33 @@
 module JsonSchema.Compatibility
   ( BackwardIncompatibility(..)
+  , BackwardIncompatibilityType(..)
   , Compatibility(..)
   , ForwardIncompatibility(..)
-  , Incompatibility
+  , ForwardIncompatibilityType(..)
   , calculate
-  , renderCompatibility
   ) where
 
 import Prelude
 
 import Data.Array as Array
+import Data.Array.NonEmpty as ArrayNE
 import Data.Foldable (foldl)
 import Data.Generic.Rep (class Generic)
 import Data.List (List(..))
+import Data.Markdown as M
 import Data.Maybe (Maybe(..))
+import Data.NonEmpty ((:|))
+import Data.NonEmpty as NE
 import Data.Set (Set)
 import Data.Set as Set
+import Data.Set.NonEmpty (NonEmptySet)
+import Data.Set.NonEmpty as SetNE
 import Data.Show.Generic (genericShow)
 import Data.String as String
+import Docs.Document (class Document, document)
 import JsonSchema (JsonValueType(..))
 import JsonSchema as Schema
-import JsonSchema.Diff (Difference, DifferenceType(..))
+import JsonSchema.Difference (Difference(..), DifferenceType(..))
 import JsonSchema.Range (Boundary(..), Range)
 import JsonSchema.Range as Range
 import JsonSchema.SchemaPath (SchemaPath)
@@ -29,19 +36,14 @@ import Utils (isInteger)
 
 data Compatibility
   = Backward
-      { forwardIncompatibilities ∷
-          Set (Incompatibility ForwardIncompatibility)
-      }
+      { forwardIncompatibilities ∷ NonEmptySet ForwardIncompatibility }
   | Forward
-      { backwardIncompatibilities ∷
-          Set (Incompatibility BackwardIncompatibility)
+      { backwardIncompatibilities ∷ NonEmptySet BackwardIncompatibility
       }
   | Full
   | None
-      { backwardIncompatibilities ∷
-          Set (Incompatibility BackwardIncompatibility)
-      , forwardIncompatibilities ∷
-          Set (Incompatibility ForwardIncompatibility)
+      { backwardIncompatibilities ∷ NonEmptySet BackwardIncompatibility
+      , forwardIncompatibilities ∷ NonEmptySet ForwardIncompatibility
       }
 
 derive instance Eq Compatibility
@@ -50,12 +52,71 @@ derive instance Generic Compatibility _
 instance Show Compatibility where
   show = genericShow
 
-type Incompatibility a =
-  { incompatibilityType ∷ a
+instance Document Compatibility where
+  document = case _ of
+    Backward { forwardIncompatibilities } →
+      ( M.paragraph $ ArrayNE.singleton $ M.text
+          "Reasons for breaking the forward compatibility:"
+      ) :|
+        [ M.unorderedList $ ArrayNE.singleton
+            <$>
+              ( ArrayNE.fromFoldable1
+                  $ document forwardIncompatibilities
+              )
+        ]
+    Forward { backwardIncompatibilities } →
+      ( M.paragraph $ ArrayNE.singleton $ M.text
+          "Reasons for breaking the backward compatibility:"
+      ) :|
+        [ M.unorderedList $ ArrayNE.singleton
+            <$>
+              ( ArrayNE.fromFoldable1
+                  $ document backwardIncompatibilities
+              )
+        ]
+    Full →
+      NE.singleton $ M.paragraph $ ArrayNE.singleton $ M.text "✓"
+    None
+      { backwardIncompatibilities
+      , forwardIncompatibilities
+      } →
+      document (Backward { forwardIncompatibilities })
+        <> document (Forward { backwardIncompatibilities })
+
+newtype BackwardIncompatibility = BackwardIncompatibility
+  { incompatibilityType ∷ BackwardIncompatibilityType
   , path ∷ SchemaPath
   }
 
-data BackwardIncompatibility
+derive newtype instance Eq BackwardIncompatibility
+derive newtype instance Ord BackwardIncompatibility
+derive newtype instance Show BackwardIncompatibility
+
+instance Document BackwardIncompatibility where
+  document (BackwardIncompatibility { incompatibilityType, path }) =
+    ( M.paragraph
+        $ ArrayNE.singleton
+        $ M.text
+        $ "schema path: " <> SchemaPath.render path
+    )
+      :| (Array.fromFoldable $ document incompatibilityType)
+
+newtype ForwardIncompatibility = ForwardIncompatibility
+  { incompatibilityType ∷ ForwardIncompatibilityType
+  , path ∷ SchemaPath
+  }
+
+derive newtype instance Eq ForwardIncompatibility
+derive newtype instance Ord ForwardIncompatibility
+derive newtype instance Show ForwardIncompatibility
+
+instance Document ForwardIncompatibility where
+  document (ForwardIncompatibility { incompatibilityType, path }) =
+    ( M.paragraph $ ArrayNE.singleton $ M.text $
+        "schema path: " <> SchemaPath.render path
+    ) :| Array.fromFoldable (document incompatibilityType)
+
+data BackwardIncompatibilityType
   = MultipleIntroduced Number
   | OldMultipleIsNotFactorOfNewMultiple { new ∷ Number, old ∷ Number }
   | RangeOfAllowedNumbersReduced
@@ -63,46 +124,51 @@ data BackwardIncompatibility
   | SetOfAllowedTypesReduced
       (Set JsonValueType)
 
-derive instance Eq BackwardIncompatibility
-derive instance Generic BackwardIncompatibility _
-derive instance Ord BackwardIncompatibility
+derive instance Eq BackwardIncompatibilityType
+derive instance Generic BackwardIncompatibilityType _
+derive instance Ord BackwardIncompatibilityType
 
-instance Show BackwardIncompatibility where
+instance Show BackwardIncompatibilityType where
   show = genericShow
 
-describeBackwardIncompatibility ∷ BackwardIncompatibility → String
-describeBackwardIncompatibility = case _ of
-  MultipleIntroduced multiple →
-    "numerical values must be multiples of "
-      <> show multiple
-      <> " now"
-  OldMultipleIsNotFactorOfNewMultiple { new, old } →
-    "the old multiple constraint of "
-      <> show old
-      <> " is not a factor of the new multiple constraint of "
-      <> show new
-  RangeOfAllowedNumbersReduced { lower, upper } →
-    "the range of allowed values has been reduced by"
-      <> case lower, upper of
-        Just l, Just u →
-          " "
-            <> Range.renderRange l
-            <> " and "
-            <> Range.renderRange u
-        Just l, Nothing →
-          " " <> Range.renderRange l
-        Nothing, Just u →
-          " " <> Range.renderRange u
-        Nothing, Nothing →
-          "FIXME: should never happen, inprove the data model"
-  SetOfAllowedTypesReduced removedTypes →
-    "the set of allowed JSON value types has been reduced by "
-      <> String.joinWith ", "
-        ( Schema.renderJsonValueType <$>
-            Array.fromFoldable removedTypes
-        )
+instance Document BackwardIncompatibilityType where
+  document = NE.singleton <<< M.paragraph <<< map M.text <<<
+    case _ of
+      MultipleIntroduced multiple →
+        ArrayNE.singleton "numerical values must be multiples of "
+          <> ArrayNE.singleton (show multiple)
+          <> ArrayNE.singleton "now"
+      OldMultipleIsNotFactorOfNewMultiple { new, old } →
+        ArrayNE.singleton "the old multiple constraint of "
+          <> ArrayNE.singleton (show old)
+          <> ArrayNE.singleton
+            " is not a factor of the new multiple constraint of "
+          <> ArrayNE.singleton (show new)
+      RangeOfAllowedNumbersReduced { lower, upper } →
+        ArrayNE.singleton
+          "the range of allowed values has been reduced by"
+          <> ArrayNE.singleton case lower, upper of
+            Just l, Just u →
+              " "
+                <> Range.renderRange l
+                <> " and "
+                <> Range.renderRange u
+            Just l, Nothing →
+              " " <> Range.renderRange l
+            Nothing, Just u →
+              " " <> Range.renderRange u
+            Nothing, Nothing →
+              "FIXME: should never happen, inprove the data model"
+      SetOfAllowedTypesReduced removedTypes →
+        ArrayNE.singleton
+          "the set of allowed JSON value types has been reduced by "
+          <>
+            ( ArrayNE.singleton $ String.joinWith ", " $
+                Schema.renderJsonValueType <$> Array.fromFoldable
+                  removedTypes
+            )
 
-data ForwardIncompatibility
+data ForwardIncompatibilityType
   = MultipleWithdrawn Number
   | NewMultipleIsNotFactorOfOldMultiple { new ∷ Number, old ∷ Number }
   | RangeOfAllowedNumbersExtended
@@ -110,48 +176,55 @@ data ForwardIncompatibility
   | SetOfAllowedTypesExtended
       (Set JsonValueType)
 
-derive instance Eq ForwardIncompatibility
-derive instance Generic ForwardIncompatibility _
-derive instance Ord ForwardIncompatibility
+derive instance Eq ForwardIncompatibilityType
+derive instance Generic ForwardIncompatibilityType _
+derive instance Ord ForwardIncompatibilityType
 
-instance Show ForwardIncompatibility where
+instance Show ForwardIncompatibilityType where
   show = genericShow
 
-describeForwardIncompatibility ∷ ForwardIncompatibility → String
-describeForwardIncompatibility = case _ of
-  MultipleWithdrawn multiple →
-    "numerical values must not be multiples of "
-      <> show multiple
-      <> " anymore"
-  NewMultipleIsNotFactorOfOldMultiple { new, old } →
-    "the new multiple constraint of "
-      <> show new
-      <> " is not a factor of the olf multiple constraint of "
-      <> show old
-  RangeOfAllowedNumbersExtended { lower, upper } →
-    "the range of allowed values has been extended by"
-      <> case lower, upper of
-        Just l, Just u →
-          " "
-            <> Range.renderRange l
-            <> " and "
-            <> Range.renderRange u
-        Just l, Nothing →
-          " " <> Range.renderRange l
-        Nothing, Just u →
-          " " <> Range.renderRange u
-        Nothing, Nothing →
-          "FIXME: should never happen, inprove the data model"
-  SetOfAllowedTypesExtended removedTypes →
-    "the set of allowed JSON value types has been extended by "
-      <> String.joinWith ", "
-        ( Schema.renderJsonValueType <$>
-            Array.fromFoldable removedTypes
-        )
+instance Document ForwardIncompatibilityType where
+  document = NE.singleton <<< M.paragraph <<< map M.text <<<
+    case _ of
+      MultipleWithdrawn multiple →
+        ArrayNE.singleton "numerical values must not be multiples of "
+          <> ArrayNE.singleton (show multiple)
+          <> ArrayNE.singleton " anymore"
+      NewMultipleIsNotFactorOfOldMultiple { new, old } →
+        ArrayNE.singleton "the new multiple constraint of "
+          <> ArrayNE.singleton (show new)
+          <> ArrayNE.singleton
+            " is not a factor of the olf multiple constraint of "
+          <> ArrayNE.singleton (show old)
+      RangeOfAllowedNumbersExtended { lower, upper } →
+        ArrayNE.singleton
+          "the range of allowed values has been extended by"
+          <> ArrayNE.singleton case lower, upper of
+            Just l, Just u →
+              " "
+                <> Range.renderRange l
+                <> " and "
+                <> Range.renderRange u
+            Just l, Nothing →
+              " " <> Range.renderRange l
+            Nothing, Just u →
+              " " <> Range.renderRange u
+            Nothing, Nothing →
+              "FIXME: should never happen, inprove the data model"
+      SetOfAllowedTypesExtended removedTypes →
+        ArrayNE.singleton
+          "the set of allowed JSON value types has been extended by "
+          <>
+            ( ArrayNE.singleton $ String.joinWith ", " $
+                Schema.renderJsonValueType <$> Array.fromFoldable
+                  removedTypes
+            )
 
 calculate ∷ Set Difference → Compatibility
 calculate differences = foldl
-  (\acc diff → mergeCompatibility acc $ f diff.differenceType)
+  ( \acc (Difference { differenceType }) →
+      mergeCompatibility acc $ f differenceType
+  )
   (calculateRangeChange differences)
   differences
   where
@@ -172,26 +245,28 @@ calculateRangeChange differences =
         mbExtensionLowerRange == Nothing && mbExtensionUpperRange ==
           Nothing then Full
       else Backward
-        { forwardIncompatibilities: Set.singleton
-            { incompatibilityType: RangeOfAllowedNumbersExtended
-                { lower: mbExtensionLowerRange
-                , upper: mbExtensionUpperRange
+        { forwardIncompatibilities: SetNE.singleton
+            $ ForwardIncompatibility
+                { incompatibilityType: RangeOfAllowedNumbersExtended
+                    { lower: mbExtensionLowerRange
+                    , upper: mbExtensionUpperRange
+                    }
+                , path: Nil
                 }
-            , path: Nil
-            }
         }
     rangeReductionCompatibility =
       if
         mbReductionLowerRange == Nothing && mbReductionUpperRange ==
           Nothing then Full
       else Forward
-        { backwardIncompatibilities: Set.singleton
-            { incompatibilityType: RangeOfAllowedNumbersReduced
-                { lower: mbReductionLowerRange
-                , upper: mbReductionUpperRange
+        { backwardIncompatibilities: SetNE.singleton
+            $ BackwardIncompatibility
+                { incompatibilityType: RangeOfAllowedNumbersReduced
+                    { lower: mbReductionLowerRange
+                    , upper: mbReductionUpperRange
+                    }
+                , path: Nil
                 }
-            , path: Nil
-            }
         }
   in
     mergeCompatibility
@@ -200,7 +275,7 @@ calculateRangeChange differences =
   where
   mbExtensionLowerRange ∷ Maybe Range
   mbExtensionLowerRange = foldl
-    ( \acc { differenceType } → case differenceType of
+    ( \acc (Difference { differenceType }) → case differenceType of
         ExclusiveMinimumChange (Just before) Nothing →
           Just { from: Open bottom, to: Closed before }
         ExclusiveMinimumChange (Just before) (Just after) →
@@ -221,7 +296,7 @@ calculateRangeChange differences =
 
   mbExtensionUpperRange ∷ Maybe Range
   mbExtensionUpperRange = foldl
-    ( \acc { differenceType } → case differenceType of
+    ( \acc (Difference { differenceType }) → case differenceType of
         ExclusiveMaximumChange (Just before) Nothing →
           Just { from: Closed before, to: Open top }
         ExclusiveMaximumChange (Just before) (Just after) →
@@ -242,7 +317,7 @@ calculateRangeChange differences =
 
   mbReductionLowerRange ∷ Maybe Range
   mbReductionLowerRange = foldl
-    ( \acc { differenceType } → case differenceType of
+    ( \acc (Difference { differenceType }) → case differenceType of
         ExclusiveMinimumChange Nothing (Just after) →
           Just { from: Open bottom, to: Open after }
         ExclusiveMinimumChange (Just before) (Just after) →
@@ -263,7 +338,7 @@ calculateRangeChange differences =
 
   mbReductionUpperRange ∷ Maybe Range
   mbReductionUpperRange = foldl
-    ( \acc { differenceType } → case differenceType of
+    ( \acc (Difference { differenceType }) → case differenceType of
         ExclusiveMaximumChange Nothing (Just after) →
           Just { from: Open after, to: Open top }
         ExclusiveMaximumChange (Just before) (Just after) →
@@ -286,44 +361,49 @@ calculateMultipleOfChange ∷ Maybe Number → Maybe Number → Compatibility
 calculateMultipleOfChange = case _, _ of
   Just before, Just after →
     if isInteger $ before / after then Forward
-      { backwardIncompatibilities: Set.singleton
-          { incompatibilityType: OldMultipleIsNotFactorOfNewMultiple
-              { new: after, old: before }
-          , path: Nil
-          }
+      { backwardIncompatibilities: SetNE.singleton
+          $ BackwardIncompatibility
+              { incompatibilityType:
+                  OldMultipleIsNotFactorOfNewMultiple
+                    { new: after, old: before }
+              , path: Nil
+              }
       }
     else if isInteger $ after / before then Backward
-      { forwardIncompatibilities: Set.singleton
-          { incompatibilityType:
-              NewMultipleIsNotFactorOfOldMultiple
-                { new: after, old: before }
-          , path: Nil
-          }
+      { forwardIncompatibilities: SetNE.singleton
+          $ ForwardIncompatibility
+              { incompatibilityType:
+                  NewMultipleIsNotFactorOfOldMultiple
+                    { new: after, old: before }
+              , path: Nil
+              }
       }
     else None
       { backwardIncompatibilities:
-          Set.singleton
+          SetNE.singleton $ BackwardIncompatibility
             { incompatibilityType: OldMultipleIsNotFactorOfNewMultiple
                 { new: after, old: before }
             , path: Nil
             }
-      , forwardIncompatibilities: Set.singleton
-          { incompatibilityType:
-              NewMultipleIsNotFactorOfOldMultiple
-                { new: after, old: before }
-          , path: Nil
-          }
+      , forwardIncompatibilities: SetNE.singleton
+          $ ForwardIncompatibility
+              { incompatibilityType:
+                  NewMultipleIsNotFactorOfOldMultiple
+                    { new: after, old: before }
+              , path: Nil
+              }
       }
   Just before, Nothing →
     Backward
       { forwardIncompatibilities:
-          Set.singleton
+          SetNE.singleton $ ForwardIncompatibility
             { incompatibilityType: MultipleWithdrawn before, path: Nil }
       }
   Nothing, Just after →
     Forward
-      { backwardIncompatibilities: Set.singleton
-          { incompatibilityType: MultipleIntroduced after, path: Nil }
+      { backwardIncompatibilities: SetNE.singleton $
+          BackwardIncompatibility
+            { incompatibilityType: MultipleIntroduced after, path: Nil }
       }
   Nothing, Nothing →
     Full
@@ -343,18 +423,22 @@ calculateTypeChange mbTypesBefore mbTypesAfter =
     typesAddedCompatibility =
       if Set.isEmpty typesAdded then Full
       else Backward
-        { forwardIncompatibilities: Set.singleton
-            { incompatibilityType: SetOfAllowedTypesExtended typesAdded
-            , path: Nil
-            }
+        { forwardIncompatibilities: SetNE.singleton
+            $ ForwardIncompatibility
+                { incompatibilityType:
+                    SetOfAllowedTypesExtended typesAdded
+                , path: Nil
+                }
         }
     typesRemovedCompatibility =
       if Set.isEmpty typesRemoved then Full
       else Forward
-        { backwardIncompatibilities: Set.singleton
-            { incompatibilityType: SetOfAllowedTypesReduced typesRemoved
-            , path: Nil
-            }
+        { backwardIncompatibilities: SetNE.singleton
+            $ BackwardIncompatibility
+                { incompatibilityType:
+                    SetOfAllowedTypesReduced typesRemoved
+                , path: Nil
+                }
         }
   in
     mergeCompatibility typesAddedCompatibility typesRemovedCompatibility
@@ -417,85 +501,41 @@ mergeCompatibility = case _, _ of
   None nl, None nr →
     None
       { backwardIncompatibilities: nl.backwardIncompatibilities
-          `Set.union`
+          `union`
             nr.backwardIncompatibilities
       , forwardIncompatibilities: nl.forwardIncompatibilities
-          `Set.union` nr.forwardIncompatibilities
+          `union` nr.forwardIncompatibilities
       }
   None n, Full →
     None n
   where
   mergeBackwardIncompabilities
     ∷ ∀ rl rr
-    . { backwardIncompatibilities ∷
-          Set (Incompatibility BackwardIncompatibility)
+    . { backwardIncompatibilities ∷ NonEmptySet BackwardIncompatibility
       | rl
       }
-    → { backwardIncompatibilities ∷
-          Set (Incompatibility BackwardIncompatibility)
+    → { backwardIncompatibilities ∷ NonEmptySet BackwardIncompatibility
       | rr
       }
-    → Set (Incompatibility BackwardIncompatibility)
+    → NonEmptySet BackwardIncompatibility
   mergeBackwardIncompabilities
     { backwardIncompatibilities: bl }
     { backwardIncompatibilities: br } =
-    bl `Set.union` br
+    bl `union` br
 
   mergeForwardIncompabilities
     ∷ ∀ rl rr
-    . { forwardIncompatibilities ∷
-          Set (Incompatibility ForwardIncompatibility)
+    . { forwardIncompatibilities ∷ NonEmptySet ForwardIncompatibility
       | rl
       }
-    → { forwardIncompatibilities ∷
-          Set (Incompatibility ForwardIncompatibility)
+    → { forwardIncompatibilities ∷ NonEmptySet ForwardIncompatibility
       | rr
       }
-    → Set (Incompatibility ForwardIncompatibility)
+    → NonEmptySet ForwardIncompatibility
   mergeForwardIncompabilities
     { forwardIncompatibilities: fl }
     { forwardIncompatibilities: fr } =
-    fl `Set.union` fr
+    fl `union` fr
 
-renderCompatibility ∷ Compatibility → String
-renderCompatibility = case _ of
-  Backward { forwardIncompatibilities } →
-    "backward compatible:\n"
-      <> String.joinWith "\n"
-        ( renderForwardIncompatibility
-            <$> Array.fromFoldable forwardIncompatibilities
-        )
-  Forward { backwardIncompatibilities } →
-    "forward compatible:\n"
-      <> String.joinWith "\n"
-        ( renderBackwardIncompatibility
-            <$> Array.fromFoldable backwardIncompatibilities
-        )
-  Full →
-    "fully compatible"
-  None { backwardIncompatibilities, forwardIncompatibilities } →
-    "incompatible:\n"
-      <> String.joinWith "\n"
-        ( renderForwardIncompatibility
-            <$> Array.fromFoldable forwardIncompatibilities
-        )
-      <> String.joinWith "\n"
-        ( renderBackwardIncompatibility
-            <$> Array.fromFoldable backwardIncompatibilities
-        )
-  where
-  renderBackwardIncompatibility
-    ∷ Incompatibility BackwardIncompatibility → String
-  renderBackwardIncompatibility { incompatibilityType, path } =
-    "- at "
-      <> SchemaPath.render path
-      <> "\n  "
-      <> describeBackwardIncompatibility incompatibilityType
-
-  renderForwardIncompatibility
-    ∷ Incompatibility ForwardIncompatibility → String
-  renderForwardIncompatibility { incompatibilityType, path } =
-    "- at "
-      <> SchemaPath.render path
-      <> "\n  "
-      <> describeForwardIncompatibility incompatibilityType
+union ∷ ∀ a. Ord a ⇒ NonEmptySet a → NonEmptySet a → NonEmptySet a
+union sl sr = SetNE.toSet sl `SetNE.unionSet` sr

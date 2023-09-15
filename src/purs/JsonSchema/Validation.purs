@@ -1,5 +1,5 @@
 module JsonSchema.Validation
-  ( Violation
+  ( Violation(..)
   , ViolationReason(..)
   , renderViolation
   , validateAgainst
@@ -7,26 +7,29 @@ module JsonSchema.Validation
 
 import Prelude
 
-import Data.Argonaut.Core (Json)
 import Data.Argonaut.Core as A
 import Data.Array as Array
+import Data.Array.NonEmpty as ArrayNE
 import Data.Foldable (foldMap, foldl)
 import Data.FoldableWithIndex (foldMapWithIndex)
 import Data.Generic.Rep (class Generic)
 import Data.List (List(..), (:))
 import Data.Map (Map)
 import Data.Map as Map
+import Data.Markdown (FlowContentNode)
+import Data.Markdown as M
 import Data.Maybe (Maybe(..), maybe)
+import Data.Newtype (unwrap, wrap)
+import Data.NonEmpty ((:|))
+import Data.NonEmpty as NE
 import Data.Set (Set)
 import Data.Set as Set
+import Data.Set.NonEmpty (NonEmptySet)
+import Data.Set.NonEmpty as SetNE
 import Data.Show.Generic (genericShow)
 import Data.String as String
-import JsonSchema
-  ( JsonSchema(..)
-  , JsonValueType(..)
-  , Keywords
-  , renderJsonValueType
-  )
+import Docs.Document (class Document, document)
+import JsonSchema (JsonSchema(..), JsonValueType(..), Keywords)
 import JsonSchema as Schema
 import JsonSchema.JsonPath (JsonPath, JsonPathSegment(..))
 import JsonSchema.JsonPath as JsonPath
@@ -34,17 +37,35 @@ import JsonSchema.Range (Boundary(..), Range)
 import JsonSchema.Range as Range
 import JsonSchema.SchemaPath (SchemaPath, SchemaPathSegment(..))
 import JsonSchema.SchemaPath as SchemaPath
+import JsonValue (JsonValue)
 import Utils (isInteger)
 
-type Violation =
+newtype Violation = Violation
   { jsonPath ∷ JsonPath
   , reason ∷ ViolationReason
   , schemaPath ∷ SchemaPath
   }
 
+derive instance Eq Violation
+derive instance Generic Violation _
+derive instance Ord Violation
+
+instance Show Violation where
+  show = genericShow
+
+instance Document Violation where
+  document (Violation { jsonPath, reason, schemaPath }) =
+    ( M.paragraph $ M.text <$>
+        ( ( ArrayNE.singleton $ "JSON value path: " <> JsonPath.render
+              jsonPath
+          ) <> ArrayNE.singleton
+            ("JSON schema path: " <> SchemaPath.render schemaPath)
+        )
+    ) :| (Array.fromFoldable $ document reason)
+
 data ViolationReason
   = AlwaysFailingSchema
-  | InvalidArray (Set Violation)
+  | InvalidArray (NonEmptySet Violation)
   | InvalidMultiple { expectedMultiple ∷ Number, value ∷ Number }
   | InvalidRange { validRange ∷ Range, value ∷ Number }
   | NonUniqueArrayItem
@@ -61,8 +82,72 @@ derive instance Ord ViolationReason
 instance Show ViolationReason where
   show reason = genericShow reason
 
+instance Document ViolationReason where
+  document = case _ of
+    AlwaysFailingSchema →
+      NE.singleton $ M.paragraph $ ArrayNE.singleton $ M.text
+        "Schema always fails validation."
+    InvalidArray itemViolations →
+      ( M.paragraph $ ArrayNE.singleton $ M.text "Invalid array:"
+      )
+        :|
+          [ M.unorderedList $ ArrayNE.singleton $
+              documentViolation <$> ArrayNE.fromFoldable1 itemViolations
+          ]
+    InvalidMultiple { expectedMultiple, value } →
+      NE.singleton $ M.paragraph $ ArrayNE.singleton $ M.text $
+        " is not a multiple of " <> show expectedMultiple
+    InvalidRange { validRange, value } →
+      NE.singleton
+        $ M.paragraph
+        $ ArrayNE.singleton
+        $ M.text
+        $
+          show value
+            <> " is outside of the valid range of "
+            <> Range.renderRange validRange
+    NonUniqueArrayItem →
+      NE.singleton
+        $ M.paragraph
+        $ ArrayNE.singleton
+        $ M.text
+            "Non-unique array item."
+    TypeMismatch { actualJsonValueType, allowedJsonValueTypes } →
+      NE.singleton $ M.paragraph $ ArrayNE.singleton $ M.text $
+        "Invalid type. Expected "
+          <>
+            ( case Array.fromFoldable allowedJsonValueTypes of
+                [] →
+                  "none"
+                [ allowedJsonValueType ] →
+                  Schema.renderJsonValueType allowedJsonValueType
+                _ →
+                  String.joinWith " or "
+                    $ Schema.renderJsonValueType
+                        <$> Array.fromFoldable allowedJsonValueTypes
+            )
+          <> " but got "
+          <> Schema.renderJsonValueType actualJsonValueType
+          <> "."
+    ValidAgainstNotSchema →
+      NE.singleton $ M.paragraph $ ArrayNE.singleton $ M.text
+        "JSON is valid against schema from 'not'."
+
+documentViolation ∷ Violation → FlowContentNode
+documentViolation (Violation { jsonPath, reason, schemaPath }) =
+  M.blockquote $
+    ( M.paragraph $ M.text <$>
+        ( ArrayNE.singleton $ "Schema path: " <> SchemaPath.render
+            schemaPath
+        ) <>
+          ( ArrayNE.singleton $ "JSON path: " <> JsonPath.render
+              jsonPath
+          )
+    )
+      :| (Array.fromFoldable $ document reason)
+
 renderViolation ∷ Violation → Array String
-renderViolation { jsonPath, reason, schemaPath } =
+renderViolation (Violation { jsonPath, reason, schemaPath }) =
   [ "Schema path: " <> SchemaPath.render schemaPath
   , "JSON path: " <> JsonPath.render jsonPath
   ]
@@ -97,7 +182,7 @@ renderViolationReason = case _ of
                 Schema.renderJsonValueType allowedJsonValueType
               _ →
                 String.joinWith " or "
-                  $ renderJsonValueType
+                  $ Schema.renderJsonValueType
                       <$> Array.fromFoldable allowedJsonValueTypes
           )
         <> " but got "
@@ -107,21 +192,21 @@ renderViolationReason = case _ of
   ValidAgainstNotSchema →
     [ "JSON is valid against schema from 'not'." ]
 
-validateAgainst ∷ Json → JsonSchema → Set Violation
+validateAgainst ∷ JsonValue → JsonSchema → Set Violation
 validateAgainst = go Nil Nil
   where
-  go ∷ SchemaPath → JsonPath → Json → JsonSchema → Set Violation
+  go ∷ SchemaPath → JsonPath → JsonValue → JsonSchema → Set Violation
   go schemaPath jsonPath json schema = case schema of
     BooleanSchema bool →
       if bool then Set.empty
-      else Set.singleton
+      else Set.singleton $ Violation
         { jsonPath, reason: AlwaysFailingSchema, schemaPath }
 
     ObjectSchema keywords →
       validateAgainstObjectSchema schemaPath jsonPath json keywords
 
   validateAgainstObjectSchema
-    ∷ SchemaPath → JsonPath → Json → Keywords → Set Violation
+    ∷ SchemaPath → JsonPath → JsonValue → Keywords → Set Violation
   validateAgainstObjectSchema schemaPath jsonPath json keywords =
     notViolations <> typeKeywordViolations <> A.caseJson
       (const Set.empty)
@@ -138,30 +223,35 @@ validateAgainst = go Nil Nil
           in
             if shouldValidate then
               let
-                violations = validateArray schemaPath jsonPath array
+                itemViolations = validateArray
+                  schemaPath
+                  jsonPath
+                  (wrap <$> array)
                   keywords
               in
-                if Set.isEmpty violations then Set.empty
-                else
-                  Set.singleton
-                    { jsonPath
-                    , reason: InvalidArray violations
-                    , schemaPath
-                    }
-
+                case SetNE.fromSet itemViolations of
+                  Just violations →
+                    Set.singleton $ Violation
+                      { jsonPath
+                      , reason: InvalidArray violations
+                      , schemaPath
+                      }
+                  Nothing →
+                    Set.empty
             else Set.empty
       )
       (const Set.empty)
-      json
+      (unwrap json)
     where
     notViolations ∷ Set Violation
     notViolations = case keywords.not of
       Just schema →
-        if Set.isEmpty $ validateAgainst json schema then Set.singleton
-          { jsonPath
-          , reason: ValidAgainstNotSchema
-          , schemaPath
-          }
+        if Set.isEmpty $ validateAgainst json schema then
+          Set.singleton $ Violation
+            { jsonPath
+            , reason: ValidAgainstNotSchema
+            , schemaPath
+            }
         else Set.empty
       Nothing →
         Set.empty
@@ -176,7 +266,7 @@ validateAgainst = go Nil Nil
     ∷ ∀ r
     . SchemaPath
     → JsonPath
-    → Array Json
+    → Array JsonValue
     → { items ∷ Maybe JsonSchema, uniqueItems ∷ Boolean | r }
     → Set Violation
   validateArray schemaPath jsonPath array constraints =
@@ -195,11 +285,15 @@ validateAgainst = go Nil Nil
       else Set.empty
 
   validateItems
-    ∷ SchemaPath → JsonPath → Array Json → JsonSchema → Set Violation
+    ∷ SchemaPath
+    → JsonPath
+    → Array JsonValue
+    → JsonSchema
+    → Set Violation
   validateItems schemaPath jsonPath itemJsons schema =
     foldMapWithIndex f itemJsons
     where
-    f ∷ Int → Json → Set Violation
+    f ∷ Int → JsonValue → Set Violation
     f itemIndex itemJson = go
       schemaPath
       (ItemIndex itemIndex : jsonPath)
@@ -234,7 +328,7 @@ validateNumber schemaPath jsonPath constraints x =
     Set.empty
     ( \exclusiveMaximum →
         if x < exclusiveMaximum then Set.empty
-        else Set.singleton
+        else Set.singleton $ Violation
           { jsonPath
           , reason: InvalidRange { validRange, value: x }
           , schemaPath: ExclusiveMaximum : schemaPath
@@ -247,7 +341,7 @@ validateNumber schemaPath jsonPath constraints x =
     Set.empty
     ( \exclusiveMinimum →
         if x > exclusiveMinimum then Set.empty
-        else Set.singleton
+        else Set.singleton $ Violation
           { jsonPath
           , reason: InvalidRange { validRange, value: x }
           , schemaPath: ExclusiveMinimum : schemaPath
@@ -260,7 +354,7 @@ validateNumber schemaPath jsonPath constraints x =
     Set.empty
     ( \maximum →
         if x <= maximum then Set.empty
-        else Set.singleton
+        else Set.singleton $ Violation
           { jsonPath
           , reason: InvalidRange { validRange, value: x }
           , schemaPath: Maximum : schemaPath
@@ -273,7 +367,7 @@ validateNumber schemaPath jsonPath constraints x =
     Set.empty
     ( \minimum →
         if x >= minimum then Set.empty
-        else Set.singleton
+        else Set.singleton $ Violation
           { jsonPath
           , reason: InvalidRange { validRange, value: x }
           , schemaPath: Minimum : schemaPath
@@ -311,24 +405,24 @@ validateNumber schemaPath jsonPath constraints x =
         else Open exclusiveMaximum
 
 validateUniqueItems
-  ∷ SchemaPath → JsonPath → Array Json → Set Violation
+  ∷ SchemaPath → JsonPath → Array JsonValue → Set Violation
 validateUniqueItems schemaPath jsonPath itemJsons =
   foldMapWithIndex f itemJsons
   where
-  f ∷ Int → Json → Set Violation
+  f ∷ Int → JsonValue → Set Violation
   f itemIndex itemJson =
     if itemJson `Set.member` duplicates then
-      Set.singleton
+      Set.singleton $ Violation
         { jsonPath: ItemIndex itemIndex : jsonPath
         , reason: NonUniqueArrayItem
         , schemaPath
         }
     else Set.empty
 
-  duplicates ∷ Set Json
+  duplicates ∷ Set JsonValue
   duplicates = Map.keys $ Map.filter (_ > 1) frequencies
 
-  frequencies ∷ Map Json Int
+  frequencies ∷ Map JsonValue Int
   frequencies = foldl
     (\acc json → Map.insertWith (+) json 1 acc)
     Map.empty
@@ -340,7 +434,7 @@ validateMultipleOf schemaPath jsonPath x = case _ of
   Just expectedMultiple →
     if isInteger $ x / expectedMultiple then
       Set.empty
-    else Set.singleton
+    else Set.singleton $ Violation
       { jsonPath
       , reason: InvalidMultiple { expectedMultiple, value: x }
       , schemaPath: MultipleOf : schemaPath
@@ -349,12 +443,16 @@ validateMultipleOf schemaPath jsonPath x = case _ of
     Set.empty
 
 validateTypeKeyword
-  ∷ SchemaPath → JsonPath → Json → Set JsonValueType → Set Violation
+  ∷ SchemaPath
+  → JsonPath
+  → JsonValue
+  → Set JsonValueType
+  → Set Violation
 validateTypeKeyword schemaPath jsonPath json allowedJsonValueTypes =
   if jsonValueType == JsonInteger && integersAreAllowed then Set.empty
   else if jsonValueType `Set.member` allowedJsonValueTypes then
     Set.empty
-  else Set.singleton
+  else Set.singleton $ Violation
     { jsonPath
     , reason: TypeMismatch
         { actualJsonValueType: jsonValueType, allowedJsonValueTypes }
@@ -377,4 +475,4 @@ validateTypeKeyword schemaPath jsonPath json allowedJsonValueTypes =
     (const JsonString)
     (const JsonArray)
     (const JsonObject)
-    json
+    (unwrap json)

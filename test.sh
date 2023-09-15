@@ -2,4 +2,5 @@
 
 set -e
 
-spago test
+spago test -m Test.Unit.Main
+spago test -m Test.Snapshot.Main

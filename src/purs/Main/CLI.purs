@@ -7,12 +7,13 @@ import Data.Argonaut.Core as A
 import Data.Argonaut.Parser as AP
 import Data.Either (Either(..))
 import Data.Foldable (fold)
+import Data.Newtype (wrap)
 import Effect (Effect)
 import Effect.Aff (Aff, error, launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Class.Console as Console
+import JsonSchema as Schema
 import JsonSchema.Codec.Parsing as Parsing
-import JsonSchema.Codec.Printing as Printing
 import Node.Encoding (Encoding(..))
 import Node.FS.Aff as FS
 import Options.Applicative (Parser, ParserInfo, (<**>))
@@ -75,18 +76,22 @@ run { command } = case command of
 
     schemaText ← FS.readTextFile UTF8 schemaPath
 
-    schema ← case Parsing.parseSchema =<< AP.jsonParser schemaText of
-      Left errorMessage →
-        throwError
-          $ error
-          $ "Failed to parse the JSON schema document: " <> errorMessage
-      Right json →
-        pure json
+    schema ←
+      case
+        Parsing.parseSchema =<< (wrap <$> AP.jsonParser schemaText)
+        of
+        Left errorMessage →
+          throwError
+            $ error
+            $ "Failed to parse the JSON schema document: " <>
+                errorMessage
+        Right json →
+          pure json
 
     Console.info
       $ "JSON:\n" <> A.stringify jsonValue
 
     Console.info
-      $ "Schema:\n" <> (A.stringify $ Printing.printSchema schema)
+      $ "Schema:\n" <> (show $ Schema.print schema)
 
     pure unit

@@ -8,6 +8,7 @@ import Data.Argonaut.Core as A
 import Data.Either (Either(..), note)
 import Data.Either.Nested (type (\/))
 import Data.Maybe (Maybe(..), maybe)
+import Data.Newtype (unwrap, wrap)
 import Data.Set (Set)
 import Data.Set as Set
 import Data.Traversable (traverse)
@@ -15,22 +16,25 @@ import Foreign.Object (Object)
 import Foreign.Object as Object
 import JsonSchema (JsonSchema(..), JsonValueType(..))
 import JsonSchema as Schema
+import JsonValue (JsonValue)
 
-parseSchema ∷ Json → String \/ JsonSchema
-parseSchema json = parseBooleanSchema json <|> parseObjectSchema json
+parseSchema ∷ JsonValue → String \/ JsonSchema
+parseSchema json = parseBooleanSchema json
+  <|> parseObjectSchema json
+  <|> Left "the JSON value is neither a boolean nor an object"
 
-parseBooleanSchema ∷ Json → String \/ JsonSchema
+parseBooleanSchema ∷ JsonValue → String \/ JsonSchema
 parseBooleanSchema json = do
   bool ← note
-    (parsingErrorMessage "schema is not a JSON boolean")
-    (A.toBoolean json)
+    (parsingErrorMessage "the JSON value is not a JSON boolean")
+    (A.toBoolean $ unwrap json)
   pure $ BooleanSchema bool
 
-parseObjectSchema ∷ Json → String \/ JsonSchema
+parseObjectSchema ∷ JsonValue → String \/ JsonSchema
 parseObjectSchema keywordsJson = do
   schemaObject ← note
-    (parsingErrorMessage "schema is not a JSON object")
-    (A.toObject keywordsJson)
+    (parsingErrorMessage "the JSON value is not a JSON object")
+    (A.toObject $ unwrap keywordsJson)
 
   exclusiveMaximum ← parseOptionalNumber
     "exclusiveMaximum"
@@ -42,7 +46,7 @@ parseObjectSchema keywordsJson = do
 
   items ← maybe (Right Schema.defaultKeywords.items)
     (map Just <<< parseSchema)
-    (Object.lookup "items" schemaObject)
+    (wrap <$> Object.lookup "items" schemaObject)
 
   maximum ← parseOptionalNumber
     "maximum"
@@ -56,7 +60,7 @@ parseObjectSchema keywordsJson = do
 
   not ← maybe (Right Schema.defaultKeywords.not)
     (map Just <<< parseSchema)
-    (Object.lookup "not" schemaObject)
+    (wrap <$> Object.lookup "not" schemaObject)
 
   required ← maybe (Right Schema.defaultKeywords.required)
     parseRequiredKeywordSpec

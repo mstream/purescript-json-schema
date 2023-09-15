@@ -2,7 +2,7 @@
 pkgs.stdenv.mkDerivation {
   buildInputs = with pkgs; [ esbuild mdbook mdbook-mermaid nodePackages.markdownlint-cli ];
   checkPhase = ''
-    markdownlint docs/src
+    markdownlint --disable MD004 -- .
   '';
   doCheck = true;
   installPhase = ''
