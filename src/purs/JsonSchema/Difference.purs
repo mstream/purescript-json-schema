@@ -26,6 +26,7 @@ import JsonSchema (JsonSchema(..), JsonValueType, Keywords)
 import JsonSchema as Schema
 import JsonSchema.SchemaPath (SchemaPath, SchemaPathSegment(..))
 import JsonSchema.SchemaPath as SchemaPath
+import Show.NonEmpty (show1)
 import Type.Proxy (Proxy(..))
 
 newtype Difference = Difference
@@ -283,10 +284,9 @@ calculateTypeKeywordDiff path previousKeywords nextKeywords =
       }
 
 renderOptionalNumber ∷ Maybe Number → NonEmptyString
-renderOptionalNumber =
-  fromMaybe (StringNE.nes (Proxy ∷ Proxy "unspecified"))
-    <<< StringNE.fromString
-    <<< show
+renderOptionalNumber = maybe
+  (StringNE.nes (Proxy ∷ Proxy "unspecified"))
+  show1
 
 renderJsonValueTypes ∷ Maybe (Set JsonValueType) → FlowContentNode
 renderJsonValueTypes = maybe
