@@ -77,26 +77,49 @@ spec =
 
 context ∷ ComputationContext
 context =
-  [ M.paragraph $
-      M.text
-        "JSON validation is a specification for validating the structure and data types of JSON values."
-        `ArrayNE.cons'`
-          [ M.lineBreak
-          , M.text
-              "It allows you to specify the required properties, the types of values, the format of the data, and other constraints for a JSON object."
-          , M.lineBreak
-          , M.text
-              "This is useful for ensuring that the data received or sent in a JSON format is as expected and can be processed correctly."
-          , M.lineBreak
-          , M.text
-              "It helps to catch errors early, improve data quality, and reduce the amount of code needed for data validation."
-          ]
+  [ M.paragraph
+      $
+        ( M.text
+            $
+              StringNE.nes
+                ( Proxy
+                    ∷ Proxy
+                        "JSON validation is a specification for validating the structure and data types of JSON values."
+                )
+        )
+          `ArrayNE.cons'`
+            [ M.lineBreak
+            , M.text
+                $ StringNE.nes
+                    ( Proxy
+                        ∷ Proxy
+                            "It allows you to specify the required properties, the types of values, the format of the data, and other constraints for a JSON object."
+                    )
+            , M.lineBreak
+            , M.text
+                $ StringNE.nes
+                    ( Proxy
+                        ∷ Proxy
+                            "This is useful for ensuring that the data received or sent in a JSON format is as expected and can be processed correctly."
+                    )
+            , M.lineBreak
+            , M.text
+                $ StringNE.nes
+                    ( Proxy
+                        ∷ Proxy
+                            "It helps to catch errors early, improve data quality, and reduce the amount of code needed for data validation."
+                    )
+            ]
   ]
 
 properties ∷ Array Property
 properties =
   [ { description:
-        "any JSON value passes validation against 'true' JSON schema"
+        StringNE.nes
+          ( Proxy
+              ∷ Proxy
+                  "'true' JSON schema does not impose any constraints"
+          )
     , property: \execute → do
         json ← genAnyJsonValueSample
 
@@ -115,7 +138,8 @@ properties =
                 <> show violations
     }
   , { description:
-        "no JSON value passes validation against 'false' JSON schema"
+        StringNE.nes
+          (Proxy ∷ Proxy "'false' JSON schema rejects anything")
     , property: \execute → do
         json ← genAnyJsonValueSample
 
@@ -132,8 +156,11 @@ properties =
             "the validation did not report any violations"
           else Success
     }
-  , { description:
-        "any JSON value passes validation against 'empty object' JSON schema"
+  , { description: StringNE.nes
+        ( Proxy
+            ∷ Proxy
+                "any JSON value passes validation against 'empty object' JSON schema"
+        )
     , property: \execute → do
         json ← genAnyJsonValueSample
 
@@ -228,7 +255,7 @@ examples =
           }
       }
   , violationsExample
-      "TODO"
+      "the value is neither null or string"
       { json: ValueSample
           { description: StringNE.nes (Proxy ∷ Proxy "a boolean value")
           , sample: wrap $ A.jsonTrue
@@ -257,7 +284,7 @@ examples =
           }
       )
   , violationsExample
-      "TODO"
+      "the schema accepts only whole numbers"
       { json: ValueSample
           { description: StringNE.nes
               (Proxy ∷ Proxy "a fractional number")
@@ -284,7 +311,7 @@ examples =
           }
       )
   , violationsExample
-      "When schema requires items to conform to a certain schema, every single value in the array has to"
+      "the schema requires items to conform to a certain schema and this is not the case here"
       { json: ValueSample
           { description: StringNE.nes
               ( Proxy
@@ -339,7 +366,7 @@ examples =
           }
       )
   , violationsExample
-      "When schema requires items to be unique, any duplicate occurrence of any value will cause a validation failure."
+      "the schema requires items to be unique, and the value contains duplicate occurrence"
       { json: ValueSample
           { description: StringNE.nes
               ( Proxy
@@ -388,7 +415,7 @@ examples =
           }
       )
   , noViolationsExample
-      "TODO"
+      "the schema accepts any multiples of 2.5"
       { json: ValueSample
           { description: StringNE.nes
               (Proxy ∷ Proxy "a multiple of 2.5")
@@ -404,7 +431,7 @@ examples =
           }
       }
   , violationsExample
-      "TODO"
+      "the schema accepts only multiples of 2.5"
       { json: ValueSample
           { description: StringNE.nes
               (Proxy ∷ Proxy "not a multiple of 2.5")
@@ -431,7 +458,7 @@ examples =
           }
       )
   , noViolationsExample
-      "Because the maximum value constraint is inclusive, such a value is valid."
+      "the maximum value constraint is inclusive"
       { json: ValueSample
           { description:
               StringNE.nes
@@ -453,7 +480,7 @@ examples =
           }
       }
   , violationsExample
-      "Because the maximum value constraint is exclusive, such a value is invalid."
+      "the maximum value constraint is exclusive"
       { json: ValueSample
           { description:
               StringNE.nes
@@ -488,7 +515,7 @@ examples =
           }
       )
   , violationsExample
-      "Because the value is greater than the maximum value constraint is exclusive, such a value is invalid."
+      "the value is greater than the maximum value constraint is exclusive"
       { json: ValueSample
           { description:
               StringNE.nes
@@ -523,7 +550,7 @@ examples =
           }
       )
   , noViolationsExample
-      "Because the value is less than the maximum value constraint, such a value is valid."
+      "the value is less than the maximum value constraint"
       { json: ValueSample
           { description:
               StringNE.nes
@@ -545,7 +572,7 @@ examples =
           }
       }
   , noViolationsExample
-      "Because the minimum value constraint is inclusive, such a value is valid."
+      "the minimum value constraint is inclusive"
       { json: ValueSample
           { description:
               StringNE.nes
@@ -567,7 +594,7 @@ examples =
           }
       }
   , violationsExample
-      "Because the maximum value constraint is exclusive, such a value is invalid."
+      "the minimum value constraint is exclusive"
       { json: ValueSample
           { description:
               StringNE.nes
@@ -602,7 +629,7 @@ examples =
           }
       )
   , violationsExample
-      "Because the value is greater than the minimum value constraint is exclusive, such a value is invalid."
+      "the value is greater than the minimum value constraint is exclusive"
       { json: ValueSample
           { description:
               StringNE.nes
@@ -637,7 +664,7 @@ examples =
           }
       )
   , noViolationsExample
-      "Because the value is less than the minimum value constraint, such a value is valid."
+      "the value is less than the minimum value constraint"
       { json: ValueSample
           { description:
               StringNE.nes
@@ -661,16 +688,27 @@ examples =
   ]
 
 noViolationsExample ∷ String → { | InputSample } → Example
-noViolationsExample title input = violationsExample title input
-  $ ValueSample
+noViolationsExample justification input =
+  { description:
+      StringNE.nes (Proxy ∷ Proxy "Because ")
+        `StringNE.appendString` justification
+        <>
+          StringNE.nes (Proxy ∷ Proxy ", such a value is valid.")
+  , expectedOutput: ValueSample
       { description: StringNE.nes (Proxy ∷ Proxy "no violations")
       , sample: Set.empty
       }
+  , input
+  }
 
 violationsExample
   ∷ String → { | InputSample } → ValueSample Output → Example
-violationsExample description input expectedOutput =
-  { description
+violationsExample justification input expectedOutput =
+  { description:
+      StringNE.nes (Proxy ∷ Proxy "Because ")
+        `StringNE.appendString` justification
+        <>
+          StringNE.nes (Proxy ∷ Proxy ", such a value is invalid.")
   , expectedOutput
   , input
   }

@@ -24,6 +24,7 @@ import Docs.Document (class Document, document)
 import Heterogeneous.Mapping (class Mapping)
 import Test.QuickCheck (Result)
 import Test.QuickCheck.Gen (Gen)
+import Type.Proxy (Proxy(..))
 
 type ComputationSpec isa isp o osa =
   { context ∷ ComputationContext
@@ -51,21 +52,22 @@ instance (Document a) ⇒ Document (ValueSample a) where
     ( M.paragraph
         $ ArrayNE.singleton
         $ M.text
-        $ StringNE.toString description
-            <> ":"
+        $ description <> StringNE.nes (Proxy ∷ Proxy ":")
     )
       :| [ M.blockquote $ document sample ]
 
 type ValueGenerator a = { description ∷ String, generator ∷ Gen a }
 
 type ComputationExample (isa ∷ Row Type) (osa ∷ Type) =
-  { description ∷ String
+  { description ∷ NonEmptyString
   , expectedOutput ∷ osa
   , input ∷ { | isa }
   }
 
 type ComputationProperty (isa ∷ Row Type) (o ∷ Type) =
-  { description ∷ String, property ∷ ({ | isa } → o) → Gen Result }
+  { description ∷ NonEmptyString
+  , property ∷ ({ | isa } → o) → Gen Result
+  }
 
 data GetValueDescription = GetValueDescription
 

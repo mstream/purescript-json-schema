@@ -57,7 +57,10 @@ context = []
 
 properties ∷ Array Property
 properties =
-  [ { description: "always prints a well-formatted schema JSON"
+  [ { description: StringNE.nes
+        ( Proxy
+            ∷ Proxy "always prints a well-formatted schema JSON"
+        )
     , property: \execute → do
         schema ← genAnyJsonSchemaSample
 

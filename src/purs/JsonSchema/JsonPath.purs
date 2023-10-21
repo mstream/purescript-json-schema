@@ -6,27 +6,31 @@ module JsonSchema.JsonPath
 
 import Prelude
 
-import Data.Foldable (foldMap)
+import Data.Foldable (foldl)
 import Data.Generic.Rep (class Generic)
 import Data.List (List)
 import Data.List as List
 import Data.Show.Generic (genericShow)
+import Data.String.NonEmpty (NonEmptyString)
+import Data.String.NonEmpty as StringNE
+import Type.Proxy (Proxy(..))
 
 type JsonPath = List JsonPathSegment
 
-render ∷ JsonPath → String
-render = ("$" <> _) <<< foldMap f <<< List.reverse
+render ∷ JsonPath → NonEmptyString
+render = foldl f (StringNE.nes (Proxy ∷ Proxy "$")) <<< List.reverse
   where
-  f ∷ JsonPathSegment → String
-  f = case _ of
+  f ∷ NonEmptyString → JsonPathSegment → NonEmptyString
+  f acc = (acc <> _) <<< case _ of
     ItemIndex idx →
-      "[" <> show idx <> "]"
+      StringNE.nes (Proxy ∷ Proxy "[") `StringNE.appendString` show idx
+        <> StringNE.nes (Proxy ∷ Proxy "]")
     Property name →
-      "/" <> name
+      "/" `StringNE.prependString` name
 
 data JsonPathSegment
   = ItemIndex Int
-  | Property String
+  | Property NonEmptyString
 
 derive instance Eq JsonPathSegment
 derive instance Generic JsonPathSegment _

@@ -3,7 +3,7 @@ module Docs.Main (main) where
 import Prelude
 
 import Data.Array.NonEmpty as ArrayNE
-import Data.Markdown (Document, PhrasingContentNode)
+import Data.Markdown (Document, FormattingOptions, PhrasingContentNode)
 import Data.Markdown as M
 import Data.Set.NonEmpty (NonEmptySet)
 import Data.Set.NonEmpty as SetNE
@@ -41,7 +41,10 @@ main = launchAff_ $ saveDocumentation docsByTitle
 buildTableOfContents ∷ NonEmptySet NonEmptyString → Document
 buildTableOfContents titles =
   M.document
-    [ M.heading1 $ ArrayNE.singleton $ M.text "Summary"
+    [ M.heading1
+        $ ArrayNE.singleton
+        $ M.text
+        $ StringNE.nes (Proxy ∷ Proxy "Summary")
     , M.orderedList $
         ( ArrayNE.singleton
             <<< M.paragraph
@@ -72,7 +75,7 @@ saveDocumentation docsByTitle = do
 
   FS.writeTextFile UTF8
     (prefix <> "/SUMMARY.md")
-    ( M.render
+    ( M.render formattingOptions
         $ buildTableOfContents
         $ Tuple.fst `SetNE.map` docsByTitle
     )
@@ -85,10 +88,13 @@ saveDocumentation docsByTitle = do
               <> "/"
               <> (StringNE.toString $ documentFilePath title)
           )
-          (M.render doc)
+          (M.render formattingOptions doc)
     )
     docsByTitle
 
   where
+  formattingOptions ∷ FormattingOptions
+  formattingOptions = { maxLineLength: 72 }
+
   prefix ∷ String
   prefix = "docs/src"

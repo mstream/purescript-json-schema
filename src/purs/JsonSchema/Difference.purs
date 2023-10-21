@@ -2,7 +2,6 @@ module JsonSchema.Difference
   ( Difference(..)
   , DifferenceType(..)
   , calculate
-  , renderDifference
   ) where
 
 import Prelude
@@ -14,17 +13,20 @@ import Data.Generic.Rep (class Generic)
 import Data.List (List(..), (:))
 import Data.Markdown (FlowContentNode)
 import Data.Markdown as M
-import Data.Maybe (Maybe(..), maybe)
+import Data.Maybe (Maybe(..), fromMaybe, maybe)
 import Data.NonEmpty ((:|))
 import Data.NonEmpty as NE
 import Data.Set (Set)
 import Data.Set as Set
 import Data.Show.Generic (genericShow)
+import Data.String.NonEmpty (NonEmptyString)
+import Data.String.NonEmpty as StringNE
 import Docs.Document (class Document, document)
 import JsonSchema (JsonSchema(..), JsonValueType, Keywords)
 import JsonSchema as Schema
 import JsonSchema.SchemaPath (SchemaPath, SchemaPathSegment(..))
 import JsonSchema.SchemaPath as SchemaPath
+import Type.Proxy (Proxy(..))
 
 newtype Difference = Difference
   { differenceType ∷ DifferenceType, path ∷ SchemaPath }
@@ -38,8 +40,11 @@ instance Show Difference where
 
 instance Document Difference where
   document (Difference { differenceType, path }) =
-    ( M.paragraph $ ArrayNE.singleton $ M.text $
-        "JSON schema path: " <> SchemaPath.render path
+    ( M.paragraph
+        $ ArrayNE.singleton
+        $ M.text
+        $ StringNE.nes (Proxy ∷ Proxy "JSON schema path: ")
+            <> SchemaPath.render path
     ) :| (Array.fromFoldable $ document differenceType)
 
 data DifferenceType
@@ -66,73 +71,106 @@ instance Document DifferenceType where
       NE.singleton
         $ M.paragraph
         $ ArrayNE.singleton
-        $ M.text "change of boolean schema from allow-all to reject-all"
+        $ M.text
+        $ StringNE.nes
+            ( Proxy
+                ∷ Proxy
+                    "change of boolean schema from allow-all to reject-all"
+            )
     BooleanSchemaChange true →
       NE.singleton
         $ M.paragraph
         $ ArrayNE.singleton
-        $ M.text "change of boolean schema from reject-all to allow-all"
+        $ M.text
+        $ StringNE.nes
+            ( Proxy
+                ∷ Proxy
+                    "change of boolean schema from reject-all to allow-all"
+            )
     ExclusiveMaximumChange before after →
       NE.singleton
         $ M.paragraph
         $ ArrayNE.singleton
         $ M.text
-        $ "change of exclusiveMaximum from "
+        $
+          StringNE.nes
+            ( Proxy
+                ∷ Proxy "change of exclusiveMaximum from "
+            )
             <> renderOptionalNumber before
-            <> " to "
+            <> StringNE.nes
+              ( Proxy
+                  ∷ Proxy " to "
+              )
             <> renderOptionalNumber after
     ExclusiveMinimumChange before after →
       NE.singleton
         $ M.paragraph
         $ ArrayNE.singleton
         $ M.text
-        $ "change of exclusiveMinimum from "
+        $
+          StringNE.nes
+            ( Proxy
+                ∷ Proxy "change of exclusiveMinimum from "
+            )
             <> renderOptionalNumber before
-            <> " to "
+            <> StringNE.nes
+              ( Proxy
+                  ∷ Proxy " to "
+              )
             <> renderOptionalNumber after
     MaximumChange before after →
       NE.singleton
         $ M.paragraph
         $ ArrayNE.singleton
         $ M.text
-        $ "change of maximum from "
+        $ StringNE.nes (Proxy ∷ Proxy "change of maximum from ")
             <> renderOptionalNumber before
-            <> " to "
+            <> StringNE.nes (Proxy ∷ Proxy " to ")
             <> renderOptionalNumber after
     MinimumChange before after →
       NE.singleton
         $ M.paragraph
         $ ArrayNE.singleton
         $ M.text
-        $ "change of minimum from "
+        $ StringNE.nes (Proxy ∷ Proxy "change of minimum from ")
             <> renderOptionalNumber before
-            <> " to "
+            <> StringNE.nes (Proxy ∷ Proxy " to ")
             <> renderOptionalNumber after
     MultipleOfChange before after →
       NE.singleton
         $ M.paragraph
         $ ArrayNE.singleton
         $ M.text
-        $ "change of multipleOf from "
+        $ StringNE.nes (Proxy ∷ Proxy "change of multipleOf from ")
             <> renderOptionalNumber before
-            <> " to "
+            <> StringNE.nes (Proxy ∷ Proxy " to ")
+            <> renderOptionalNumber after
     SchemaChangeFromBooleanToObject _ _ →
       NE.singleton
         $ M.paragraph
         $ ArrayNE.singleton
-        $ M.text "change of boolean schema to object schema"
+        $ M.text
+        $ StringNE.nes
+            (Proxy ∷ Proxy "change of boolean schema to object schema")
     SchemaChangeFromObjectToBoolean _ _ →
       NE.singleton
         $ M.paragraph
         $ ArrayNE.singleton
         $ M.text
-            "change of object schema to boolean schema"
+        $ StringNE.nes
+            (Proxy ∷ Proxy "change of object schema to boolean schema")
     TypeChange typesBefore typesAfter →
-      ( M.paragraph $ ArrayNE.singleton $ M.text
-          "change of accepted JSON value types from"
+      ( M.paragraph $ ArrayNE.singleton $ M.text $
+          StringNE.nes
+            (Proxy ∷ Proxy "change of accepted JSON value types from")
       ) :|
         [ renderJsonValueTypes typesBefore
-        , M.paragraph $ ArrayNE.singleton $ M.text "to"
+        , M.paragraph
+            $ ArrayNE.singleton
+            $ M.text
+            $ StringNE.nes
+                (Proxy ∷ Proxy "to")
         , renderJsonValueTypes typesAfter
         ]
 
@@ -244,72 +282,20 @@ calculateTypeKeywordDiff path previousKeywords nextKeywords =
       , path: TypeKeyword : path
       }
 
-renderDifference ∷ Difference → Array String
-renderDifference (Difference { differenceType, path }) =
-  [ "Schema path: " <> SchemaPath.render path ]
-    <> renderDifferenceType
-  where
-  renderDifferenceType ∷ Array String
-  renderDifferenceType = case differenceType of
-    BooleanSchemaChange false →
-      [ "change of boolean schema from allow-all to reject-all" ]
-    BooleanSchemaChange true →
-      [ "change of boolean schema from reject-all to allow-all" ]
-    ExclusiveMaximumChange before after →
-      [ "change of exclusiveMaximum from "
-          <> renderOptionalNumber before
-          <> " to "
-          <> renderOptionalNumber after
-      ]
-    ExclusiveMinimumChange before after →
-      [ "change of exclusiveMinimum from "
-          <> renderOptionalNumber before
-          <> " to "
-          <> renderOptionalNumber after
-      ]
-    MaximumChange before after →
-      [ "change of maximum from "
-          <> renderOptionalNumber before
-          <> " to "
-          <> renderOptionalNumber after
-      ]
-    MinimumChange before after →
-      [ "change of minimum from "
-          <> renderOptionalNumber before
-          <> " to "
-          <> renderOptionalNumber after
-      ]
-    MultipleOfChange before after →
-      [ "change of multipleOf from "
-          <> renderOptionalNumber before
-          <> " to "
-          <> renderOptionalNumber after
-      ]
-    SchemaChangeFromBooleanToObject _ _ →
-      [ "change of boolean schema to object schema" ]
-    SchemaChangeFromObjectToBoolean _ _ →
-      [ "change of object schema to boolean schema" ]
-    TypeChange typesBefore typesAfter →
-      [ "change of accepted JSON value types from " ]
-        <> renderJsonValueTypes typesBefore
-        <> [ "to" ]
-        <> renderJsonValueTypes typesAfter
-
-  renderJsonValueTypes ∷ Maybe (Set JsonValueType) → Array String
-  renderJsonValueTypes = maybe
-    [ "unspecified" ]
-    ( foldMap
-        ( \jsonValueType →
-            [ "- " <> Schema.renderJsonValueType jsonValueType ]
-        )
-    )
-
-renderOptionalNumber ∷ Maybe Number → String
-renderOptionalNumber = maybe "unspecified" show
+renderOptionalNumber ∷ Maybe Number → NonEmptyString
+renderOptionalNumber =
+  fromMaybe (StringNE.nes (Proxy ∷ Proxy "unspecified"))
+    <<< StringNE.fromString
+    <<< show
 
 renderJsonValueTypes ∷ Maybe (Set JsonValueType) → FlowContentNode
 renderJsonValueTypes = maybe
-  (M.paragraph $ ArrayNE.singleton $ M.text "unspecified")
+  ( M.paragraph
+      $ ArrayNE.singleton
+      $ M.text
+      $ StringNE.nes
+          (Proxy ∷ Proxy "unspecified")
+  )
   toFlowContentNode
   where
   toFlowContentNode ∷ Set JsonValueType → FlowContentNode
@@ -318,7 +304,11 @@ renderJsonValueTypes = maybe
       M.unorderedList $ ArrayNE.singleton <$> renderJsonValueType <$>
         jsonValueTypes
     Nothing →
-      (M.paragraph $ ArrayNE.singleton $ M.text "none")
+      M.paragraph
+        $ ArrayNE.singleton
+        $ M.text
+        $ StringNE.nes
+            (Proxy ∷ Proxy "none")
 
 renderJsonValueType ∷ JsonValueType → FlowContentNode
 renderJsonValueType = M.paragraph

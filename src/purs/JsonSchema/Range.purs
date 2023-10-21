@@ -4,25 +4,30 @@ import Prelude
 
 import Data.Generic.Rep (class Generic)
 import Data.Show.Generic (genericShow)
+import Data.String.NonEmpty (NonEmptyString)
+import Data.String.NonEmpty as StringNE
+import Type.Proxy (Proxy(..))
 
 type Range = { from ∷ Boundary, to ∷ Boundary }
 
-renderRange ∷ Range → String
-renderRange range = renderFrom <> "," <> renderTo
+renderRange ∷ Range → NonEmptyString
+renderRange range = renderFrom
+  <> StringNE.nes (Proxy ∷ Proxy ",")
+  <> renderTo
   where
-  renderFrom ∷ String
+  renderFrom ∷ NonEmptyString
   renderFrom = case range.from of
     Closed x →
-      "[" <> show x
+      StringNE.nes (Proxy ∷ Proxy "[") `StringNE.appendString` show x
     Open x →
-      "(" <> show x
+      StringNE.nes (Proxy ∷ Proxy "(") `StringNE.appendString` show x
 
-  renderTo ∷ String
+  renderTo ∷ NonEmptyString
   renderTo = case range.to of
     Closed x →
-      show x <> "]"
+      show x `StringNE.prependString` StringNE.nes (Proxy ∷ Proxy "]")
     Open x →
-      show x <> ")"
+      show x `StringNE.prependString` StringNE.nes (Proxy ∷ Proxy ")")
 
 data Boundary = Closed Number | Open Number
 

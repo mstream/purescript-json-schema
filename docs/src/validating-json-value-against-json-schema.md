@@ -1,15 +1,19 @@
 # Validating JSON value against JSON schema
 
-JSON validation is a specification for validating the structure and data types of JSON values.\
-It allows you to specify the required properties, the types of values, the format of the data, and other constraints for a JSON object.\
-This is useful for ensuring that the data received or sent in a JSON format is as expected and can be processed correctly.\
-It helps to catch errors early, improve data quality, and reduce the amount of code needed for data validation.
+JSON validation is a specification for validating the structure and data
+types of JSON values.\
+It allows you to specify the required properties, the types of values,
+the format of the data, and other constraints for a JSON object.\
+This is useful for ensuring that the data received or sent in a JSON
+format is as expected and can be processed correctly.\
+It helps to catch errors early, improve data quality, and reduce the
+amount of code needed for data validation.
 
 ## Properties
 
-- any JSON value passes validation against 'true' JSON schema
+- 'true' JSON schema does not impose any constraints
 
-- no JSON value passes validation against 'false' JSON schema
+- 'false' JSON schema rejects anything
 
 - any JSON value passes validation against 'empty object' JSON schema
 
@@ -55,7 +59,8 @@ It helps to catch errors early, improve data quality, and reduce the amount of c
 
 ### validating an array containing some duplicated strings against schema not accepting duplicates
 
-When schema requires items to be unique, any duplicate occurrence of any value will cause a validation failure.
+Because the schema requires items to be unique, and the value contains
+duplicate occurrence, such a value is invalid.
 
 _Input:_
 
@@ -85,31 +90,36 @@ _Output:_
 
 an invalid array violation:
 
-> - JSON value path: $JSON schema path: #
+> - JSON value path: `$`\
+>   JSON schema path: `#`
 >
 >   Invalid array:
 >
->   - > Schema path: #/uniqueItemsJSON path: $[1]
->     >
->     > Non-unique array item.
+>   - JSON value path: `$[1]`\
+>     JSON schema path: `#/uniqueItems`
 >
->     > Schema path: #/uniqueItemsJSON path: $[2]
->     >
->     > Non-unique array item.
+>     Non-unique array item.
 >
->     > Schema path: #/uniqueItemsJSON path: $[4]
->     >
->     > Non-unique array item.
+>   - JSON value path: `$[2]`\
+>     JSON schema path: `#/uniqueItems`
 >
->     > Schema path: #/uniqueItemsJSON path: $[5]
->     >
->     > Non-unique array item.
+>     Non-unique array item.
+>
+>   - JSON value path: `$[4]`\
+>     JSON schema path: `#/uniqueItems`
+>
+>     Non-unique array item.
+>
+>   - JSON value path: `$[5]`\
+>     JSON schema path: `#/uniqueItems`
+>
+>     Non-unique array item.
 
 ---
 
 ### validating a boolean value against schema accepting only nulls or strings
 
-TODO
+Because the value is neither null or string, such a value is invalid.
 
 _Input:_
 
@@ -134,15 +144,17 @@ _Output:_
 
 a type mismatch violation:
 
-> - JSON value path: $JSON schema path: #/type
+> - JSON value path: `$`\
+>   JSON schema path: `#/type`
 >
->   Invalid type. Expected null or string but got boolean.
+>   Invalid type. Expected nullorstring but got boolean.
 
 ---
 
 ### validating JSON number value against JSON schema accepting only numbers
 
-a JSON value directly matches schema's only 'type' keyword item
+Because a JSON value directly matches schema's only 'type' keyword item,
+such a value is valid.
 
 _Input:_
 
@@ -172,7 +184,8 @@ no violations:
 
 ### validating JSON null value against JSON schema accepting booleans, nulls and strings
 
-a JSON value directly matches one of schema's 'type' keyword items
+Because a JSON value directly matches one of schema's 'type' keyword
+items, such a value is valid.
 
 _Input:_
 
@@ -204,7 +217,8 @@ no violations:
 
 ### validating JSON number value which happens to be an integer against JSON schema accepting any numbers
 
-a JSON value indirectly matches schema's only 'type' keyword item
+Because a JSON value indirectly matches schema's only 'type' keyword
+item, such a value is valid.
 
 _Input:_
 
@@ -234,7 +248,8 @@ no violations:
 
 ### validating a multiple of x against schema accepting only numbers which are multiples of x
 
-a JSON number value is a multiple of the factor desired by the schema
+Because a JSON number value is a multiple of the factor desired by the
+schema, such a value is valid.
 
 _Input:_
 
@@ -265,7 +280,7 @@ no violations:
 
 ### validating a fractional number against schema accepting only whole numbers
 
-TODO
+Because the schema accepts only whole numbers, such a value is invalid.
 
 _Input:_
 
@@ -289,7 +304,8 @@ _Output:_
 
 a type mismatch violation:
 
-> - JSON value path: $JSON schema path: #/type
+> - JSON value path: `$`\
+>   JSON schema path: `#/type`
 >
 >   Invalid type. Expected integer but got number.
 
@@ -297,7 +313,7 @@ a type mismatch violation:
 
 ### validating a multiple of 2.5 against a schema accepting only multiples of 2.5
 
-TODO
+Because the schema accepts any multiples of 2.5, such a value is valid.
 
 _Input:_
 
@@ -328,11 +344,13 @@ no violations:
 
 ### validating an array containing a mixture of null and boolean values to a schema accepting only arrays of nulls against schema accepting only arrays of nulls
 
-When schema requires items to conform to a certain schema, every single value in the array has to
+Because the schema requires items to conform to a certain schema and
+this is not the case here, such a value is invalid.
 
 _Input:_
 
-an array containing a mixture of null and boolean values to a schema accepting only arrays of nulls:
+an array containing a mixture of null and boolean values to a schema
+accepting only arrays of nulls:
 
 > ```json
 > [
@@ -363,23 +381,27 @@ _Output:_
 
 an invalid array violation:
 
-> - JSON value path: $JSON schema path: #
+> - JSON value path: `$`\
+>   JSON schema path: `#`
 >
 >   Invalid array:
 >
->   - > Schema path: #/items/typeJSON path: $[1]
->     >
->     > Invalid type. Expected null but got boolean.
+>   - JSON value path: `$[1]`\
+>     JSON schema path: `#/items/type`
 >
->     > Schema path: #/items/typeJSON path: $[3]
->     >
->     > Invalid type. Expected null but got boolean.
+>     Invalid type. Expected null but got boolean.
+>
+>   - JSON value path: `$[3]`\
+>     JSON schema path: `#/items/type`
+>
+>     Invalid type. Expected null but got boolean.
 
 ---
 
 ### validating number at the schema's minimum allowed values boundary against a schema with a minimum exclusive allowed value set
 
-Because the maximum value constraint is exclusive, such a value is invalid.
+Because the minimum value constraint is exclusive, such a value is
+invalid.
 
 _Input:_
 
@@ -401,7 +423,8 @@ _Output:_
 
 an invalid range violation:
 
-> - JSON value path: $JSON schema path: #/exclusiveMinimum
+> - JSON value path: `$`\
+>   JSON schema path: `#/exclusiveMinimum`
 >
 >   4.0 is outside of the valid range of (4.0,Infinity)
 
@@ -409,7 +432,8 @@ an invalid range violation:
 
 ### validating number at the schema's maximum allowed values boundary against a schema with a maximum exclusive allowed value set
 
-Because the maximum value constraint is exclusive, such a value is invalid.
+Because the maximum value constraint is exclusive, such a value is
+invalid.
 
 _Input:_
 
@@ -431,7 +455,8 @@ _Output:_
 
 an invalid range violation:
 
-> - JSON value path: $JSON schema path: #/exclusiveMaximum
+> - JSON value path: `$`\
+>   JSON schema path: `#/exclusiveMaximum`
 >
 >   4.0 is outside of the valid range of (-Infinity,4.0)
 
@@ -439,7 +464,8 @@ an invalid range violation:
 
 ### validating not a multiple of 2.5 against a schema accepting only multiples of 2.5
 
-TODO
+Because the schema accepts only multiples of 2.5, such a value is
+invalid.
 
 _Input:_
 
@@ -464,7 +490,8 @@ _Output:_
 
 an invalid multiple violation:
 
-> - JSON value path: $JSON schema path: #/multipleOf
+> - JSON value path: `$`\
+>   JSON schema path: `#/multipleOf`
 >
 >    is not a multiple of 2.5
 
@@ -472,7 +499,8 @@ an invalid multiple violation:
 
 ### validating number at the schema's maximum allowed values boundary against a schema with a maximum inclusive allowed value set
 
-Because the maximum value constraint is inclusive, such a value is valid.
+Because the maximum value constraint is inclusive, such a value is
+valid.
 
 _Input:_
 
@@ -500,7 +528,8 @@ no violations:
 
 ### validating number below the schema's maximum allowed values boundary against a schema with a maximum exclusive allowed value set
 
-Because the value is less than the maximum value constraint, such a value is valid.
+Because the value is less than the maximum value constraint, such a
+value is valid.
 
 _Input:_
 
@@ -528,7 +557,8 @@ no violations:
 
 ### validating number exceeding the schema's maximum allowed values boundary against a schema with a maximum inclusive allowed value set
 
-Because the value is greater than the maximum value constraint is exclusive, such a value is invalid.
+Because the value is greater than the maximum value constraint is
+exclusive, such a value is invalid.
 
 _Input:_
 
@@ -550,7 +580,8 @@ _Output:_
 
 an invalid range violation:
 
-> - JSON value path: $JSON schema path: #/maximum
+> - JSON value path: `$`\
+>   JSON schema path: `#/maximum`
 >
 >   5.0 is outside of the valid range of (-Infinity,4.0]
 
@@ -558,7 +589,8 @@ an invalid range violation:
 
 ### validating number at the schema's minimum allowed values boundary against a schema with a minimum inclusive allowed value set
 
-Because the minimum value constraint is inclusive, such a value is valid.
+Because the minimum value constraint is inclusive, such a value is
+valid.
 
 _Input:_
 
@@ -586,7 +618,8 @@ no violations:
 
 ### validating number below the schema's minimum allowed values boundary against a schema with a minimum exclusive allowed value set
 
-Because the value is less than the minimum value constraint, such a value is valid.
+Because the value is less than the minimum value constraint, such a
+value is valid.
 
 _Input:_
 
@@ -614,7 +647,8 @@ no violations:
 
 ### validating number exceeding the schema's minimum allowed values boundary against a schema with a minimum inclusive allowed value set
 
-Because the value is greater than the minimum value constraint is exclusive, such a value is invalid.
+Because the value is greater than the minimum value constraint is
+exclusive, such a value is invalid.
 
 _Input:_
 
@@ -636,6 +670,7 @@ _Output:_
 
 an invalid range violation:
 
-> - JSON value path: $JSON schema path: #/minimum
+> - JSON value path: `$`\
+>   JSON schema path: `#/minimum`
 >
 >   3.0 is outside of the valid range of [4.0,Infinity)

@@ -7,7 +7,10 @@ import Control.Monad.Gen as Gen
 import Control.Monad.Rec.Class (class MonadRec)
 import Data.NonEmpty ((:|))
 import Data.String.Gen as StringGen
+import Data.String.NonEmpty (NonEmptyString)
+import Data.String.NonEmpty as StringNE
 import JsonSchema.SchemaPath (SchemaPath, SchemaPathSegment(..))
+import Type.Proxy (Proxy(..))
 
 genSchemaPath ∷ ∀ m. MonadGen m ⇒ MonadRec m ⇒ m SchemaPath
 genSchemaPath = Gen.unfoldable genSegment
@@ -19,7 +22,13 @@ genSchemaPath = Gen.unfoldable genSegment
         , pure Items
         , pure Maximum
         , pure MultipleOf
-        , Properties <$> StringGen.genAlphaString
+        , Properties <$> genPropertyName
         , pure TypeKeyword
         , pure UniqueItems
         ]
+
+  genPropertyName ∷ m NonEmptyString
+  genPropertyName = do
+    suffix ← StringGen.genAlphaString
+    pure $ StringNE.nes (Proxy ∷ Proxy "prop-")
+      `StringNE.appendString` suffix

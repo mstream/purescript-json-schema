@@ -2,6 +2,7 @@ module Data.Markdown
   ( CodeLanguage(..)
   , Document
   , FlowContentNode(..)
+  , FormattingOptions
   , HeadingId(..)
   , HeadingLevel(..)
   , Node(..)
@@ -14,6 +15,7 @@ module Data.Markdown
   , emphasis
   , flowContent
   , formatAnchor
+  , formatText
   , heading1
   , heading2
   , heading3
@@ -59,6 +61,8 @@ import Data.String (Pattern(..), Replacement(..))
 import Data.String as String
 import Data.String.NonEmpty (NonEmptyString)
 import Data.String.NonEmpty as StringNE
+import Data.Tuple.Nested (type (/\), (/\))
+import Data.Unfoldable1 (unfoldr1)
 
 mapFirst ∷ ∀ a. (a → a) → NonEmptyList a → NonEmptyList a
 mapFirst f = ListNE.uncons >>> \{ head, tail } →
@@ -71,13 +75,6 @@ mapOtherThanLast f =
       ListNE.singleton (f head) <> mapOtherThanLast f restOfList
     Nothing →
       ListNE.singleton head
-
-mapOtherThanLast' ∷ ∀ a. (a → a) → List a → List a
-mapOtherThanLast' f = ListNE.fromList >>> case _ of
-  Just xs →
-    ListNE.toList $ mapOtherThanLast f xs
-  Nothing →
-    Nil
 
 mapLast ∷ ∀ a. (a → a) → NonEmptyList a → NonEmptyList a
 mapLast f =
@@ -97,13 +94,6 @@ mapLast' f = ListNE.fromList >>> case _ of
 mapTail ∷ ∀ a. (a → a) → NonEmptyList a → NonEmptyList a
 mapTail f = ListNE.uncons >>> \{ head, tail } →
   head `ListNE.cons'` (f <$> tail)
-
-appendWith
-  ∷ ∀ a. (a → a → a) → NonEmptyList a → NonEmptyList a → NonEmptyList a
-appendWith f left = ListNE.uncons >>>
-  \{ head: headOfRight, tail: tailOfRight } →
-    mapLast (\x → f x headOfRight) left
-      `ListNE.appendFoldable` tailOfRight
 
 appendWith'
   ∷ ∀ a. (a → a → a) → List a → List a → List a
@@ -174,7 +164,7 @@ data PhrasingContentNode
   | LineBreak
   | Link NonEmptyString Url
   | InlineCode NonEmptyString
-  | Text String
+  | Text NonEmptyString
 
 derive instance Eq PhrasingContentNode
 derive instance Ord PhrasingContentNode
@@ -183,6 +173,8 @@ derive instance Generic PhrasingContentNode _
 instance Show PhrasingContentNode where
   show node = genericShow node
 
+type FormattingOptions = { maxLineLength ∷ Int }
+
 renderMermaid ∷ FlowChartDef → FlowContentNode
 renderMermaid flowChartDef =
   codeBlock Mermaid code
@@ -190,8 +182,8 @@ renderMermaid flowChartDef =
   code ∷ Array String
   code = String.split (Pattern "\n") $ FlowChart.render flowChartDef
 
-render ∷ Document → String
-render = (_ <> "\n")
+render ∷ FormattingOptions → Document → String
+render options = (_ <> "\n")
   <<< String.joinWith "\n"
   <<< Array.fromFoldable
   <<< List.reverse
@@ -203,8 +195,8 @@ render = (_ <> "\n")
   f acc = case _ of
     FlowContent flowContentNode →
       let
-        renderedLines = ListNE.toList $ renderFlowContentNode
-          flowContentNode
+        renderedLines = ListNE.toList
+          $ renderFlowContentNode options flowContentNode
 
         mergedLines = renderedLines <> acc
       in
@@ -212,7 +204,7 @@ render = (_ <> "\n")
     PhrasingContent phrasingContentNode →
       let
         renderedLines = ListNE.toList
-          $ renderPhrasingContentNodes
+          $ renderPhrasingContentNodes options
           $ ArrayNE.singleton phrasingContentNode
 
         mergedLines = appendWith'
@@ -223,55 +215,98 @@ render = (_ <> "\n")
       in
         mergedLines
 
-renderFlowContentNode ∷ FlowContentNode → NonEmptyList String
-renderFlowContentNode = Lazy.defer \_ →
+renderFlowContentNode
+  ∷ FormattingOptions → FlowContentNode → NonEmptyList String
+renderFlowContentNode options = Lazy.defer \_ →
   case _ of
     Blockquote children →
-      renderBlockquote children
+      renderBlockquote options children
     CodeBlock codeBlockType code →
       renderCodeBlock codeBlockType code
     Heading headingLevel children →
-      renderHeading headingLevel children
+      renderHeading
+        options { maxLineLength = top }
+        headingLevel
+        children
     List isOrdered listItems →
-      renderList isOrdered listItems
+      renderList options isOrdered listItems
     Paragraph children →
-      renderParagraph children
+      renderParagraph options children
     Rule →
       renderRule
 
 renderPhrasingContentNodes
-  ∷ NonEmptyArray PhrasingContentNode → NonEmptyList String
-renderPhrasingContentNodes = foldl f
+  ∷ FormattingOptions
+  → NonEmptyArray PhrasingContentNode
+  → NonEmptyList String
+renderPhrasingContentNodes options = foldl f
   (ListNE.singleton "")
   where
   f ∷ NonEmptyList String → PhrasingContentNode → NonEmptyList String
   f acc node =
     case node of
       Emphasis children →
-        ListNE.uncons (renderEmphasis children) # \{ head, tail } →
-          mapFirst (_ <> head) acc `ListNE.appendFoldable` tail
+        ListNE.uncons (renderEmphasis options children) #
+          \{ head, tail } →
+            mapFirst (_ <> head) acc `ListNE.appendFoldable` tail
       Link title url →
         mapFirst (_ <> renderLink title url) acc
       InlineCode code →
         mapFirst (_ <> renderInlineCode code) acc
       LineBreak →
         ListNE.singleton "" <> mapFirst (_ <> "\\") acc
-      Text s →
-        mapFirst (_ <> s) acc
+      Text str →
+        let
+          { head, tail } = ListNE.uncons
+            $ formatText options.maxLineLength str
+        in
+          case ListNE.fromList tail of
+            Nothing →
+              mapFirst (_ <> StringNE.toString head) acc
+            Just lines →
+              (StringNE.toString <$> ListNE.reverse lines)
+                <> mapFirst (_ <> StringNE.toString head) acc
 
-renderEmphasis ∷ NonEmptyArray PhrasingContentNode → NonEmptyList String
-renderEmphasis = Lazy.defer \_ →
+formatText ∷ Int → NonEmptyString → NonEmptyList NonEmptyString
+formatText maxLineLength = unfoldr1 splitAtFurthestSpace
+  where
+  splitAtFurthestSpace
+    ∷ NonEmptyString → NonEmptyString /\ Maybe NonEmptyString
+  splitAtFurthestSpace s =
+    if StringNE.length s <= maxLineLength then
+      s /\ Nothing
+    else case StringNE.lastIndexOf' (Pattern " ") maxLineLength s of
+      Nothing →
+        s /\ Nothing
+      Just i →
+        let
+          { after, before } = StringNE.splitAt i s
+        in
+          case before, after of
+            Just b, Just a →
+              b /\ StringNE.stripPrefix (Pattern " ") a
+            _, _ →
+              s /\ Nothing
+
+renderEmphasis
+  ∷ FormattingOptions
+  → NonEmptyArray PhrasingContentNode
+  → NonEmptyList String
+renderEmphasis options = Lazy.defer \_ →
   mapLast (_ <> "_")
     <<< mapFirst ("_" <> _)
-    <<< renderPhrasingContentNodes
+    <<< renderPhrasingContentNodes options
 
-renderBlockquote ∷ NonEmptyArray FlowContentNode → NonEmptyList String
-renderBlockquote children =
+renderBlockquote
+  ∷ FormattingOptions
+  → NonEmptyArray FlowContentNode
+  → NonEmptyList String
+renderBlockquote options children =
   let
     formatLine s = if String.null s then ">" else "> " <> s
 
     renderedLines = foldMap1
-      renderFlowContentNode
+      (renderFlowContentNode options)
       (ArrayNE.reverse children)
 
     { init, last } = ListNE.unsnoc renderedLines
@@ -295,21 +330,21 @@ renderCodeBlock codeLanguage code =
   bottom = ListNE.singleton "" <> ListNE.singleton "```"
 
 renderHeading
-  ∷ HeadingLevel
+  ∷ FormattingOptions
+  → HeadingLevel
   → NonEmptyArray PhrasingContentNode
   → NonEmptyList String
-renderHeading headingLevel children =
+renderHeading options headingLevel children =
   let
-    renderedLines = renderPhrasingContentNodes children
-    formattedLines = mapFirst (prefix <> _)
-      $ mapTail (indentation <> _) renderedLines
+    renderedLines = renderPhrasingContentNodes options children
+    formattedLine = String.joinWith ""
+      ( String.replaceAll (Pattern "\\") (Replacement "<br/>")
+          <$> (Array.fromFoldable $ ListNE.reverse renderedLines)
+      )
   in
-    ListNE.singleton "" <> formattedLines
+    ListNE.singleton ""
+      <> (ListNE.singleton $ prefix <> formattedLine)
   where
-  indentation ∷ String
-  indentation = String.joinWith ""
-    $ Array.replicate (String.length prefix) " "
-
   prefix ∷ String
   prefix = (_ <> " ") $ case headingLevel of
     L1 →
@@ -343,17 +378,18 @@ renderLink name url = "["
       "#" <> s
 
 renderList
-  ∷ Boolean
+  ∷ FormattingOptions
+  → Boolean
   → NonEmptyArray (NonEmptyArray FlowContentNode)
   → NonEmptyList String
-renderList isOrdered children =
+renderList options isOrdered children =
   foldMap1 renderListItem (ArrayNE.reverse children)
   where
   renderListItem ∷ NonEmptyArray FlowContentNode → NonEmptyList String
   renderListItem nodes =
     let
       renderedLines = foldMap1
-        renderFlowContentNode
+        (renderFlowContentNode options)
         (ArrayNE.reverse nodes)
       { init, last } = ListNE.unsnoc renderedLines
       formattedFirstLine = itemPrefix <> last
@@ -372,10 +408,12 @@ renderList isOrdered children =
   itemPrefix = (if isOrdered then "1." else "-") <> " "
 
 renderParagraph
-  ∷ NonEmptyArray PhrasingContentNode → NonEmptyList String
-renderParagraph nodes =
+  ∷ FormattingOptions
+  → NonEmptyArray PhrasingContentNode
+  → NonEmptyList String
+renderParagraph options nodes =
   let
-    renderedLines = renderPhrasingContentNodes nodes
+    renderedLines = renderPhrasingContentNodes options nodes
   in
     ListNE.singleton "" <> renderedLines
 
@@ -466,7 +504,7 @@ paragraph = Paragraph <<< ArrayNE.fromFoldable1
 rule ∷ FlowContentNode
 rule = Rule
 
-text ∷ String → PhrasingContentNode
+text ∷ NonEmptyString → PhrasingContentNode
 text = Text
 
 urlOfHeading ∷ NonEmptyString → Url

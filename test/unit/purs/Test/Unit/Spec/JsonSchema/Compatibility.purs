@@ -13,6 +13,7 @@ import Data.Set (Set)
 import Data.Set as Set
 import Data.Set.NonEmpty (NonEmptySet)
 import Data.Set.NonEmpty as SetNE
+import Data.String.NonEmpty (NonEmptyString)
 import Data.String.NonEmpty as StringNE
 import JsonSchema (JsonValueType(..))
 import JsonSchema.Compatibility
@@ -21,6 +22,7 @@ import JsonSchema.Compatibility
   , Compatibility(..)
   , ForwardIncompatibility(..)
   , ForwardIncompatibilityType(..)
+  , NumberRangeChange(..)
   )
 import JsonSchema.Compatibility as Compatibility
 import JsonSchema.Difference (Difference(..), DifferenceType(..))
@@ -70,21 +72,56 @@ spec =
 
 context ∷ ComputationContext
 context =
-  [ compatibilityTypeParagraph "Backward"
-      "an ability of a system to understand input intended for previous versions of itself"
-  , compatibilityTypeParagraph "Forward"
-      "an ability of a system to understand input intended for future versions of itself"
-  , compatibilityTypeParagraph "Full"
-      "backward and forward compatibility combined"
-  , compatibilityTypeParagraph "No"
-      "neither level of compatibility"
+  [ compatibilityTypeParagraph
+      ( StringNE.nes
+          (Proxy ∷ Proxy "Backward")
+      )
+      ( StringNE.nes
+          ( Proxy
+              ∷ Proxy
+                  "an ability of a system to understand input intended for previous versions of itself"
+          )
+      )
+  , compatibilityTypeParagraph
+      ( StringNE.nes
+          (Proxy ∷ Proxy "Forward")
+      )
+      ( StringNE.nes
+          ( Proxy
+              ∷ Proxy
+                  "an ability of a system to understand input intended for future versions of itself"
+          )
+      )
+  , compatibilityTypeParagraph
+      ( StringNE.nes
+          (Proxy ∷ Proxy "Full")
+      )
+      ( StringNE.nes
+          (Proxy ∷ Proxy "backward and forward compatibility combined")
+      )
+  , compatibilityTypeParagraph
+      ( StringNE.nes
+          (Proxy ∷ Proxy "No")
+      )
+      ( StringNE.nes
+          (Proxy ∷ Proxy "neither level of compatibility")
+      )
   , M.paragraph $
-      M.text
-        "Maintaining backward and forward compatibility is important for minimizing disruption"
+      ( M.text $
+          StringNE.nes
+            ( Proxy
+                ∷ Proxy
+                    "Maintaining backward and forward compatibility is important for minimizing disruption"
+            )
+      )
         `ArrayNE.cons'`
           [ M.lineBreak
           , M.text
-              "and ensuring smooth transitions when updating JSON schemas."
+              $ StringNE.nes
+                  ( Proxy
+                      ∷ Proxy
+                          "and ensuring smooth transitions when updating JSON schemas."
+                  )
           ]
   , M.renderMermaid $ FlowChartDef LeftToRight
       [ FlowChart.subGraph "data writers"
@@ -134,14 +171,19 @@ context =
       ]
   ]
   where
-  compatibilityTypeParagraph ∷ String → String → FlowContentNode
+  compatibilityTypeParagraph
+    ∷ NonEmptyString → NonEmptyString → FlowContentNode
   compatibilityTypeParagraph compatibilityType description =
     M.paragraph $
       M.emphasis
-        ( ArrayNE.singleton $ M.text $ compatibilityType <>
-            " compatibility"
+        ( ArrayNE.singleton $ M.text
+            $ compatibilityType <> StringNE.nes
+                (Proxy ∷ Proxy " compatibility")
         )
-        `ArrayNE.cons'` [ M.text " - ", M.text description ]
+        `ArrayNE.cons'`
+          [ M.text $ StringNE.nes (Proxy ∷ Proxy " - ")
+          , M.text description
+          ]
 
 properties ∷ Array Property
 properties = []
@@ -186,7 +228,7 @@ examples =
       }
       ( SetNE.singleton $ ForwardIncompatibility
           { incompatibilityType: SetOfAllowedTypesExtended
-              $ Set.singleton JsonNumber
+              $ SetNE.singleton JsonNumber
           , path: Nil
           }
       )
@@ -205,7 +247,7 @@ examples =
       }
       ( SetNE.singleton $ BackwardIncompatibility
           { incompatibilityType: SetOfAllowedTypesReduced
-              $ Set.singleton JsonNumber
+              $ SetNE.singleton JsonNumber
           , path: Nil
           }
       )
@@ -226,13 +268,13 @@ examples =
       }
       ( SetNE.singleton $ BackwardIncompatibility
           { incompatibilityType: SetOfAllowedTypesReduced $
-              Set.singleton JsonNull
+              SetNE.singleton JsonNull
           , path: Nil
           }
       )
       ( SetNE.singleton $ ForwardIncompatibility
           { incompatibilityType: SetOfAllowedTypesExtended $
-              Set.singleton JsonBoolean
+              SetNE.singleton JsonBoolean
           , path: Nil
           }
       )
@@ -254,7 +296,7 @@ examples =
       }
       ( SetNE.singleton $ ForwardIncompatibility
           { incompatibilityType: SetOfAllowedTypesExtended
-              $ Set.singleton JsonNumber
+              $ SetNE.singleton JsonNumber
           , path: Nil
           }
       )
@@ -276,7 +318,7 @@ examples =
       }
       ( SetNE.singleton $ BackwardIncompatibility
           { incompatibilityType: SetOfAllowedTypesReduced
-              $ Set.singleton JsonNumber
+              $ SetNE.singleton JsonNumber
           , path: Nil
           }
       )
@@ -298,7 +340,7 @@ examples =
       }
       ( SetNE.singleton $ ForwardIncompatibility
           { incompatibilityType: SetOfAllowedTypesExtended
-              $ Set.singleton JsonBoolean
+              $ SetNE.singleton JsonBoolean
           , path: Nil
           }
       )
@@ -317,7 +359,7 @@ examples =
       }
       ( SetNE.singleton $ BackwardIncompatibility
           { incompatibilityType: SetOfAllowedTypesReduced
-              $ Set.singleton JsonBoolean
+              $ SetNE.singleton JsonBoolean
           , path: Nil
           }
       )
@@ -362,7 +404,7 @@ examples =
           }
       )
   , noCompatibilityExample
-      "In this situation, there are potentially some numbers that are not divisible by neither of multipleOf values. Therefore, such a change is incompatible."
+      "there are potentially some numbers that are not divisible by neither of multipleOf values"
       { differences: ValueSample
           { description: StringNE.nes
               ( Proxy
@@ -388,7 +430,7 @@ examples =
           }
       )
   , forwardCompatibilityExample
-      "In this situation, all numbers from the new range fall into the old, unconstrained one. Therefore, such a change if forward compatible."
+      "all numbers from the new range fall into the old, unconstrained one"
       { differences: ValueSample
           { description: StringNE.nes
               ( Proxy
@@ -410,14 +452,14 @@ examples =
       }
       ( SetNE.singleton $ BackwardIncompatibility
           { incompatibilityType: RangeOfAllowedNumbersReduced
-              { lower: Just { from: Open bottom, to: Open 5.0 }
-              , upper: Just { from: Open 20.0, to: Open top }
-              }
+              $ LowerAndUpper
+                  { from: Open bottom, to: Open 5.0 }
+                  { from: Open 20.0, to: Open top }
           , path: Nil
           }
       )
   , backwardCompatibilityExample
-      "In this situation, all numbers from the old range fall into the new, unconstrained one. Therefore, such a change if forward backward compatible."
+      "all numbers from the old range fall into the new, unconstrained one"
       { differences: ValueSample
           { description: StringNE.nes
               ( Proxy
@@ -439,14 +481,14 @@ examples =
       }
       ( SetNE.singleton $ ForwardIncompatibility
           { incompatibilityType: RangeOfAllowedNumbersExtended
-              { lower: Just { from: Open bottom, to: Closed 5.0 }
-              , upper: Just { from: Open 20.0, to: Open top }
-              }
+              $ LowerAndUpper
+                  { from: Open bottom, to: Closed 5.0 }
+                  { from: Open 20.0, to: Open top }
           , path: Nil
           }
       )
   , backwardCompatibilityExample
-      "In this situation, all numbers from the new, longer range fall into the old, shorter range. Therefore, such a change is backward compatible."
+      "all numbers from the new, longer range fall into the old, shorter range"
       { differences: ValueSample
           { description: StringNE.nes
               ( Proxy
@@ -473,20 +515,19 @@ examples =
       ( SetNE.singleton $ ForwardIncompatibility
           { incompatibilityType:
               RangeOfAllowedNumbersExtended
-                { lower: Just { from: Closed 5.0, to: Open 10.0 }
-                , upper: Just { from: Open 15.0, to: Closed 20.0 }
-                }
-
+                $ LowerAndUpper
+                    { from: Closed 5.0, to: Open 10.0 }
+                    { from: Open 15.0, to: Closed 20.0 }
           , path: Nil
           }
       )
   , backwardCompatibilityExample
-      "In this situation, all numbers from the new, longer range fall into the old, shorter range. Therefore, such a change is backward compatible."
+      "all numbers from the new, longer range fall into the old, shorter range"
       { differences: ValueSample
           { description: StringNE.nes
               ( Proxy
                   ∷ Proxy
-                      "TODO"
+                      "the range of allowed values being shifted"
               )
           , sample:
               Set.fromFoldable
@@ -508,15 +549,14 @@ examples =
       ( SetNE.singleton $ ForwardIncompatibility
           { incompatibilityType:
               RangeOfAllowedNumbersExtended
-                { lower: Just { from: Open 5.0, to: Closed 10.0 }
-                , upper: Just { from: Closed 15.0, to: Open 20.0 }
-                }
-
+                $ LowerAndUpper
+                    { from: Open 5.0, to: Closed 10.0 }
+                    { from: Closed 15.0, to: Open 20.0 }
           , path: Nil
           }
       )
   , forwardCompatibilityExample
-      "In this situation, all numbers from the new, shorted range fall into the old, longer range. Therefore, such a change is forward compatible."
+      "all numbers from the new, shorted range fall into the old, longer range"
       { differences: ValueSample
           { description: StringNE.nes
               ( Proxy
@@ -543,15 +583,14 @@ examples =
       ( SetNE.singleton $ BackwardIncompatibility
           { incompatibilityType:
               RangeOfAllowedNumbersReduced
-                { lower: Just { from: Closed 5.0, to: Open 10.0 }
-                , upper: Just { from: Open 15.0, to: Closed 20.0 }
-                }
-
+                $ LowerAndUpper
+                    { from: Closed 5.0, to: Open 10.0 }
+                    { from: Open 15.0, to: Closed 20.0 }
           , path: Nil
           }
       )
   , forwardCompatibilityExample
-      "In this situation, all numbers from the new, shorted range fall into the old, longer range. Therefore, such a change is forward compatible."
+      "all numbers from the new, shorted range fall into the old, longer range"
       { differences: ValueSample
           { description: StringNE.nes
               ( Proxy
@@ -578,15 +617,14 @@ examples =
       ( SetNE.singleton $ BackwardIncompatibility
           { incompatibilityType:
               RangeOfAllowedNumbersReduced
-                { lower: Just { from: Open 5.0, to: Closed 10.0 }
-                , upper: Just { from: Closed 15.0, to: Open 20.0 }
-                }
-
+                $ LowerAndUpper
+                    { from: Open 5.0, to: Closed 10.0 }
+                    { from: Closed 15.0, to: Open 20.0 }
           , path: Nil
           }
       )
   , noCompatibilityExample
-      "In this situation, there are some numbers which do not fall into neither old nor new range. Therefore, such a change is incompatible."
+      "there are some numbers which do not fall into neither old nor new range"
       { differences: ValueSample
           { description: StringNE.nes
               ( Proxy
@@ -613,25 +651,19 @@ examples =
       ( SetNE.singleton $ BackwardIncompatibility
           { incompatibilityType:
               RangeOfAllowedNumbersReduced
-                { lower: Just { from: Closed 5.0, to: Open 10.0 }
-                , upper: Nothing
-                }
-
+                $ Lower { from: Closed 5.0, to: Open 10.0 }
           , path: Nil
           }
       )
       ( SetNE.singleton $ ForwardIncompatibility
           { incompatibilityType:
               RangeOfAllowedNumbersExtended
-                { lower: Nothing
-                , upper: Just { from: Open 15.0, to: Closed 20.0 }
-                }
-
+                $ Upper { from: Open 15.0, to: Closed 20.0 }
           , path: Nil
           }
       )
   , noCompatibilityExample
-      "In this situation, there are some numbers which do not fall into neither old nor new range. Therefore, such a change is incompatible."
+      "there are some numbers which do not fall into neither old nor new range"
       { differences: ValueSample
           { description: StringNE.nes
               ( Proxy
@@ -658,20 +690,14 @@ examples =
       ( SetNE.singleton $ BackwardIncompatibility
           { incompatibilityType:
               RangeOfAllowedNumbersReduced
-                { lower: Just { from: Open 5.0, to: Closed 10.0 }
-                , upper: Nothing
-                }
-
+                $ Lower { from: Open 5.0, to: Closed 10.0 }
           , path: Nil
           }
       )
       ( SetNE.singleton $ ForwardIncompatibility
           { incompatibilityType:
               RangeOfAllowedNumbersExtended
-                { lower: Nothing
-                , upper: Just { from: Closed 15.0, to: Open 20.0 }
-                }
-
+                $ Upper { from: Closed 15.0, to: Open 20.0 }
           , path: Nil
           }
       )
@@ -679,7 +705,15 @@ examples =
 
 fullCompatibilityExample ∷ String → { | InputSample } → Example
 fullCompatibilityExample description input =
-  { description
+  { description:
+      StringNE.nes (Proxy ∷ Proxy "In this situation, ")
+        `StringNE.appendString` description
+        <> StringNE.nes
+          ( Proxy
+              ∷ Proxy
+                  ". Therefore, such a change is fully compatible."
+          )
+
   , expectedOutput: ValueSample
       { description:
           StringNE.nes (Proxy ∷ Proxy "full compatibility")
@@ -694,7 +728,14 @@ backwardCompatibilityExample
   → NonEmptySet ForwardIncompatibility
   → Example
 backwardCompatibilityExample description input forwardIncompatibilities =
-  { description
+  { description:
+      StringNE.nes (Proxy ∷ Proxy "In this situation, ")
+        `StringNE.appendString` description
+        <> StringNE.nes
+          ( Proxy
+              ∷ Proxy
+                  ". Therefore, such a change is backward compatible."
+          )
   , expectedOutput: ValueSample
       { description: StringNE.nes
           (Proxy ∷ Proxy "backward compatibility")
@@ -709,7 +750,14 @@ forwardCompatibilityExample
   → NonEmptySet BackwardIncompatibility
   → Example
 forwardCompatibilityExample description input backwardIncompatibilities =
-  { description
+  { description:
+      StringNE.nes (Proxy ∷ Proxy "In this situation, ")
+        `StringNE.appendString` description
+        <> StringNE.nes
+          ( Proxy
+              ∷ Proxy
+                  ". Therefore, such a change is forward compatible."
+          )
   , expectedOutput: ValueSample
       { description: StringNE.nes
           (Proxy ∷ Proxy "forward compatibility")
@@ -729,7 +777,14 @@ noCompatibilityExample
   input
   backwardIncompatibilities
   forwardIncompatibilities =
-  { description
+  { description:
+      StringNE.nes (Proxy ∷ Proxy "In this situation, ")
+        `StringNE.appendString` description
+        <> StringNE.nes
+          ( Proxy
+              ∷ Proxy
+                  ". Therefore, such a change is not compatible."
+          )
   , expectedOutput: ValueSample
       { description: StringNE.nes
           (Proxy ∷ Proxy "no compatibility")

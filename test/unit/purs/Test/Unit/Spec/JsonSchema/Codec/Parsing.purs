@@ -11,6 +11,7 @@ import Data.Markdown as M
 import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
 import Data.Set as Set
+import Data.String.NonEmpty (NonEmptyString)
 import Data.String.NonEmpty as StringNE
 import Data.Tuple.Nested ((/\))
 import Foreign.Object as Object
@@ -62,12 +63,19 @@ context ∷ ComputationContext
 context =
   [ M.paragraph $ M.text <$> desc ]
   where
-  desc ∷ NonEmptyArray String
+  desc ∷ NonEmptyArray NonEmptyString
   desc =
-    ArrayNE.singleton
-      "JSON schema is commonly expressed in a JSON format."
-      <> ArrayNE.singleton
-        "However, not every JSON is a valid JSON schema."
+    StringNE.nes
+      ( Proxy
+          ∷ Proxy "JSON schema is commonly expressed in a JSON format."
+      )
+      `ArrayNE.cons'`
+        [ StringNE.nes
+            ( Proxy
+                ∷ Proxy
+                    "However, not every JSON is a valid JSON schema."
+            )
+        ]
 
 properties ∷ Array Property
 properties = []
@@ -75,7 +83,7 @@ properties = []
 examples ∷ Array Example
 examples =
   [ failureExample
-      "Booleans and objects are the only acceptable forms of JSON schema."
+      "booleans and objects are the only acceptable forms"
       { json: ValueSample
           { description: StringNE.nes
               ( Proxy
@@ -87,7 +95,7 @@ examples =
       }
       "the JSON value is neither a boolean nor an object"
   , successExample
-      "A boolean value of true is a valid schema which passes validation of any JSON value"
+      "a boolean value of true is a valid schema which passes validation of any JSON value"
       { json: ValueSample
           { description: StringNE.nes
               (Proxy ∷ Proxy "a boolean JSON value")
@@ -96,7 +104,7 @@ examples =
       }
       (BooleanSchema true)
   , successExample
-      "A boolean value of false is a valid schema which passes validation of any JSON value"
+      "a boolean value of false is a valid schema which passes validation of any JSON value"
       { json: ValueSample
           { description: StringNE.nes
               (Proxy ∷ Proxy "a boolean JSON value")
@@ -105,7 +113,7 @@ examples =
       }
       (BooleanSchema false)
   , successExample
-      "An empty JSON object is a valid schema which passes validation of any JSON value"
+      "an empty JSON object is a valid schema which passes validation of any JSON value"
       { json: ValueSample
           { description: StringNE.nes
               ( Proxy ∷ Proxy "an empty JSON object"
@@ -115,7 +123,7 @@ examples =
       }
       (ObjectSchema Schema.defaultKeywords)
   , successExample
-      "The 'items' constrain makes sure than if a JSON value is an array, every item of that array conforms the schema defined by it."
+      "the 'items' constrain makes sure than if a JSON value is an array, every item of that array conforms the schema defined by it"
       { json: ValueSample
           { description:
               StringNE.nes
@@ -132,7 +140,7 @@ examples =
           }
       )
   , successExample
-      "The 'not' constrain rejects any JSON value which conform to schema defined by it."
+      "the 'not' constrain rejects any JSON value which conform to schema defined by it"
       { json: ValueSample
           { description:
               StringNE.nes
@@ -149,13 +157,12 @@ examples =
           }
       )
   , successExample
-      "The 'required' constrain rejects any JSON object not containing properties defined by it."
+      "the 'required' constrain rejects any JSON object not containing properties defined by it"
       { json: ValueSample
           { description:
               StringNE.nes
                 ( Proxy
                     ∷ Proxy
-
                         "A JSON object with 'required' property being array of strings"
                 )
           , sample: wrap $ A.fromObject $ Object.fromFoldable
@@ -169,7 +176,7 @@ examples =
           }
       )
   , successExample
-      "The 'type' keyword defines acceptable JSON types. It can be in a form of a single string."
+      "the 'type' keyword defines acceptable JSON types. It can be in a form of a single string"
       { json: ValueSample
           { description:
               StringNE.nes
@@ -187,7 +194,7 @@ examples =
           }
       )
   , successExample
-      "The 'type' keyword defines acceptable JSON types. It can be in a form of an array of string. Here, only with one type defined."
+      "the 'type' keyword defines acceptable JSON types. It can be in a form of an array of string (here, only with one type defined)"
       { json: ValueSample
           { description:
               StringNE.nes
@@ -203,7 +210,7 @@ examples =
           { typeKeyword = Just $ Set.singleton JsonNull }
       )
   , successExample
-      "The 'type' keyword defines acceptable JSON types. It can be in a form of an array of string. Here, with no types defined."
+      "the 'type' keyword defines acceptable JSON types. It can be in a form of an array of string (here, with no types defined)"
       { json: ValueSample
           { description:
               StringNE.nes
@@ -219,7 +226,7 @@ examples =
           { typeKeyword = Just Set.empty }
       )
   , successExample
-      "The 'type' keyword defines acceptable JSON types. It can be in a form of an array of string. Here, with three types defined."
+      "the 'type' keyword defines acceptable JSON types. It can be in a form of an array of string (here, with three types defined)"
       { json: ValueSample
           { description:
               StringNE.nes
@@ -239,7 +246,7 @@ examples =
           }
       )
   , successExample
-      "The 'uniqueItems' keyword makes sure that if JSON value is an array, its items do not contain any duplicates"
+      "the 'uniqueItems' keyword makes sure that if JSON value is an array, its items do not contain any duplicates"
       { json: ValueSample
           { description:
               StringNE.nes
@@ -259,7 +266,14 @@ examples =
 
 successExample ∷ String → { | InputSample } → JsonSchema → Example
 successExample description input expectedJsonSchema =
-  { description
+  { description:
+      StringNE.nes (Proxy ∷ Proxy "Because ")
+        `StringNE.appendString` description
+        <> StringNE.nes
+          ( Proxy
+              ∷ Proxy
+                  ", such a value represents a JSON schema."
+          )
   , expectedOutput: ValueSample
       { description: StringNE.nes
           (Proxy ∷ Proxy "a successfully parsed JSON schema")
@@ -271,7 +285,14 @@ successExample description input expectedJsonSchema =
 
 failureExample ∷ String → { | InputSample } → String → Example
 failureExample description input expectedErrorMessage =
-  { description
+  { description:
+      StringNE.nes (Proxy ∷ Proxy "Because ")
+        `StringNE.appendString` description
+        <> StringNE.nes
+          ( Proxy
+              ∷ Proxy
+                  ", such a value does not represent a JSON schema."
+          )
   , expectedOutput: ValueSample
       { description: StringNE.nes
           (Proxy ∷ Proxy "a parsing error")

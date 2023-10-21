@@ -52,12 +52,19 @@ describeInput { input, output } = "a computation with input of '"
   <> "'"
 
 renderComputationSpec ∷ Spec → String
-renderComputationSpec = M.render <<< Tuple.snd <<< documentComputation
+renderComputationSpec = M.render { maxLineLength: 72 }
+  <<< Tuple.snd
+  <<< documentComputation
 
 computation1 ∷ Spec
 computation1 =
   { context:
-      [ M.paragraph $ ArrayNE.singleton $ M.text "computation context" ]
+      [ M.paragraph
+          $ ArrayNE.singleton
+          $ M.text
+          $ StringNE.nes
+              (Proxy ∷ Proxy "computation context")
+      ]
   , description: \{ i: ValueSpec i, s: ValueSpec s } →
       StringNE.nes (Proxy ∷ Proxy "computation based on ")
         <> i
@@ -71,7 +78,8 @@ computation1 =
           $ StringNE.nes (Proxy ∷ Proxy "a string")
       }
   , examples:
-      [ { description: "example1 description"
+      [ { description: StringNE.nes
+            (Proxy ∷ Proxy "example1 description")
         , expectedOutput: ValueSample
             { description: StringNE.nes (Proxy ∷ Proxy "false value")
             , sample: false
@@ -89,7 +97,8 @@ computation1 =
                 }
             }
         }
-      , { description: "example2 description"
+      , { description: StringNE.nes
+            (Proxy ∷ Proxy "example2 description")
         , expectedOutput: ValueSample
             { description: StringNE.nes (Proxy ∷ Proxy "true value")
             , sample: true
@@ -119,10 +128,12 @@ computation1 =
               "computation result"
       )
   , properties:
-      [ { description: "property1 description"
+      [ { description: StringNE.nes
+            (Proxy ∷ Proxy "property1 description")
         , property: const $ pure Success
         }
-      , { description: "property2 description"
+      , { description: StringNE.nes
+            (Proxy ∷ Proxy "property2 description")
         , property: const $ pure Success
         }
       ]

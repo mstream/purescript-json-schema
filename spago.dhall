@@ -21,6 +21,7 @@
   , "nonempty"
   , "optparse"
   , "ordered-collections"
+  , "partial"
   , "prelude"
   , "quickcheck"
   , "spec"
@@ -28,6 +29,7 @@
   , "tailrec"
   , "transformers"
   , "tuples"
+  , "unfoldable"
   ]
 , packages = ./packages.dhall
 , sources =

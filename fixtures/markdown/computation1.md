@@ -24,19 +24,19 @@ _Input:_
 
 number one and two:
 
-> 1. 1
+> 1. `1`
 >
-> 1. 2
+> 1. `2`
 
 a three letter word:
 
-> fox
+> `"fox"`
 
 _Output:_
 
 false value:
 
-> false
+> `false`
 
 ---
 
@@ -48,18 +48,18 @@ _Input:_
 
 number two, three and four:
 
-> 1. 2
+> 1. `2`
 >
-> 1. 3
+> 1. `3`
 >
-> 1. 4
+> 1. `4`
 
 a three letter word:
 
-> fox
+> `"fox"`
 
 _Output:_
 
 true value:
 
-> true
+> `true`

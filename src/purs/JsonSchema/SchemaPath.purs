@@ -6,37 +6,40 @@ module JsonSchema.SchemaPath
 
 import Prelude
 
-import Data.Foldable (foldMap)
+import Data.Foldable (foldMap, foldl)
 import Data.Generic.Rep (class Generic)
 import Data.List (List)
 import Data.List as List
 import Data.Show.Generic (genericShow)
+import Data.String.NonEmpty (NonEmptyString)
+import Data.String.NonEmpty as StringNE
+import Type.Proxy (Proxy(..))
 
 type SchemaPath = List SchemaPathSegment
 
-render ∷ SchemaPath → String
-render = ("#" <> _) <<< foldMap f <<< List.reverse
+render ∷ SchemaPath → NonEmptyString
+render = foldl f (StringNE.nes (Proxy ∷ Proxy "#")) <<< List.reverse
   where
-  f ∷ SchemaPathSegment → String
-  f = case _ of
+  f ∷ NonEmptyString → SchemaPathSegment → NonEmptyString
+  f acc = (acc `StringNE.appendString` "/" <> _) <<< case _ of
     ExclusiveMinimum →
-      "/exclusiveMinimum"
+      StringNE.nes (Proxy ∷ Proxy "exclusiveMinimum")
     ExclusiveMaximum →
-      "/exclusiveMaximum"
+      StringNE.nes (Proxy ∷ Proxy "exclusiveMaximum")
     Items →
-      "/items"
+      StringNE.nes (Proxy ∷ Proxy "items")
     Maximum →
-      "/maximum"
+      StringNE.nes (Proxy ∷ Proxy "maximum")
     Minimum →
-      "/minimum"
+      StringNE.nes (Proxy ∷ Proxy "minimum")
     MultipleOf →
-      "/multipleOf"
+      StringNE.nes (Proxy ∷ Proxy "multipleOf")
     Properties name →
-      "/properties/" <> name
+      "properties/" `StringNE.prependString` name
     TypeKeyword →
-      "/type"
+      StringNE.nes (Proxy ∷ Proxy "type")
     UniqueItems →
-      "/uniqueItems"
+      StringNE.nes (Proxy ∷ Proxy "uniqueItems")
 
 data SchemaPathSegment
   = ExclusiveMaximum
@@ -45,7 +48,7 @@ data SchemaPathSegment
   | Maximum
   | Minimum
   | MultipleOf
-  | Properties String
+  | Properties NonEmptyString
   | TypeKeyword
   | UniqueItems
 

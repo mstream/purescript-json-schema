@@ -44,6 +44,7 @@ import Test.Unit.Computation
   , ValueSample
   , ValueSpec
   )
+import Type.Proxy (Proxy(..))
 
 data DocumentInput = DocumentInput
 
@@ -77,7 +78,8 @@ documentInput = hfoldl
       $ ArrayNE.singleton
       $ M.emphasis
       $ ArrayNE.singleton
-      $ M.text "Input:"
+      $ M.text
+      $ StringNE.nes (Proxy ∷ Proxy "Input:")
   )
 
 documentOutput
@@ -93,15 +95,16 @@ documentOutput outputSample =
       $ ArrayNE.singleton
       $ M.emphasis
       $ ArrayNE.singleton
-      $ M.text "Output:"
+      $ M.text
+      $ StringNE.nes (Proxy ∷ Proxy "Output:")
   )
     <>
       ( ArrayNE.singleton
           $ M.paragraph
           $ ArrayNE.singleton
           $ M.text
-          $ StringNE.toString (mapping GetValueDescription outputSample)
-              <> ":"
+          $ mapping GetValueDescription outputSample
+              <> StringNE.nes (Proxy ∷ Proxy ":")
       )
     <>
       ( ArrayNE.singleton $ M.blockquote $ document
@@ -144,7 +147,7 @@ documentComputation
       [ M.heading1
           $ ArrayNE.singleton
           $ M.text
-          $ StringNE.toString docTitle
+          $ docTitle
       ]
         <> context
         <> renderProperties properties
@@ -156,7 +159,12 @@ documentComputation
   renderExamples = ArrayNE.fromFoldable >>>
     case _ of
       Just docsByIdx →
-        [ M.heading2 $ ArrayNE.singleton $ M.text "Examples" ]
+        [ M.heading2
+            $ ArrayNE.singleton
+            $ M.text
+            $ StringNE.nes
+                (Proxy ∷ Proxy "Examples")
+        ]
           <> (renderExamplesIndex $ Tuple.fst <$> docsByIdx)
           <>
             ( Array.concat
@@ -170,7 +178,11 @@ documentComputation
     ∷ Array (ComputationProperty isa o) → Array FlowContentNode
   renderProperties = ArrayNE.fromFoldable >>> case _ of
     Just props →
-      [ M.heading2 $ ArrayNE.singleton $ M.text "Properties"
+      [ M.heading2
+          $ ArrayNE.singleton
+          $ M.text
+          $ StringNE.nes
+              (Proxy ∷ Proxy "Properties")
       , M.unorderedList $ documentComputationProperty <$> props
       ]
     Nothing →
@@ -203,8 +215,7 @@ documentComputation
         ( M.rule `ArrayNE.cons'`
             ( [ M.heading3
                   $ ArrayNE.singleton
-                  $ M.text
-                  $ StringNE.toString exampleTitle
+                  $ M.text exampleTitle
               ]
             )
             <>

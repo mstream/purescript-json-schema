@@ -18,10 +18,13 @@ import Data.Newtype (unwrap, wrap)
 import Data.Set (Set)
 import Data.Set as Set
 import Data.Show.Generic (genericShow)
+import Data.String.NonEmpty (NonEmptyString)
+import Data.String.NonEmpty as StringNE
 import Data.Tuple.Nested (type (/\), (/\))
 import Docs.Document (class Document, document)
 import Foreign.Object as Object
 import JsonValue (JsonValue)
+import Type.Proxy (Proxy(..))
 
 data JsonSchema
   = BooleanSchema Boolean
@@ -80,22 +83,22 @@ derive instance Ord JsonValueType
 instance Show JsonValueType where
   show keyword = genericShow keyword
 
-renderJsonValueType ∷ JsonValueType → String
+renderJsonValueType ∷ JsonValueType → NonEmptyString
 renderJsonValueType = case _ of
   JsonArray →
-    "array"
+    StringNE.nes (Proxy ∷ Proxy "array")
   JsonBoolean →
-    "boolean"
+    StringNE.nes (Proxy ∷ Proxy "boolean")
   JsonInteger →
-    "integer"
+    StringNE.nes (Proxy ∷ Proxy "integer")
   JsonNull →
-    "null"
+    StringNE.nes (Proxy ∷ Proxy "null")
   JsonNumber →
-    "number"
+    StringNE.nes (Proxy ∷ Proxy "number")
   JsonObject →
-    "object"
+    StringNE.nes (Proxy ∷ Proxy "object")
   JsonString →
-    "string"
+    StringNE.nes (Proxy ∷ Proxy "string")
 
 print ∷ JsonSchema → JsonValue
 print = case _ of

@@ -77,7 +77,7 @@ testComputation { description, examples, execute, input, properties } =
 
   testComputationProperty ∷ ComputationProperty isa o → TestSpec
   testComputationProperty { description: propertyDesc, property } =
-    Spec.it ("property: " <> propertyDesc)
+    Spec.it ("property: " <> StringNE.toString propertyDesc)
       (liftEffect $ QC.quickCheckGen' 10 (property execute))
 
 genValueSample ∷ ∀ a. NonEmptyString → Gen a → Gen (ValueSample a)

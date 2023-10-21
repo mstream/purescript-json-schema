@@ -1,7 +1,6 @@
 module JsonSchema.Validation
   ( Violation(..)
   , ViolationReason(..)
-  , renderViolation
   , validateAgainst
   ) where
 
@@ -10,24 +9,25 @@ import Prelude
 import Data.Argonaut.Core as A
 import Data.Array as Array
 import Data.Array.NonEmpty as ArrayNE
-import Data.Foldable (foldMap, foldl)
+import Data.Foldable (foldl)
 import Data.FoldableWithIndex (foldMapWithIndex)
 import Data.Generic.Rep (class Generic)
 import Data.List (List(..), (:))
 import Data.Map (Map)
 import Data.Map as Map
-import Data.Markdown (FlowContentNode)
 import Data.Markdown as M
 import Data.Maybe (Maybe(..), maybe)
 import Data.Newtype (unwrap, wrap)
 import Data.NonEmpty ((:|))
 import Data.NonEmpty as NE
+import Data.Semigroup.Foldable (foldMap1)
 import Data.Set (Set)
 import Data.Set as Set
 import Data.Set.NonEmpty (NonEmptySet)
 import Data.Set.NonEmpty as SetNE
 import Data.Show.Generic (genericShow)
 import Data.String as String
+import Data.String.NonEmpty as StringNE
 import Docs.Document (class Document, document)
 import JsonSchema (JsonSchema(..), JsonValueType(..), Keywords)
 import JsonSchema as Schema
@@ -38,6 +38,7 @@ import JsonSchema.Range as Range
 import JsonSchema.SchemaPath (SchemaPath, SchemaPathSegment(..))
 import JsonSchema.SchemaPath as SchemaPath
 import JsonValue (JsonValue)
+import Type.Proxy (Proxy(..))
 import Utils (isInteger)
 
 newtype Violation = Violation
@@ -55,12 +56,14 @@ instance Show Violation where
 
 instance Document Violation where
   document (Violation { jsonPath, reason, schemaPath }) =
-    ( M.paragraph $ M.text <$>
-        ( ( ArrayNE.singleton $ "JSON value path: " <> JsonPath.render
-              jsonPath
-          ) <> ArrayNE.singleton
-            ("JSON schema path: " <> SchemaPath.render schemaPath)
-        )
+    ( M.paragraph $
+        (M.text $ StringNE.nes (Proxy ∷ Proxy "JSON value path: "))
+          `ArrayNE.cons'`
+            [ M.inlineCode $ JsonPath.render jsonPath
+            , M.lineBreak
+            , M.text $ StringNE.nes (Proxy ∷ Proxy "JSON schema path: ")
+            , M.inlineCode $ SchemaPath.render schemaPath
+            ]
     ) :| (Array.fromFoldable $ document reason)
 
 data ViolationReason
@@ -85,18 +88,29 @@ instance Show ViolationReason where
 instance Document ViolationReason where
   document = case _ of
     AlwaysFailingSchema →
-      NE.singleton $ M.paragraph $ ArrayNE.singleton $ M.text
-        "Schema always fails validation."
+      NE.singleton $ M.paragraph $ ArrayNE.singleton $ M.text $
+        StringNE.nes
+          (Proxy ∷ Proxy "Schema always fails validation.")
     InvalidArray itemViolations →
-      ( M.paragraph $ ArrayNE.singleton $ M.text "Invalid array:"
+      ( M.paragraph $ ArrayNE.singleton $ M.text $ StringNE.nes
+          (Proxy ∷ Proxy "Invalid array:")
       )
         :|
-          [ M.unorderedList $ ArrayNE.singleton $
-              documentViolation <$> ArrayNE.fromFoldable1 itemViolations
+          [ M.unorderedList
+              $ foldMap1
+                  ( ArrayNE.singleton
+                      <<< ArrayNE.fromNonEmpty
+                      <<< document
+                  )
+                  itemViolations
           ]
     InvalidMultiple { expectedMultiple, value } →
       NE.singleton $ M.paragraph $ ArrayNE.singleton $ M.text $
-        " is not a multiple of " <> show expectedMultiple
+        StringNE.nes
+          ( Proxy
+              ∷ Proxy
+                  " is not a multiple of "
+          ) `StringNE.appendString` show expectedMultiple
     InvalidRange { validRange, value } →
       NE.singleton
         $ M.paragraph
@@ -104,93 +118,36 @@ instance Document ViolationReason where
         $ M.text
         $
           show value
-            <> " is outside of the valid range of "
+            `StringNE.prependString` StringNE.nes
+              (Proxy ∷ Proxy " is outside of the valid range of ")
             <> Range.renderRange validRange
     NonUniqueArrayItem →
       NE.singleton
         $ M.paragraph
         $ ArrayNE.singleton
         $ M.text
-            "Non-unique array item."
+        $ StringNE.nes (Proxy ∷ Proxy "Non-unique array item.")
     TypeMismatch { actualJsonValueType, allowedJsonValueTypes } →
       NE.singleton $ M.paragraph $ ArrayNE.singleton $ M.text $
-        "Invalid type. Expected "
+        StringNE.nes (Proxy ∷ Proxy "Invalid type. Expected ")
           <>
-            ( case Array.fromFoldable allowedJsonValueTypes of
-                [] →
-                  "none"
-                [ allowedJsonValueType ] →
-                  Schema.renderJsonValueType allowedJsonValueType
-                _ →
-                  String.joinWith " or "
-                    $ Schema.renderJsonValueType
-                        <$> Array.fromFoldable allowedJsonValueTypes
+            ( case ArrayNE.fromFoldable allowedJsonValueTypes of
+                Nothing →
+                  StringNE.nes (Proxy ∷ Proxy "none")
+                Just allowedTypes →
+                  StringNE.join1With "or"
+                    $ Schema.renderJsonValueType <$> allowedTypes
             )
-          <> " but got "
+          <> StringNE.nes (Proxy ∷ Proxy " but got ")
           <> Schema.renderJsonValueType actualJsonValueType
-          <> "."
+          <> StringNE.nes (Proxy ∷ Proxy ".")
     ValidAgainstNotSchema →
-      NE.singleton $ M.paragraph $ ArrayNE.singleton $ M.text
-        "JSON is valid against schema from 'not'."
-
-documentViolation ∷ Violation → FlowContentNode
-documentViolation (Violation { jsonPath, reason, schemaPath }) =
-  M.blockquote $
-    ( M.paragraph $ M.text <$>
-        ( ArrayNE.singleton $ "Schema path: " <> SchemaPath.render
-            schemaPath
-        ) <>
-          ( ArrayNE.singleton $ "JSON path: " <> JsonPath.render
-              jsonPath
-          )
-    )
-      :| (Array.fromFoldable $ document reason)
-
-renderViolation ∷ Violation → Array String
-renderViolation (Violation { jsonPath, reason, schemaPath }) =
-  [ "Schema path: " <> SchemaPath.render schemaPath
-  , "JSON path: " <> JsonPath.render jsonPath
-  ]
-    <> renderViolationReason reason
-
-renderViolationReason ∷ ViolationReason → Array String
-renderViolationReason = case _ of
-  AlwaysFailingSchema →
-    [ "Schema always fails validation." ]
-  InvalidArray itemViolations →
-    [ "Invalid array: " ] <> foldMap
-      ( \violation →
-          [ "-" ] <> (("  " <> _) <$> renderViolation violation)
-      )
-      itemViolations
-  InvalidMultiple { expectedMultiple, value } →
-    [ show value <> " is not a multiple of " <> show expectedMultiple ]
-  InvalidRange { validRange, value } →
-    [ show value
-        <> " is outside of the valid range of "
-        <> Range.renderRange validRange
-    ]
-  NonUniqueArrayItem →
-    [ "Non-unique array item." ]
-  TypeMismatch { actualJsonValueType, allowedJsonValueTypes } →
-    [ "Invalid type. Expected "
-        <>
-          ( case Array.fromFoldable allowedJsonValueTypes of
-              [] →
-                "none"
-              [ allowedJsonValueType ] →
-                Schema.renderJsonValueType allowedJsonValueType
-              _ →
-                String.joinWith " or "
-                  $ Schema.renderJsonValueType
-                      <$> Array.fromFoldable allowedJsonValueTypes
-          )
-        <> " but got "
-        <> Schema.renderJsonValueType actualJsonValueType
-        <> "."
-    ]
-  ValidAgainstNotSchema →
-    [ "JSON is valid against schema from 'not'." ]
+      NE.singleton
+        $ M.paragraph
+        $ ArrayNE.singleton
+        $ M.text
+        $ StringNE.nes
+            (Proxy ∷ Proxy "JSON is valid against schema from 'not'.")
 
 validateAgainst ∷ JsonValue → JsonSchema → Set Violation
 validateAgainst = go Nil Nil

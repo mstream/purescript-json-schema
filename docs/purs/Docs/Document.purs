@@ -10,12 +10,16 @@ import Data.Either.Nested (type (\/))
 import Data.Foldable (class Foldable)
 import Data.Markdown (FlowContentNode)
 import Data.Markdown as M
-import Data.Maybe (Maybe(..), maybe)
+import Data.Maybe (Maybe(..), fromMaybe, maybe)
 import Data.NonEmpty (NonEmpty, (:|))
 import Data.NonEmpty as NE
 import Data.Set (Set)
 import Data.Set.NonEmpty (NonEmptySet)
 import Data.Set.NonEmpty as SetNE
+import Data.String.NonEmpty (NonEmptyString)
+import Data.String.NonEmpty as StringNE
+import Show.NonEmpty (show1)
+import Type.Proxy (Proxy(..))
 
 class Document a where
   document ∷ a → NonEmpty Array FlowContentNode
@@ -23,7 +27,9 @@ class Document a where
 instance (Document a, Document e) ⇒ Document (e \/ a) where
   document = case _ of
     Left error →
-      (M.paragraph $ ArrayNE.singleton $ M.text "an error:")
+      ( M.paragraph $ ArrayNE.singleton $ M.text $ StringNE.nes
+          (Proxy ∷ Proxy "an error:")
+      )
         :| (Array.fromFoldable $ document error)
     Right value →
       document value
@@ -43,7 +49,11 @@ documentFoldable
   → NonEmpty Array FlowContentNode
 documentFoldable isOrdered = NE.singleton
   <<< maybe
-    (M.paragraph $ ArrayNE.singleton $ M.text "∅")
+    ( M.paragraph
+        $ ArrayNE.singleton
+        $ M.text
+        $ StringNE.nes (Proxy ∷ Proxy "∅")
+    )
     ( (if isOrdered then M.orderedList else M.unorderedList)
         <<< map (ArrayNE.fromNonEmpty <<< document)
     )
@@ -55,14 +65,24 @@ instance (Document a) ⇒ Document (NonEmptyArray a) where
 instance (Document a) ⇒ Document (NonEmptySet a) where
   document = document <<< SetNE.toSet
 
+instance Document NonEmptyString where
+  document = document <<< StringNE.toString
+
 instance Document String where
   document = NE.singleton
     <<< M.paragraph
     <<< ArrayNE.singleton
-    <<< M.text
+    <<< M.inlineCode
+    <<< show1
 
 instance Document Boolean where
-  document = document <<< show
+  document = documentSimpleValue <<< show1
 
 instance Document Int where
-  document = document <<< show
+  document = documentSimpleValue <<< show1
+
+documentSimpleValue ∷ NonEmptyString → NonEmpty Array FlowContentNode
+documentSimpleValue = NE.singleton
+  <<< M.paragraph
+  <<< ArrayNE.singleton
+  <<< M.inlineCode

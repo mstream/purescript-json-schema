@@ -3,7 +3,6 @@ module Test.Unit.Spec.JsonSchema.Difference (spec) where
 import Prelude
 
 import Data.Array.NonEmpty as ArrayNE
-import Data.Foldable (maximum)
 import Data.List (List(..), (:))
 import Data.Markdown as M
 import Data.Maybe (Maybe(..))
@@ -81,25 +80,44 @@ spec =
 
 context ∷ ComputationContext
 context =
-  [ M.paragraph $
-      M.text
-        "Calculating JSON Schema Difference is a process used to identify the changes between two JSON schemata."
-        `ArrayNE.cons'`
-          [ M.lineBreak
-          , M.text
-              "It is used to to see what has been added, removed, or changed."
-          , M.lineBreak
-          , M.text
-              "This is useful for tracking changes over time, understanding the impact of changes, and managing versions of a schema."
-          , M.lineBreak
-          , M.text
-              "It can also be used to generate a diff report or to automate the process of updating dependent systems or documentation when a schema changes."
-          ]
+  [ M.paragraph
+      $
+        ( M.text
+            $
+              StringNE.nes
+                ( Proxy
+                    ∷ Proxy
+                        "Calculating JSON Schema Difference is a process used to identify the changes between two JSON schemata."
+                )
+        )
+          `ArrayNE.cons'`
+            [ M.lineBreak
+            , M.text $ StringNE.nes
+                ( Proxy
+                    ∷ Proxy
+                        "It is used to to see what has been added, removed, or changed."
+                )
+            , M.lineBreak
+            , M.text $ StringNE.nes
+                ( Proxy
+                    ∷ Proxy
+                        "This is useful for tracking changes over time, understanding the impact of changes, and managing versions of a schema."
+                )
+            , M.lineBreak
+            , M.text $ StringNE.nes
+                ( Proxy
+                    ∷ Proxy
+                        "It can also be used to generate a diff report or to automate the process of updating dependent systems or documentation when a schema changes."
+                )
+            ]
   ]
 
 properties ∷ Array Property
 properties =
-  [ { description: "comparing identical schemata yields no differences"
+  [ { description: StringNE.nes
+        ( Proxy
+            ∷ Proxy "comparing identical schemata yields no differences"
+        )
     , property: \execute → do
         schema ← genAnyJsonSchemaSample
 
@@ -121,8 +139,8 @@ genAnyJsonSchemaSample = genValueSample
 
 examples ∷ Array Example
 examples =
-  [ example
-      "comparing two identical schemata yields no differences"
+  [ noDifferencesExample
+      "two identical schemata"
       { newSchema: ValueSample
           { description: StringNE.nes
               (Proxy ∷ Proxy "some schema")
@@ -135,13 +153,8 @@ examples =
           , sample: BooleanSchema false
           }
       }
-      ( ValueSample
-          { description: StringNE.nes (Proxy ∷ Proxy "no differences")
-          , sample: Set.empty
-          }
-      )
-  , example
-      "Any change in expected JSON value type should be considered a difference."
+  , differencesExample
+      "expected JSON value type "
       { newSchema: ValueSample
           { description: StringNE.nes
               (Proxy ∷ Proxy "JSON schema accepting only other type")
@@ -170,8 +183,8 @@ examples =
               }
           }
       )
-  , example
-      "Any change of multipleOf keyword should be considered a difference."
+  , differencesExample
+      "multipleOf keyword"
       { newSchema: ValueSample
           { description: StringNE.nes
               ( Proxy
@@ -201,8 +214,8 @@ examples =
               }
           }
       )
-  , example
-      "Any change of maximum inclusive keyword value should be considered a difference."
+  , differencesExample
+      "maximum inclusive keyword value "
       { newSchema: ValueSample
           { description: StringNE.nes
               ( Proxy
@@ -233,8 +246,8 @@ examples =
               }
           }
       )
-  , example
-      "Any change of maximum exclusive keyword value should be considered a difference."
+  , differencesExample
+      "maximum exclusive keyword value "
       { newSchema: ValueSample
           { description: StringNE.nes
               ( Proxy
@@ -266,8 +279,8 @@ examples =
               }
           }
       )
-  , example
-      "Any change of minimum inclusive keyword value should be considered a difference."
+  , differencesExample
+      "minimum inclusive keyword value"
       { newSchema: ValueSample
           { description: StringNE.nes
               ( Proxy
@@ -297,8 +310,8 @@ examples =
               }
           }
       )
-  , example
-      "Any change of minimum exclusive keyword value should be considered a difference."
+  , differencesExample
+      "minimum exclusive keyword value "
       { newSchema: ValueSample
           { description: StringNE.nes
               ( Proxy
@@ -333,6 +346,27 @@ examples =
 
   ]
 
-example ∷ String → { | InputSample } → ValueSample Output → Example
-example description input expectedOutput =
-  { description, input, expectedOutput }
+noDifferencesExample ∷ String → { | InputSample } → Example
+noDifferencesExample schemataDescription input =
+  { description:
+      StringNE.nes (Proxy ∷ Proxy "Comparison of ")
+        `StringNE.appendString` schemataDescription
+        <> StringNE.nes (Proxy ∷ Proxy " yields no differences.")
+  , input
+  , expectedOutput: ValueSample
+      { description: StringNE.nes (Proxy ∷ Proxy "no differences")
+      , sample: Set.empty
+      }
+  }
+
+differencesExample
+  ∷ String → { | InputSample } → ValueSample Output → Example
+differencesExample changeDescription input expectedOutput =
+  { description:
+      StringNE.nes (Proxy ∷ Proxy "Any change of ")
+        `StringNE.appendString` changeDescription
+        <> StringNE.nes
+          (Proxy ∷ Proxy " is considered a difference.")
+  , input
+  , expectedOutput
+  }
