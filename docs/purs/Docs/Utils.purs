@@ -113,7 +113,7 @@ documentOutput outputSample =
 
 type ComputationDocsSpec isa isp o osa r =
   { context ∷ ComputationContext
-  , description ∷ ComputationDescription isp
+  , description ∷ ComputationDescription isp o
   , examples ∷ Array (ComputationExample isa osa)
   , input ∷ { | isp }
   , output ∷ ValueSpec o
@@ -189,7 +189,7 @@ documentComputation
       []
 
   docTitle ∷ NonEmptyString
-  docTitle = capitalizeTitle $ description input
+  docTitle = capitalizeTitle $ description output input
 
   renderExamplesIndex
     ∷ NonEmptyArray NonEmptyString → Array FlowContentNode
@@ -210,7 +210,9 @@ documentComputation
     → NonEmptyString /\ NonEmptyArray FlowContentNode
   documentComputationExample example =
     let
-      exampleTitle = description $ hmap ToValueSpec example.input
+      exampleTitle = description
+        output
+        (hmap ToValueSpec example.input)
       exampleDoc =
         ( M.rule `ArrayNE.cons'`
             ( [ M.heading3

@@ -91,10 +91,6 @@ mapLast' f = ListNE.fromList >>> case _ of
   Nothing →
     Nil
 
-mapTail ∷ ∀ a. (a → a) → NonEmptyList a → NonEmptyList a
-mapTail f = ListNE.uncons >>> \{ head, tail } →
-  head `ListNE.cons'` (f <$> tail)
-
 appendWith'
   ∷ ∀ a. (a → a → a) → List a → List a → List a
 appendWith' f left = List.uncons >>> case _ of

@@ -9,6 +9,7 @@ import Data.String as String
 import Data.String.NonEmpty as StringNE
 import Data.Tuple as Tuple
 import Docs.Utils (documentComputation)
+import Show.NonEmpty (show1)
 import Test.QuickCheck (Result(..))
 import Test.Snapshot.Utils (Fixture, SnapshotTestSpec)
 import Test.Unit.Computation
@@ -65,11 +66,13 @@ computation1 =
           $ StringNE.nes
               (Proxy ∷ Proxy "computation context")
       ]
-  , description: \{ i: ValueSpec i, s: ValueSpec s } →
-      StringNE.nes (Proxy ∷ Proxy "computation based on ")
-        <> i
+  , description: \oSpec { i: iSpec, s: sSpec } →
+      StringNE.nes (Proxy ∷ Proxy "computation of ")
+        <> show1 oSpec
+        <> StringNE.nes (Proxy ∷ Proxy " based on ")
+        <> show1 iSpec
         <> StringNE.nes (Proxy ∷ Proxy " and ")
-        <> s
+        <> show1 sSpec
   , input:
       { i: ValueSpec
           $

@@ -30,14 +30,16 @@ import Test.Unit.Computation
   , GetValueSample(..)
   , ToValueSpec(..)
   , ValueSample(..)
+  , ValueSpec
   )
 import Test.Unit.TestSpec (class Assertable, TestSpec)
 
 type ComputationTestSpec isa isp o osa r =
-  { description ∷ ComputationDescription isp
+  { description ∷ ComputationDescription isp o
   , examples ∷ Array (ComputationExample isa osa)
   , execute ∷ { | isa } → o
   , input ∷ { | isp }
+  , output ∷ ValueSpec o
   , properties ∷ Array (ComputationProperty isa o)
   | r
   }
@@ -52,8 +54,9 @@ testComputation
   ⇒ RowToList isa rlsa
   ⇒ ComputationTestSpec isa isp o osa r
   → TestSpec
-testComputation { description, examples, execute, input, properties } =
-  Spec.describe (StringNE.toString $ description input) do
+testComputation
+  { description, examples, execute, input, output, properties } =
+  Spec.describe (StringNE.toString $ description output input) do
     traverse_ testComputationProperty properties
     traverse_ testComputationExample examples
   where
@@ -62,8 +65,8 @@ testComputation { description, examples, execute, input, properties } =
     Spec.it
       ( "example: "
           <>
-            ( StringNE.toString $ description $ hmap ToValueSpec
-                inputSample
+            ( StringNE.toString
+                $ description output (hmap ToValueSpec inputSample)
             )
           <> " should result in "
           <>

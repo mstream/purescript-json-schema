@@ -21,6 +21,7 @@ import JsonSchema.SchemaPath (SchemaPathSegment(..))
 import JsonSchema.Validation (Violation(..), ViolationReason(..))
 import JsonSchema.Validation as Validation
 import JsonValue (JsonValue)
+import Show.NonEmpty (show1)
 import Test.QuickCheck (Result(..))
 import Test.QuickCheck.Gen (Gen)
 import Test.Unit.Computation
@@ -58,11 +59,13 @@ spec ∷ Spec
 spec =
   { context
   , description:
-      \{ json: ValueSpec jsonDesc, schema: ValueSpec schemaDesc } →
-        StringNE.nes (Proxy ∷ Proxy "validating ")
-          <> jsonDesc
+      \outputSpec { json: jsonSpec, schema: schemaSpec } →
+        StringNE.nes (Proxy ∷ Proxy "finding ")
+          <> show1 outputSpec
+          <> StringNE.nes (Proxy ∷ Proxy " as a result of validating ")
+          <> show1 jsonSpec
           <> StringNE.nes (Proxy ∷ Proxy " against ")
-          <> schemaDesc
+          <> show1 schemaSpec
   , examples
   , execute: \{ json: ValueSample json, schema: ValueSample schema } →
       json.sample `Validation.validateAgainst` schema.sample

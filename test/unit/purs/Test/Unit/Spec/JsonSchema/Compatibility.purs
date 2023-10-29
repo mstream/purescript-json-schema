@@ -27,6 +27,7 @@ import JsonSchema.Compatibility
 import JsonSchema.Compatibility as Compatibility
 import JsonSchema.Difference (Difference(..), DifferenceType(..))
 import JsonSchema.Range (Boundary(..))
+import Show.NonEmpty (show1)
 import Test.Unit.Computation
   ( ComputationContext
   , ComputationExample
@@ -55,9 +56,11 @@ type Property = ComputationProperty InputSample Output
 spec ∷ Spec
 spec =
   { context
-  , description: \{ differences: ValueSpec differencesDesc } →
-      StringNE.nes (Proxy ∷ Proxy "assessing compatibility based on ")
-        <> differencesDesc
+  , description: \outputSpec { differences: differencesSpec } →
+      StringNE.nes (Proxy ∷ Proxy "assessing ")
+        <> show1 outputSpec
+        <> StringNE.nes (Proxy ∷ Proxy " based on ")
+        <> show1 differencesSpec
   , examples
   , execute: \{ differences: ValueSample differences } →
       Compatibility.calculate differences.sample
@@ -66,7 +69,7 @@ spec =
           (Proxy ∷ Proxy "schemata differences")
       }
   , output: ValueSpec $ StringNE.nes
-      (Proxy ∷ Proxy "a type of compatibility")
+      (Proxy ∷ Proxy "the type of compatibility")
   , properties
   }
 

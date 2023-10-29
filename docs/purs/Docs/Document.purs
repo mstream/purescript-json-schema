@@ -10,7 +10,7 @@ import Data.Either.Nested (type (\/))
 import Data.Foldable (class Foldable)
 import Data.Markdown (FlowContentNode)
 import Data.Markdown as M
-import Data.Maybe (Maybe(..), fromMaybe, maybe)
+import Data.Maybe (maybe)
 import Data.NonEmpty (NonEmpty, (:|))
 import Data.NonEmpty as NE
 import Data.Set (Set)

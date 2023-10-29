@@ -2,6 +2,7 @@ module Test.Unit.Spec.JsonSchema.Difference (spec) where
 
 import Prelude
 
+import Control.Monad.Gen as Gen
 import Data.Array.NonEmpty as ArrayNE
 import Data.List (List(..), (:))
 import Data.Markdown as M
@@ -15,6 +16,7 @@ import JsonSchema.Difference (Difference(..), DifferenceType(..))
 import JsonSchema.Difference as Difference
 import JsonSchema.Gen as SchemaGen
 import JsonSchema.SchemaPath (SchemaPathSegment(..))
+import Show.NonEmpty (show1)
 import Test.QuickCheck (Result(..))
 import Test.QuickCheck.Gen (Gen)
 import Test.Unit.Computation
@@ -54,13 +56,13 @@ spec ∷ Spec
 spec =
   { context
   , description:
-      \{ newSchema: ValueSpec newSchemaDesc
-       , oldSchema: ValueSpec oldSchemaDesc
-       } →
-        StringNE.nes (Proxy ∷ Proxy "calculating differences between ")
-          <> oldSchemaDesc
+      \outputSpec { newSchema: newSchemaSpec, oldSchema: oldSchemaSpec } →
+        StringNE.nes (Proxy ∷ Proxy "calculating ")
+          <> show1 outputSpec
+          <> StringNE.nes (Proxy ∷ Proxy " based on ")
+          <> show1 oldSchemaSpec
           <> StringNE.nes (Proxy ∷ Proxy " and ")
-          <> newSchemaDesc
+          <> show1 newSchemaSpec
   , examples
   , execute:
       \{ newSchema: ValueSample newSchema
@@ -74,7 +76,7 @@ spec =
           (Proxy ∷ Proxy "old JSON schema")
       }
   , output: ValueSpec $ StringNE.nes
-      (Proxy ∷ Proxy "differences between old and new schema")
+      (Proxy ∷ Proxy "differences between schemata")
   , properties
   }
 
@@ -119,10 +121,11 @@ properties =
             ∷ Proxy "comparing identical schemata yields no differences"
         )
     , property: \execute → do
-        schema ← genAnyJsonSchemaSample
+        schemaSample ← genAnyJsonSchemaSample
 
         let
-          differences = execute { newSchema: schema, oldSchema: schema }
+          differences = execute
+            { newSchema: schemaSample, oldSchema: schemaSample }
 
         pure
           if Set.isEmpty differences then Success
@@ -130,11 +133,39 @@ properties =
             $ "the comparison produced differences: "
                 <> show differences
     }
+  , { description: StringNE.nes
+        ( Proxy
+            ∷ Proxy "comparing different schemata yields differences"
+        )
+    , property: \execute → do
+        schemaSample@(ValueSample { sample }) ← genAnyJsonSchemaSample
+
+        differentSchema ← SchemaGen.genSchema
+          `Gen.suchThat` (_ /= sample)
+
+        let
+          differentSchemaSample = ValueSample
+            { description: StringNE.nes
+                (Proxy ∷ Proxy "a different schema")
+            , sample: differentSchema
+            }
+
+          differences = execute
+            { newSchema: differentSchemaSample
+            , oldSchema: schemaSample
+            }
+
+        pure
+          if Set.isEmpty differences then
+            Failed $ "the comparison produced no differences:\n"
+              <> show { differentSchemaSample, schemaSample }
+          else Success
+    }
   ]
 
 genAnyJsonSchemaSample ∷ Gen (ValueSample JsonSchema)
 genAnyJsonSchemaSample = genValueSample
-  (StringNE.nes (Proxy ∷ Proxy "any JSON schema"))
+  (StringNE.nes (Proxy ∷ Proxy "a JSON schema"))
   SchemaGen.genSchema
 
 examples ∷ Array Example

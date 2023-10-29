@@ -1,4 +1,4 @@
-# Computation based on integers and a string
+# Computation of computation result based on integers and a string
 
 computation context
 
@@ -10,13 +10,13 @@ computation context
 
 ## Examples
 
-- [computation based on number one and two and a three letter word](#computation-based-on-number-one-and-two-and-a-three-letter-word)
+- [computation of computation result based on number one and two and a three letter word](#computation-of-computation-result-based-on-number-one-and-two-and-a-three-letter-word)
 
-- [computation based on number two, three and four and a three letter word](#computation-based-on-number-two-three-and-four-and-a-three-letter-word)
+- [computation of computation result based on number two, three and four and a three letter word](#computation-of-computation-result-based-on-number-two-three-and-four-and-a-three-letter-word)
 
 ---
 
-### computation based on number one and two and a three letter word
+### computation of computation result based on number one and two and a three letter word
 
 example1 description
 
@@ -40,7 +40,7 @@ false value:
 
 ---
 
-### computation based on number two, three and four and a three letter word
+### computation of computation result based on number two, three and four and a three letter word
 
 example2 description
 

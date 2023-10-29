@@ -26,7 +26,6 @@ import Data.Set as Set
 import Data.Set.NonEmpty (NonEmptySet)
 import Data.Set.NonEmpty as SetNE
 import Data.Show.Generic (genericShow)
-import Data.String as String
 import Data.String.NonEmpty as StringNE
 import Docs.Document (class Document, document)
 import JsonSchema (JsonSchema(..), JsonValueType(..), Keywords)
@@ -38,6 +37,7 @@ import JsonSchema.Range as Range
 import JsonSchema.SchemaPath (SchemaPath, SchemaPathSegment(..))
 import JsonSchema.SchemaPath as SchemaPath
 import JsonValue (JsonValue)
+import Show.NonEmpty (show1)
 import Type.Proxy (Proxy(..))
 import Utils (isInteger)
 
@@ -106,11 +106,12 @@ instance Document ViolationReason where
           ]
     InvalidMultiple { expectedMultiple, value } →
       NE.singleton $ M.paragraph $ ArrayNE.singleton $ M.text $
-        StringNE.nes
-          ( Proxy
-              ∷ Proxy
-                  " is not a multiple of "
-          ) `StringNE.appendString` show expectedMultiple
+        show1 value <>
+          StringNE.nes
+            ( Proxy
+                ∷ Proxy
+                    " is not a multiple of "
+            ) `StringNE.appendString` show expectedMultiple
     InvalidRange { validRange, value } →
       NE.singleton
         $ M.paragraph

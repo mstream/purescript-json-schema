@@ -22,13 +22,14 @@ import Data.String.NonEmpty (NonEmptyString)
 import Data.String.NonEmpty as StringNE
 import Docs.Document (class Document, document)
 import Heterogeneous.Mapping (class Mapping)
+import Show.NonEmpty (class Show1)
 import Test.QuickCheck (Result)
 import Test.QuickCheck.Gen (Gen)
 import Type.Proxy (Proxy(..))
 
 type ComputationSpec isa isp o osa =
   { context ∷ ComputationContext
-  , description ∷ ComputationDescription isp
+  , description ∷ ComputationDescription isp o
   , input ∷ { | isp }
   , examples ∷ Array (ComputationExample isa osa)
   , execute ∷ { | isa } → o
@@ -37,15 +38,21 @@ type ComputationSpec isa isp o osa =
   }
 
 type ComputationContext = Array FlowContentNode
-type ComputationDescription isp = { | isp } → NonEmptyString
+type ComputationDescription isp o =
+  ValueSpec o → { | isp } → NonEmptyString
 
 newtype ValueSpec (a ∷ Type) = ValueSpec NonEmptyString
 
 instance Show (ValueSpec a) where
   show (ValueSpec nes) = StringNE.toString nes
 
+instance Show1 (ValueSpec a) where
+  show1 (ValueSpec nes) = nes
+
 newtype ValueSample (a ∷ Type) = ValueSample
   { description ∷ NonEmptyString, sample ∷ a }
+
+derive newtype instance Show a ⇒ Show (ValueSample a)
 
 instance (Document a) ⇒ Document (ValueSample a) where
   document (ValueSample { description, sample }) =

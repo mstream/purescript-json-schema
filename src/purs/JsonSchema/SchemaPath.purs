@@ -6,7 +6,7 @@ module JsonSchema.SchemaPath
 
 import Prelude
 
-import Data.Foldable (foldMap, foldl)
+import Data.Foldable (foldl)
 import Data.Generic.Rep (class Generic)
 import Data.List (List)
 import Data.List as List

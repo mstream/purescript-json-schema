@@ -9,6 +9,7 @@ import JsonSchema as Schema
 import JsonSchema.Codec.Parsing as Parsing
 import JsonSchema.Gen as SchemaGen
 import JsonValue (JsonValue)
+import Show.NonEmpty (show1)
 import Test.QuickCheck (Result(..))
 import Test.QuickCheck.Gen (Gen)
 import Test.Unit.Computation
@@ -40,15 +41,18 @@ type Property = ComputationProperty InputSample Output
 spec ∷ Spec
 spec =
   { context
-  , description: \{ schema: ValueSpec schemaDesc } →
-      StringNE.nes (Proxy ∷ Proxy "printing ") <> schemaDesc
+  , description: \outputSpec { schema: schemaSpec } →
+      StringNE.nes (Proxy ∷ Proxy "printing ")
+        <> show1 outputSpec
+        <> StringNE.nes (Proxy ∷ Proxy "representing a ")
+        <> show1 schemaSpec
   , examples
   , execute: \{ schema: ValueSample schema } →
       Schema.print schema.sample
   , input:
       { schema: ValueSpec $ StringNE.nes (Proxy ∷ Proxy "JSON schema") }
   , output: ValueSpec $ StringNE.nes
-      (Proxy ∷ Proxy "a JSON value representing the given JSON schema")
+      (Proxy ∷ Proxy "a JSON value")
   , properties
   }
 

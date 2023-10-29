@@ -13,7 +13,7 @@ import Data.Generic.Rep (class Generic)
 import Data.List (List(..), (:))
 import Data.Markdown (FlowContentNode)
 import Data.Markdown as M
-import Data.Maybe (Maybe(..), fromMaybe, maybe)
+import Data.Maybe (Maybe(..), maybe)
 import Data.NonEmpty ((:|))
 import Data.NonEmpty as NE
 import Data.Set (Set)
@@ -181,13 +181,50 @@ calculate = go Nil
   go ∷ SchemaPath → JsonSchema → JsonSchema → Set Difference
   go path previousSchema nextSchema = case previousSchema, nextSchema of
     BooleanSchema previousBool, BooleanSchema nextBool →
-      Set.empty
+      Set.fromFoldable
+        $ calculateBooleanSchemataDiff path previousBool nextBool
     BooleanSchema previousBool, ObjectSchema nextKeywords →
-      Set.empty
+      Set.singleton
+        $ calculateBooleanAndObjectSchemataDiff
+            path
+            previousBool
+            nextKeywords
     ObjectSchema previousKeywords, BooleanSchema nextBool →
-      Set.empty
+      Set.singleton
+        $ calculateObjectAndBooleanSchemataDiff
+            path
+            previousKeywords
+            nextBool
     ObjectSchema previousKeywords, ObjectSchema nextKeywords →
       calculateObjectSchemataDiff path previousKeywords nextKeywords
+
+  calculateBooleanSchemataDiff
+    ∷ SchemaPath → Boolean → Boolean → Maybe Difference
+  calculateBooleanSchemataDiff path =
+    case _, _ of
+      false, true →
+        Just $ Difference
+          { differenceType: BooleanSchemaChange true, path }
+
+      true, false →
+        Just $ Difference
+          { differenceType: BooleanSchemaChange false, path }
+      _, _ →
+        Nothing
+
+  calculateBooleanAndObjectSchemataDiff
+    ∷ SchemaPath → Boolean → Keywords → Difference
+  calculateBooleanAndObjectSchemataDiff path bool keywords = Difference
+    { differenceType: SchemaChangeFromBooleanToObject bool keywords
+    , path
+    }
+
+  calculateObjectAndBooleanSchemataDiff
+    ∷ SchemaPath → Keywords → Boolean → Difference
+  calculateObjectAndBooleanSchemataDiff path keywords bool = Difference
+    { differenceType: SchemaChangeFromObjectToBoolean keywords bool
+    , path
+    }
 
   calculateObjectSchemataDiff
     ∷ SchemaPath → Keywords → Keywords → Set Difference

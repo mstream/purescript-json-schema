@@ -19,6 +19,7 @@ import JsonSchema (JsonSchema(..), JsonValueType(..))
 import JsonSchema as Schema
 import JsonSchema.Codec.Parsing as Parsing
 import JsonValue (JsonValue)
+import Show.NonEmpty (show1)
 import Test.Unit.Computation
   ( ComputationContext
   , ComputationExample
@@ -47,8 +48,11 @@ type Property = ComputationProperty InputSample Output
 spec ∷ Spec
 spec =
   { context
-  , description: \{ json: ValueSpec jsonDesc } →
-      StringNE.nes (Proxy ∷ Proxy "parsing ") <> jsonDesc
+  , description: \outputSpec { json: jsonSpec } →
+      StringNE.nes (Proxy ∷ Proxy "producing ")
+        <> show1 outputSpec
+        <> StringNE.nes (Proxy ∷ Proxy " as a result of parsing ")
+        <> show1 jsonSpec
   , examples
   , execute: \{ json: ValueSample json } →
       Parsing.parseSchema json.sample
