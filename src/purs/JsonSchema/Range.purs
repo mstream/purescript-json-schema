@@ -2,6 +2,8 @@ module JsonSchema.Range (Boundary(..), Range, renderRange) where
 
 import Prelude
 
+import Data.Argonaut.Core as A
+import Data.Argonaut.Encode (class EncodeJson, encodeJson)
 import Data.Generic.Rep (class Generic)
 import Data.Show.Generic (genericShow)
 import Data.String.NonEmpty (NonEmptyString)
@@ -34,6 +36,13 @@ data Boundary = Closed Number | Open Number
 derive instance Eq Boundary
 derive instance Generic Boundary _
 derive instance Ord Boundary
+
+instance EncodeJson Boundary where
+  encodeJson = case _ of
+    Closed x →
+      A.fromString $ show x <> " (inclusively)"
+    Open x →
+      A.fromString $ show x <> " (exclusively)"
 
 instance Show Boundary where
   show = genericShow

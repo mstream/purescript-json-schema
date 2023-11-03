@@ -1,6 +1,7 @@
 { name = "mlogo"
 , dependencies =
   [ "aff"
+  , "argonaut-codecs"
   , "argonaut-core"
   , "arrays"
   , "console"

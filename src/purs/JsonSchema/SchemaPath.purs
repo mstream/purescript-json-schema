@@ -6,6 +6,8 @@ module JsonSchema.SchemaPath
 
 import Prelude
 
+import Data.Argonaut.Core as A
+import Data.Argonaut.Encode (class EncodeJson, encodeJson)
 import Data.Foldable (foldl)
 import Data.Generic.Rep (class Generic)
 import Data.List (List)
@@ -55,6 +57,27 @@ data SchemaPathSegment
 derive instance Eq SchemaPathSegment
 derive instance Generic SchemaPathSegment _
 derive instance Ord SchemaPathSegment
+
+instance EncodeJson SchemaPathSegment where
+  encodeJson = case _ of
+    ExclusiveMinimum →
+      A.fromString "exclusiveMinimum"
+    ExclusiveMaximum →
+      A.fromString "exclusiveMaximum"
+    Items →
+      A.fromString "items"
+    Maximum →
+      A.fromString "maximum"
+    Minimum →
+      A.fromString "minimum"
+    MultipleOf →
+      A.fromString "multipleOf"
+    Properties name →
+      A.fromString $ show name
+    TypeKeyword →
+      A.fromString "type"
+    UniqueItems →
+      A.fromString "uniqueItems"
 
 instance Show SchemaPathSegment where
   show = genericShow

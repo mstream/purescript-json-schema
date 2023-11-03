@@ -6,8 +6,11 @@ module JsonSchema.JsonPath
 
 import Prelude
 
+import Data.Argonaut.Core as A
+import Data.Argonaut.Encode (class EncodeJson)
 import Data.Foldable (foldl)
 import Data.Generic.Rep (class Generic)
+import Data.Int as Int
 import Data.List (List)
 import Data.List as List
 import Data.Show.Generic (genericShow)
@@ -35,6 +38,13 @@ data JsonPathSegment
 derive instance Eq JsonPathSegment
 derive instance Generic JsonPathSegment _
 derive instance Ord JsonPathSegment
+
+instance EncodeJson JsonPathSegment where
+  encodeJson = case _ of
+    ItemIndex i →
+      A.fromNumber $ Int.toNumber i
+    Property nes →
+      A.fromString $ StringNE.toString nes
 
 instance Show JsonPathSegment where
   show = genericShow

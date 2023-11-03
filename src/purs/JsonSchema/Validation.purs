@@ -7,6 +7,8 @@ module JsonSchema.Validation
 import Prelude
 
 import Data.Argonaut.Core as A
+import Data.Argonaut.Encode (class EncodeJson, (:=), (~>))
+import Data.Argonaut.Encode as AE
 import Data.Array as Array
 import Data.Array.NonEmpty as ArrayNE
 import Data.Foldable (foldl)
@@ -51,6 +53,8 @@ derive instance Eq Violation
 derive instance Generic Violation _
 derive instance Ord Violation
 
+derive newtype instance EncodeJson Violation
+
 instance Show Violation where
   show = genericShow
 
@@ -81,6 +85,30 @@ data ViolationReason
 derive instance Eq ViolationReason
 derive instance Generic ViolationReason _
 derive instance Ord ViolationReason
+
+instance EncodeJson ViolationReason where
+  encodeJson = case _ of
+    AlwaysFailingSchema →
+      A.fromString "always failing schema"
+    InvalidArray itemViolations →
+      A.fromArray $ AE.encodeJson <$> Array.fromFoldable itemViolations
+    InvalidMultiple { expectedMultiple, value } →
+      "expectedMultiple" := A.fromNumber expectedMultiple
+        ~> "value" := A.fromNumber value
+        ~> A.jsonEmptyObject
+    InvalidRange { validRange, value } →
+      "validRange" := AE.encodeJson validRange
+        ~> "value" := A.fromNumber value
+        ~> A.jsonEmptyObject
+    NonUniqueArrayItem →
+      A.fromString "non-unique array item"
+    TypeMismatch { actualJsonValueType, allowedJsonValueTypes } →
+      "actualJsonValueType" := AE.encodeJson actualJsonValueType
+        ~> "allowedJsonValueTypes" :=
+          AE.encodeJson allowedJsonValueTypes
+        ~> A.jsonEmptyObject
+    ValidAgainstNotSchema →
+      A.fromString "valid against 'not' schema"
 
 instance Show ViolationReason where
   show reason = genericShow reason

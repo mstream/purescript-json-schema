@@ -11,6 +11,7 @@ import Prelude
 
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Core as A
+import Data.Argonaut.Encode (class EncodeJson)
 import Data.Array as Array
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(..), maybe)
@@ -79,6 +80,11 @@ data JsonValueType
 derive instance Eq JsonValueType
 derive instance Generic JsonValueType _
 derive instance Ord JsonValueType
+
+instance EncodeJson JsonValueType where
+  encodeJson = A.fromString
+    <<< StringNE.toString
+    <<< renderJsonValueType
 
 instance Show JsonValueType where
   show keyword = genericShow keyword
