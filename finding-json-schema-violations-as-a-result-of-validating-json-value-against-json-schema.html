@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Validating JSON value against JSON schema - PureScript JSON Schema</title>
+        <title>Finding JSON schema violations as a result of validating JSON value against JSON schema - PureScript JSON Schema</title>
 
 
         <!-- Custom HTML head -->
@@ -83,7 +83,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="assessing-compatibility-based-on-schemata-differences.html"><strong aria-hidden="true">1.</strong> Assessing compatibility based on schemata differences</a></li><li class="chapter-item expanded "><a href="calculating-differences-between-old-json-schema-and-new-json-schema.html"><strong aria-hidden="true">2.</strong> Calculating differences between old JSON schema and new JSON schema</a></li><li class="chapter-item expanded "><a href="parsing-json-value.html"><strong aria-hidden="true">3.</strong> Parsing JSON value</a></li><li class="chapter-item expanded "><a href="printing-json-schema.html"><strong aria-hidden="true">4.</strong> Printing JSON schema</a></li><li class="chapter-item expanded "><a href="validating-json-value-against-json-schema.html" class="active"><strong aria-hidden="true">5.</strong> Validating JSON value against JSON schema</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="assessing-the-type-of-compatibility-based-on-schemata-differences.html"><strong aria-hidden="true">1.</strong> Assessing the type of compatibility based on schemata differences</a></li><li class="chapter-item expanded "><a href="calculating-differences-between-schemata-based-on-old-json-schema-and-new-json-schema.html"><strong aria-hidden="true">2.</strong> Calculating differences between schemata based on old JSON schema and new JSON schema</a></li><li class="chapter-item expanded "><a href="finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema.html" class="active"><strong aria-hidden="true">3.</strong> Finding JSON schema violations as a result of validating JSON value against JSON schema</a></li><li class="chapter-item expanded "><a href="printing-a-json-valuerepresenting-a-json-schema.html"><strong aria-hidden="true">4.</strong> Printing a JSON valuerepresenting a JSON schema</a></li><li class="chapter-item expanded "><a href="producing-a-json-schema-or-an-error-as-a-result-of-parsing-json-value.html"><strong aria-hidden="true">5.</strong> Producing a JSON schema or an error as a result of parsing JSON value</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -144,7 +144,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="validating-json-value-against-json-schema"><a class="header" href="#validating-json-value-against-json-schema">Validating JSON value against JSON schema</a></h1>
+                        <h1 id="finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema">Finding JSON schema violations as a result of validating JSON value against JSON schema</a></h1>
 <p>JSON validation is a specification for validating the structure and data
 types of JSON values.<br />
 It allows you to specify the required properties, the types of values,
@@ -168,62 +168,62 @@ amount of code needed for data validation.</p>
 <h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
 <ul>
 <li>
-<p><a href="#validating-an-array-containing-some-duplicated-strings-against-schema-not-accepting-duplicates">validating an array containing some duplicated strings against schema not accepting duplicates</a></p>
+<p><a href="#finding-json-schema-violations-as-a-result-of-validating-an-array-containing-some-duplicated-strings-against-schema-not-accepting-duplicates">finding JSON schema violations as a result of validating an array containing some duplicated strings against schema not accepting duplicates</a></p>
 </li>
 <li>
-<p><a href="#validating-a-boolean-value-against-schema-accepting-only-nulls-or-strings">validating a boolean value against schema accepting only nulls or strings</a></p>
+<p><a href="#finding-json-schema-violations-as-a-result-of-validating-a-boolean-value-against-schema-accepting-only-nulls-or-strings">finding JSON schema violations as a result of validating a boolean value against schema accepting only nulls or strings</a></p>
 </li>
 <li>
-<p><a href="#validating-json-number-value-against-json-schema-accepting-only-numbers">validating JSON number value against JSON schema accepting only numbers</a></p>
+<p><a href="#finding-json-schema-violations-as-a-result-of-validating-json-number-value-against-json-schema-accepting-only-numbers">finding JSON schema violations as a result of validating JSON number value against JSON schema accepting only numbers</a></p>
 </li>
 <li>
-<p><a href="#validating-json-null-value-against-json-schema-accepting-booleans-nulls-and-strings">validating JSON null value against JSON schema accepting booleans, nulls and strings</a></p>
+<p><a href="#finding-json-schema-violations-as-a-result-of-validating-json-null-value-against-json-schema-accepting-booleans-nulls-and-strings">finding JSON schema violations as a result of validating JSON null value against JSON schema accepting booleans, nulls and strings</a></p>
 </li>
 <li>
-<p><a href="#validating-json-number-value-which-happens-to-be-an-integer-against-json-schema-accepting-any-numbers">validating JSON number value which happens to be an integer against JSON schema accepting any numbers</a></p>
+<p><a href="#finding-json-schema-violations-as-a-result-of-validating-json-number-value-which-happens-to-be-an-integer-against-json-schema-accepting-any-numbers">finding JSON schema violations as a result of validating JSON number value which happens to be an integer against JSON schema accepting any numbers</a></p>
 </li>
 <li>
-<p><a href="#validating-a-multiple-of-x-against-schema-accepting-only-numbers-which-are-multiples-of-x">validating a multiple of x against schema accepting only numbers which are multiples of x</a></p>
+<p><a href="#finding-json-schema-violations-as-a-result-of-validating-a-multiple-of-x-against-schema-accepting-only-numbers-which-are-multiples-of-x">finding JSON schema violations as a result of validating a multiple of x against schema accepting only numbers which are multiples of x</a></p>
 </li>
 <li>
-<p><a href="#validating-a-fractional-number-against-schema-accepting-only-whole-numbers">validating a fractional number against schema accepting only whole numbers</a></p>
+<p><a href="#finding-json-schema-violations-as-a-result-of-validating-a-fractional-number-against-schema-accepting-only-whole-numbers">finding JSON schema violations as a result of validating a fractional number against schema accepting only whole numbers</a></p>
 </li>
 <li>
-<p><a href="#validating-a-multiple-of-25-against-a-schema-accepting-only-multiples-of-25">validating a multiple of 2.5 against a schema accepting only multiples of 2.5</a></p>
+<p><a href="#finding-json-schema-violations-as-a-result-of-validating-a-multiple-of-25-against-a-schema-accepting-only-multiples-of-25">finding JSON schema violations as a result of validating a multiple of 2.5 against a schema accepting only multiples of 2.5</a></p>
 </li>
 <li>
-<p><a href="#validating-an-array-containing-a-mixture-of-null-and-boolean-values-to-a-schema-accepting-only-arrays-of-nulls-against-schema-accepting-only-arrays-of-nulls">validating an array containing a mixture of null and boolean values to a schema accepting only arrays of nulls against schema accepting only arrays of nulls</a></p>
+<p><a href="#finding-json-schema-violations-as-a-result-of-validating-an-array-containing-a-mixture-of-null-and-boolean-values-to-a-schema-accepting-only-arrays-of-nulls-against-schema-accepting-only-arrays-of-nulls">finding JSON schema violations as a result of validating an array containing a mixture of null and boolean values to a schema accepting only arrays of nulls against schema accepting only arrays of nulls</a></p>
 </li>
 <li>
-<p><a href="#validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set">validating number at the schema's minimum allowed values boundary against a schema with a minimum exclusive allowed value set</a></p>
+<p><a href="#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's minimum allowed values boundary against a schema with a minimum exclusive allowed value set</a></p>
 </li>
 <li>
-<p><a href="#validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set">validating number at the schema's maximum allowed values boundary against a schema with a maximum exclusive allowed value set</a></p>
+<p><a href="#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's maximum allowed values boundary against a schema with a maximum exclusive allowed value set</a></p>
 </li>
 <li>
-<p><a href="#validating-not-a-multiple-of-25-against-a-schema-accepting-only-multiples-of-25">validating not a multiple of 2.5 against a schema accepting only multiples of 2.5</a></p>
+<p><a href="#finding-json-schema-violations-as-a-result-of-validating-not-a-multiple-of-25-against-a-schema-accepting-only-multiples-of-25">finding JSON schema violations as a result of validating not a multiple of 2.5 against a schema accepting only multiples of 2.5</a></p>
 </li>
 <li>
-<p><a href="#validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set">validating number at the schema's maximum allowed values boundary against a schema with a maximum inclusive allowed value set</a></p>
+<p><a href="#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's maximum allowed values boundary against a schema with a maximum inclusive allowed value set</a></p>
 </li>
 <li>
-<p><a href="#validating-number-below-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set">validating number below the schema's maximum allowed values boundary against a schema with a maximum exclusive allowed value set</a></p>
+<p><a href="#finding-json-schema-violations-as-a-result-of-validating-number-below-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set">finding JSON schema violations as a result of validating number below the schema's maximum allowed values boundary against a schema with a maximum exclusive allowed value set</a></p>
 </li>
 <li>
-<p><a href="#validating-number-exceeding-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set">validating number exceeding the schema's maximum allowed values boundary against a schema with a maximum inclusive allowed value set</a></p>
+<p><a href="#finding-json-schema-violations-as-a-result-of-validating-number-exceeding-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set">finding JSON schema violations as a result of validating number exceeding the schema's maximum allowed values boundary against a schema with a maximum inclusive allowed value set</a></p>
 </li>
 <li>
-<p><a href="#validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set">validating number at the schema's minimum allowed values boundary against a schema with a minimum inclusive allowed value set</a></p>
+<p><a href="#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's minimum allowed values boundary against a schema with a minimum inclusive allowed value set</a></p>
 </li>
 <li>
-<p><a href="#validating-number-below-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set">validating number below the schema's minimum allowed values boundary against a schema with a minimum exclusive allowed value set</a></p>
+<p><a href="#finding-json-schema-violations-as-a-result-of-validating-number-below-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set">finding JSON schema violations as a result of validating number below the schema's minimum allowed values boundary against a schema with a minimum exclusive allowed value set</a></p>
 </li>
 <li>
-<p><a href="#validating-number-exceeding-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set">validating number exceeding the schema's minimum allowed values boundary against a schema with a minimum inclusive allowed value set</a></p>
+<p><a href="#finding-json-schema-violations-as-a-result-of-validating-number-exceeding-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set">finding JSON schema violations as a result of validating number exceeding the schema's minimum allowed values boundary against a schema with a minimum inclusive allowed value set</a></p>
 </li>
 </ul>
 <hr />
-<h3 id="validating-an-array-containing-some-duplicated-strings-against-schema-not-accepting-duplicates"><a class="header" href="#validating-an-array-containing-some-duplicated-strings-against-schema-not-accepting-duplicates">validating an array containing some duplicated strings against schema not accepting duplicates</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-an-array-containing-some-duplicated-strings-against-schema-not-accepting-duplicates"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-an-array-containing-some-duplicated-strings-against-schema-not-accepting-duplicates">finding JSON schema violations as a result of validating an array containing some duplicated strings against schema not accepting duplicates</a></h3>
 <p>Because the schema requires items to be unique, and the value contains
 duplicate occurrence, such a value is invalid.</p>
 <p><em>Input:</em></p>
@@ -281,7 +281,7 @@ JSON schema path: <code>#/uniqueItems</code></p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="validating-a-boolean-value-against-schema-accepting-only-nulls-or-strings"><a class="header" href="#validating-a-boolean-value-against-schema-accepting-only-nulls-or-strings">validating a boolean value against schema accepting only nulls or strings</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-a-boolean-value-against-schema-accepting-only-nulls-or-strings"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-a-boolean-value-against-schema-accepting-only-nulls-or-strings">finding JSON schema violations as a result of validating a boolean value against schema accepting only nulls or strings</a></h3>
 <p>Because the value is neither null or string, such a value is invalid.</p>
 <p><em>Input:</em></p>
 <p>a boolean value:</p>
@@ -311,7 +311,7 @@ JSON schema path: <code>#/type</code></p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="validating-json-number-value-against-json-schema-accepting-only-numbers"><a class="header" href="#validating-json-number-value-against-json-schema-accepting-only-numbers">validating JSON number value against JSON schema accepting only numbers</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-json-number-value-against-json-schema-accepting-only-numbers"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-json-number-value-against-json-schema-accepting-only-numbers">finding JSON schema violations as a result of validating JSON number value against JSON schema accepting only numbers</a></h3>
 <p>Because a JSON value directly matches schema's only 'type' keyword item,
 such a value is valid.</p>
 <p><em>Input:</em></p>
@@ -335,7 +335,7 @@ such a value is valid.</p>
 <p>∅</p>
 </blockquote>
 <hr />
-<h3 id="validating-json-null-value-against-json-schema-accepting-booleans-nulls-and-strings"><a class="header" href="#validating-json-null-value-against-json-schema-accepting-booleans-nulls-and-strings">validating JSON null value against JSON schema accepting booleans, nulls and strings</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-json-null-value-against-json-schema-accepting-booleans-nulls-and-strings"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-json-null-value-against-json-schema-accepting-booleans-nulls-and-strings">finding JSON schema violations as a result of validating JSON null value against JSON schema accepting booleans, nulls and strings</a></h3>
 <p>Because a JSON value directly matches one of schema's 'type' keyword
 items, such a value is valid.</p>
 <p><em>Input:</em></p>
@@ -361,7 +361,7 @@ items, such a value is valid.</p>
 <p>∅</p>
 </blockquote>
 <hr />
-<h3 id="validating-json-number-value-which-happens-to-be-an-integer-against-json-schema-accepting-any-numbers"><a class="header" href="#validating-json-number-value-which-happens-to-be-an-integer-against-json-schema-accepting-any-numbers">validating JSON number value which happens to be an integer against JSON schema accepting any numbers</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-json-number-value-which-happens-to-be-an-integer-against-json-schema-accepting-any-numbers"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-json-number-value-which-happens-to-be-an-integer-against-json-schema-accepting-any-numbers">finding JSON schema violations as a result of validating JSON number value which happens to be an integer against JSON schema accepting any numbers</a></h3>
 <p>Because a JSON value indirectly matches schema's only 'type' keyword
 item, such a value is valid.</p>
 <p><em>Input:</em></p>
@@ -385,7 +385,7 @@ item, such a value is valid.</p>
 <p>∅</p>
 </blockquote>
 <hr />
-<h3 id="validating-a-multiple-of-x-against-schema-accepting-only-numbers-which-are-multiples-of-x"><a class="header" href="#validating-a-multiple-of-x-against-schema-accepting-only-numbers-which-are-multiples-of-x">validating a multiple of x against schema accepting only numbers which are multiples of x</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-a-multiple-of-x-against-schema-accepting-only-numbers-which-are-multiples-of-x"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-a-multiple-of-x-against-schema-accepting-only-numbers-which-are-multiples-of-x">finding JSON schema violations as a result of validating a multiple of x against schema accepting only numbers which are multiples of x</a></h3>
 <p>Because a JSON number value is a multiple of the factor desired by the
 schema, such a value is valid.</p>
 <p><em>Input:</em></p>
@@ -410,7 +410,7 @@ schema, such a value is valid.</p>
 <p>∅</p>
 </blockquote>
 <hr />
-<h3 id="validating-a-fractional-number-against-schema-accepting-only-whole-numbers"><a class="header" href="#validating-a-fractional-number-against-schema-accepting-only-whole-numbers">validating a fractional number against schema accepting only whole numbers</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-a-fractional-number-against-schema-accepting-only-whole-numbers"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-a-fractional-number-against-schema-accepting-only-whole-numbers">finding JSON schema violations as a result of validating a fractional number against schema accepting only whole numbers</a></h3>
 <p>Because the schema accepts only whole numbers, such a value is invalid.</p>
 <p><em>Input:</em></p>
 <p>a fractional number:</p>
@@ -439,7 +439,7 @@ JSON schema path: <code>#/type</code></p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="validating-a-multiple-of-25-against-a-schema-accepting-only-multiples-of-25"><a class="header" href="#validating-a-multiple-of-25-against-a-schema-accepting-only-multiples-of-25">validating a multiple of 2.5 against a schema accepting only multiples of 2.5</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-a-multiple-of-25-against-a-schema-accepting-only-multiples-of-25"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-a-multiple-of-25-against-a-schema-accepting-only-multiples-of-25">finding JSON schema violations as a result of validating a multiple of 2.5 against a schema accepting only multiples of 2.5</a></h3>
 <p>Because the schema accepts any multiples of 2.5, such a value is valid.</p>
 <p><em>Input:</em></p>
 <p>a multiple of 2.5:</p>
@@ -463,7 +463,7 @@ JSON schema path: <code>#/type</code></p>
 <p>∅</p>
 </blockquote>
 <hr />
-<h3 id="validating-an-array-containing-a-mixture-of-null-and-boolean-values-to-a-schema-accepting-only-arrays-of-nulls-against-schema-accepting-only-arrays-of-nulls"><a class="header" href="#validating-an-array-containing-a-mixture-of-null-and-boolean-values-to-a-schema-accepting-only-arrays-of-nulls-against-schema-accepting-only-arrays-of-nulls">validating an array containing a mixture of null and boolean values to a schema accepting only arrays of nulls against schema accepting only arrays of nulls</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-an-array-containing-a-mixture-of-null-and-boolean-values-to-a-schema-accepting-only-arrays-of-nulls-against-schema-accepting-only-arrays-of-nulls"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-an-array-containing-a-mixture-of-null-and-boolean-values-to-a-schema-accepting-only-arrays-of-nulls-against-schema-accepting-only-arrays-of-nulls">finding JSON schema violations as a result of validating an array containing a mixture of null and boolean values to a schema accepting only arrays of nulls against schema accepting only arrays of nulls</a></h3>
 <p>Because the schema requires items to conform to a certain schema and
 this is not the case here, such a value is invalid.</p>
 <p><em>Input:</em></p>
@@ -517,7 +517,7 @@ JSON schema path: <code>#/items/type</code></p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set"><a class="header" href="#validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set">validating number at the schema's minimum allowed values boundary against a schema with a minimum exclusive allowed value set</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's minimum allowed values boundary against a schema with a minimum exclusive allowed value set</a></h3>
 <p>Because the minimum value constraint is exclusive, such a value is
 invalid.</p>
 <p><em>Input:</em></p>
@@ -545,7 +545,7 @@ JSON schema path: <code>#/exclusiveMinimum</code></p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set"><a class="header" href="#validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set">validating number at the schema's maximum allowed values boundary against a schema with a maximum exclusive allowed value set</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's maximum allowed values boundary against a schema with a maximum exclusive allowed value set</a></h3>
 <p>Because the maximum value constraint is exclusive, such a value is
 invalid.</p>
 <p><em>Input:</em></p>
@@ -573,7 +573,7 @@ JSON schema path: <code>#/exclusiveMaximum</code></p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="validating-not-a-multiple-of-25-against-a-schema-accepting-only-multiples-of-25"><a class="header" href="#validating-not-a-multiple-of-25-against-a-schema-accepting-only-multiples-of-25">validating not a multiple of 2.5 against a schema accepting only multiples of 2.5</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-not-a-multiple-of-25-against-a-schema-accepting-only-multiples-of-25"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-not-a-multiple-of-25-against-a-schema-accepting-only-multiples-of-25">finding JSON schema violations as a result of validating not a multiple of 2.5 against a schema accepting only multiples of 2.5</a></h3>
 <p>Because the schema accepts only multiples of 2.5, such a value is
 invalid.</p>
 <p><em>Input:</em></p>
@@ -599,12 +599,12 @@ invalid.</p>
 <li>
 <p>JSON value path: <code>$</code><br />
 JSON schema path: <code>#/multipleOf</code></p>
-<p>is not a multiple of 2.5</p>
+<p>7.0 is not a multiple of 2.5</p>
 </li>
 </ul>
 </blockquote>
 <hr />
-<h3 id="validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set"><a class="header" href="#validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set">validating number at the schema's maximum allowed values boundary against a schema with a maximum inclusive allowed value set</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's maximum allowed values boundary against a schema with a maximum inclusive allowed value set</a></h3>
 <p>Because the maximum value constraint is inclusive, such a value is
 valid.</p>
 <p><em>Input:</em></p>
@@ -626,7 +626,7 @@ valid.</p>
 <p>∅</p>
 </blockquote>
 <hr />
-<h3 id="validating-number-below-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set"><a class="header" href="#validating-number-below-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set">validating number below the schema's maximum allowed values boundary against a schema with a maximum exclusive allowed value set</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-number-below-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-number-below-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set">finding JSON schema violations as a result of validating number below the schema's maximum allowed values boundary against a schema with a maximum exclusive allowed value set</a></h3>
 <p>Because the value is less than the maximum value constraint, such a
 value is valid.</p>
 <p><em>Input:</em></p>
@@ -648,7 +648,7 @@ value is valid.</p>
 <p>∅</p>
 </blockquote>
 <hr />
-<h3 id="validating-number-exceeding-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set"><a class="header" href="#validating-number-exceeding-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set">validating number exceeding the schema's maximum allowed values boundary against a schema with a maximum inclusive allowed value set</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-number-exceeding-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-number-exceeding-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set">finding JSON schema violations as a result of validating number exceeding the schema's maximum allowed values boundary against a schema with a maximum inclusive allowed value set</a></h3>
 <p>Because the value is greater than the maximum value constraint is
 exclusive, such a value is invalid.</p>
 <p><em>Input:</em></p>
@@ -676,7 +676,7 @@ JSON schema path: <code>#/maximum</code></p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set"><a class="header" href="#validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set">validating number at the schema's minimum allowed values boundary against a schema with a minimum inclusive allowed value set</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's minimum allowed values boundary against a schema with a minimum inclusive allowed value set</a></h3>
 <p>Because the minimum value constraint is inclusive, such a value is
 valid.</p>
 <p><em>Input:</em></p>
@@ -698,7 +698,7 @@ valid.</p>
 <p>∅</p>
 </blockquote>
 <hr />
-<h3 id="validating-number-below-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set"><a class="header" href="#validating-number-below-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set">validating number below the schema's minimum allowed values boundary against a schema with a minimum exclusive allowed value set</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-number-below-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-number-below-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set">finding JSON schema violations as a result of validating number below the schema's minimum allowed values boundary against a schema with a minimum exclusive allowed value set</a></h3>
 <p>Because the value is less than the minimum value constraint, such a
 value is valid.</p>
 <p><em>Input:</em></p>
@@ -720,7 +720,7 @@ value is valid.</p>
 <p>∅</p>
 </blockquote>
 <hr />
-<h3 id="validating-number-exceeding-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set"><a class="header" href="#validating-number-exceeding-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set">validating number exceeding the schema's minimum allowed values boundary against a schema with a minimum inclusive allowed value set</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-number-exceeding-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-number-exceeding-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set">finding JSON schema violations as a result of validating number exceeding the schema's minimum allowed values boundary against a schema with a minimum inclusive allowed value set</a></h3>
 <p>Because the value is greater than the minimum value constraint is
 exclusive, such a value is invalid.</p>
 <p><em>Input:</em></p>
@@ -752,10 +752,13 @@ JSON schema path: <code>#/minimum</code></p>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="printing-json-schema.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="calculating-differences-between-schemata-based-on-old-json-schema-and-new-json-schema.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
+                            <a rel="next" href="printing-a-json-valuerepresenting-a-json-schema.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
 
                         <div style="clear: both"></div>
                     </nav>
@@ -763,10 +766,13 @@ JSON schema path: <code>#/minimum</code></p>
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="printing-json-schema.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="calculating-differences-between-schemata-based-on-old-json-schema-and-new-json-schema.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
+                    <a rel="next" href="printing-a-json-valuerepresenting-a-json-schema.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
             </nav>
 
         </div>

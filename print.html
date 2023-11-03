@@ -84,7 +84,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="assessing-compatibility-based-on-schemata-differences.html"><strong aria-hidden="true">1.</strong> Assessing compatibility based on schemata differences</a></li><li class="chapter-item expanded "><a href="calculating-differences-between-old-json-schema-and-new-json-schema.html"><strong aria-hidden="true">2.</strong> Calculating differences between old JSON schema and new JSON schema</a></li><li class="chapter-item expanded "><a href="parsing-json-value.html"><strong aria-hidden="true">3.</strong> Parsing JSON value</a></li><li class="chapter-item expanded "><a href="printing-json-schema.html"><strong aria-hidden="true">4.</strong> Printing JSON schema</a></li><li class="chapter-item expanded "><a href="validating-json-value-against-json-schema.html"><strong aria-hidden="true">5.</strong> Validating JSON value against JSON schema</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="assessing-the-type-of-compatibility-based-on-schemata-differences.html"><strong aria-hidden="true">1.</strong> Assessing the type of compatibility based on schemata differences</a></li><li class="chapter-item expanded "><a href="calculating-differences-between-schemata-based-on-old-json-schema-and-new-json-schema.html"><strong aria-hidden="true">2.</strong> Calculating differences between schemata based on old JSON schema and new JSON schema</a></li><li class="chapter-item expanded "><a href="finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema.html"><strong aria-hidden="true">3.</strong> Finding JSON schema violations as a result of validating JSON value against JSON schema</a></li><li class="chapter-item expanded "><a href="printing-a-json-valuerepresenting-a-json-schema.html"><strong aria-hidden="true">4.</strong> Printing a JSON valuerepresenting a JSON schema</a></li><li class="chapter-item expanded "><a href="producing-a-json-schema-or-an-error-as-a-result-of-parsing-json-value.html"><strong aria-hidden="true">5.</strong> Producing a JSON schema or an error as a result of parsing JSON value</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -145,7 +145,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="assessing-compatibility-based-on-schemata-differences"><a class="header" href="#assessing-compatibility-based-on-schemata-differences">Assessing compatibility based on schemata differences</a></h1>
+                        <h1 id="assessing-the-type-of-compatibility-based-on-schemata-differences"><a class="header" href="#assessing-the-type-of-compatibility-based-on-schemata-differences">Assessing the type of compatibility based on schemata differences</a></h1>
 <p><em>Backward compatibility</em> - an ability of a system to understand input intended for previous
 versions of itself</p>
 <p><em>Forward compatibility</em> - an ability of a system to understand input intended for future versions
@@ -190,65 +190,65 @@ and ensuring smooth transitions when updating JSON schemas.</p>
 <h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
 <ul>
 <li>
-<p><a href="assessing-compatibility-based-on-schemata-differences.html#assessing-compatibility-based-on-reduction-of-accepted-types-by-a-number">assessing compatibility based on reduction of accepted types by a number</a></p>
+<p><a href="assessing-the-type-of-compatibility-based-on-schemata-differences.html#assessing-the-type-of-compatibility-based-on-reduction-of-accepted-types-by-a-number">assessing the type of compatibility based on reduction of accepted types by a number</a></p>
 </li>
 <li>
-<p><a href="assessing-compatibility-based-on-schemata-differences.html#assessing-compatibility-based-on-extension-of-accepted-types-by-a-number">assessing compatibility based on extension of accepted types by a number</a></p>
+<p><a href="assessing-the-type-of-compatibility-based-on-schemata-differences.html#assessing-the-type-of-compatibility-based-on-extension-of-accepted-types-by-a-number">assessing the type of compatibility based on extension of accepted types by a number</a></p>
 </li>
 <li>
-<p><a href="assessing-compatibility-based-on-schemata-differences.html#assessing-compatibility-based-on-change-of-accepted-type-from-integer-to-number">assessing compatibility based on change of accepted type from integer to number</a></p>
+<p><a href="assessing-the-type-of-compatibility-based-on-schemata-differences.html#assessing-the-type-of-compatibility-based-on-change-of-accepted-type-from-integer-to-number">assessing the type of compatibility based on change of accepted type from integer to number</a></p>
 </li>
 <li>
-<p><a href="assessing-compatibility-based-on-schemata-differences.html#assessing-compatibility-based-on-an-accepted-type-change-from-null-to-boolean">assessing compatibility based on an accepted type change from null to boolean</a></p>
+<p><a href="assessing-the-type-of-compatibility-based-on-schemata-differences.html#assessing-the-type-of-compatibility-based-on-an-accepted-type-change-from-null-to-boolean">assessing the type of compatibility based on an accepted type change from null to boolean</a></p>
 </li>
 <li>
-<p><a href="assessing-compatibility-based-on-schemata-differences.html#assessing-compatibility-based-on-change-of-accepted-type-from-number-to-integer">assessing compatibility based on change of accepted type from number to integer</a></p>
+<p><a href="assessing-the-type-of-compatibility-based-on-schemata-differences.html#assessing-the-type-of-compatibility-based-on-change-of-accepted-type-from-number-to-integer">assessing the type of compatibility based on change of accepted type from number to integer</a></p>
 </li>
 <li>
-<p><a href="assessing-compatibility-based-on-schemata-differences.html#assessing-compatibility-based-on-extending-set-of-accepted-value-types-from-numbers-to-numbers-and-integers">assessing compatibility based on extending set of accepted value types from numbers to numbers and integers</a></p>
+<p><a href="assessing-the-type-of-compatibility-based-on-schemata-differences.html#assessing-the-type-of-compatibility-based-on-extending-set-of-accepted-value-types-from-numbers-to-numbers-and-integers">assessing the type of compatibility based on extending set of accepted value types from numbers to numbers and integers</a></p>
 </li>
 <li>
-<p><a href="assessing-compatibility-based-on-schemata-differences.html#assessing-compatibility-based-on-no-differences">assessing compatibility based on no differences</a></p>
+<p><a href="assessing-the-type-of-compatibility-based-on-schemata-differences.html#assessing-the-type-of-compatibility-based-on-no-differences">assessing the type of compatibility based on no differences</a></p>
 </li>
 <li>
-<p><a href="assessing-compatibility-based-on-schemata-differences.html#assessing-compatibility-based-on-extension-of-accepted-types-by-an-additional-type">assessing compatibility based on extension of accepted types by an additional type</a></p>
+<p><a href="assessing-the-type-of-compatibility-based-on-schemata-differences.html#assessing-the-type-of-compatibility-based-on-extension-of-accepted-types-by-an-additional-type">assessing the type of compatibility based on extension of accepted types by an additional type</a></p>
 </li>
 <li>
-<p><a href="assessing-compatibility-based-on-schemata-differences.html#assessing-compatibility-based-on-old-and-new-value-of-multipleof-being-not-each-others-factors">assessing compatibility based on old and new value of multipleOf being not each other's factors</a></p>
+<p><a href="assessing-the-type-of-compatibility-based-on-schemata-differences.html#assessing-the-type-of-compatibility-based-on-old-and-new-value-of-multipleof-being-not-each-others-factors">assessing the type of compatibility based on old and new value of multipleOf being not each other's factors</a></p>
 </li>
 <li>
-<p><a href="assessing-compatibility-based-on-schemata-differences.html#assessing-compatibility-based-on-reduction-of-accepted-types">assessing compatibility based on reduction of accepted types</a></p>
+<p><a href="assessing-the-type-of-compatibility-based-on-schemata-differences.html#assessing-the-type-of-compatibility-based-on-reduction-of-accepted-types">assessing the type of compatibility based on reduction of accepted types</a></p>
 </li>
 <li>
-<p><a href="assessing-compatibility-based-on-schemata-differences.html#assessing-compatibility-based-on-the-range-of-allowed-number-values-being-extended">assessing compatibility based on the range of allowed number values being extended</a></p>
+<p><a href="assessing-the-type-of-compatibility-based-on-schemata-differences.html#assessing-the-type-of-compatibility-based-on-the-range-of-allowed-number-values-being-extended">assessing the type of compatibility based on the range of allowed number values being extended</a></p>
 </li>
 <li>
-<p><a href="assessing-compatibility-based-on-schemata-differences.html#assessing-compatibility-based-on-the-old-value-of-multipleof-being-divisible-by-the-new-one">assessing compatibility based on the old value of multipleOf being divisible by the new one</a></p>
+<p><a href="assessing-the-type-of-compatibility-based-on-schemata-differences.html#assessing-the-type-of-compatibility-based-on-the-old-value-of-multipleof-being-divisible-by-the-new-one">assessing the type of compatibility based on the old value of multipleOf being divisible by the new one</a></p>
 </li>
 <li>
-<p><a href="assessing-compatibility-based-on-schemata-differences.html#assessing-compatibility-based-on-the-new-value-of-multipleof-being-divisible-by-the-old-one">assessing compatibility based on the new value of multipleOf being divisible by the old one</a></p>
+<p><a href="assessing-the-type-of-compatibility-based-on-schemata-differences.html#assessing-the-type-of-compatibility-based-on-the-new-value-of-multipleof-being-divisible-by-the-old-one">assessing the type of compatibility based on the new value of multipleOf being divisible by the old one</a></p>
 </li>
 <li>
-<p><a href="assessing-compatibility-based-on-schemata-differences.html#assessing-compatibility-based-on-the-range-gets-unconstrained">assessing compatibility based on the range gets unconstrained</a></p>
+<p><a href="assessing-the-type-of-compatibility-based-on-schemata-differences.html#assessing-the-type-of-compatibility-based-on-the-range-gets-unconstrained">assessing the type of compatibility based on the range gets unconstrained</a></p>
 </li>
 <li>
-<p><a href="assessing-compatibility-based-on-schemata-differences.html#assessing-compatibility-based-on-the-range-of-allowed-number-values-being-extended-and-reduced-at-the-same-time-using-exclusive-versions-of-constraints">assessing compatibility based on the range of allowed number values being extended and reduced at the same time using exclusive versions of constraints</a></p>
+<p><a href="assessing-the-type-of-compatibility-based-on-schemata-differences.html#assessing-the-type-of-compatibility-based-on-the-range-of-allowed-number-values-being-extended-and-reduced-at-the-same-time-using-exclusive-versions-of-constraints">assessing the type of compatibility based on the range of allowed number values being extended and reduced at the same time using exclusive versions of constraints</a></p>
 </li>
 <li>
-<p><a href="assessing-compatibility-based-on-schemata-differences.html#assessing-compatibility-based-on-the-range-of-allowed-values-being-reduced-using-the-exclusive-version-of-constraints">assessing compatibility based on the range of allowed values being reduced using the exclusive version of constraints</a></p>
+<p><a href="assessing-the-type-of-compatibility-based-on-schemata-differences.html#assessing-the-type-of-compatibility-based-on-the-range-of-allowed-values-being-reduced-using-the-exclusive-version-of-constraints">assessing the type of compatibility based on the range of allowed values being reduced using the exclusive version of constraints</a></p>
 </li>
 <li>
-<p><a href="assessing-compatibility-based-on-schemata-differences.html#assessing-compatibility-based-on-the-range-of-allowed-number-values-being-extended-and-reduced-at-the-same-time">assessing compatibility based on the range of allowed number values being extended and reduced at the same time</a></p>
+<p><a href="assessing-the-type-of-compatibility-based-on-schemata-differences.html#assessing-the-type-of-compatibility-based-on-the-range-of-allowed-number-values-being-extended-and-reduced-at-the-same-time">assessing the type of compatibility based on the range of allowed number values being extended and reduced at the same time</a></p>
 </li>
 <li>
-<p><a href="assessing-compatibility-based-on-schemata-differences.html#assessing-compatibility-based-on-the-range-of-allowed-values-being-reduced">assessing compatibility based on the range of allowed values being reduced</a></p>
+<p><a href="assessing-the-type-of-compatibility-based-on-schemata-differences.html#assessing-the-type-of-compatibility-based-on-the-range-of-allowed-values-being-reduced">assessing the type of compatibility based on the range of allowed values being reduced</a></p>
 </li>
 <li>
-<p><a href="assessing-compatibility-based-on-schemata-differences.html#assessing-compatibility-based-on-the-range-of-allowed-values-being-shifted">assessing compatibility based on the range of allowed values being shifted</a></p>
+<p><a href="assessing-the-type-of-compatibility-based-on-schemata-differences.html#assessing-the-type-of-compatibility-based-on-the-range-of-allowed-values-being-shifted">assessing the type of compatibility based on the range of allowed values being shifted</a></p>
 </li>
 </ul>
 <hr />
-<h3 id="assessing-compatibility-based-on-reduction-of-accepted-types-by-a-number"><a class="header" href="#assessing-compatibility-based-on-reduction-of-accepted-types-by-a-number">assessing compatibility based on reduction of accepted types by a number</a></h3>
+<h3 id="assessing-the-type-of-compatibility-based-on-reduction-of-accepted-types-by-a-number"><a class="header" href="#assessing-the-type-of-compatibility-based-on-reduction-of-accepted-types-by-a-number">assessing the type of compatibility based on reduction of accepted types by a number</a></h3>
 <p>In this situation, Because not every integer is a number, such a change
 is forward compatible.. Therefore, such a change is forward compatible.</p>
 <p><em>Input:</em></p>
@@ -289,7 +289,7 @@ is forward compatible.. Therefore, such a change is forward compatible.</p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="assessing-compatibility-based-on-extension-of-accepted-types-by-a-number"><a class="header" href="#assessing-compatibility-based-on-extension-of-accepted-types-by-a-number">assessing compatibility based on extension of accepted types by a number</a></h3>
+<h3 id="assessing-the-type-of-compatibility-based-on-extension-of-accepted-types-by-a-number"><a class="header" href="#assessing-the-type-of-compatibility-based-on-extension-of-accepted-types-by-a-number">assessing the type of compatibility based on extension of accepted types by a number</a></h3>
 <p>In this situation, Because not every integer is a number, such a change
 is backward compatible.. Therefore, such a change is backward
 compatible.</p>
@@ -331,7 +331,7 @@ compatible.</p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="assessing-compatibility-based-on-change-of-accepted-type-from-integer-to-number"><a class="header" href="#assessing-compatibility-based-on-change-of-accepted-type-from-integer-to-number">assessing compatibility based on change of accepted type from integer to number</a></h3>
+<h3 id="assessing-the-type-of-compatibility-based-on-change-of-accepted-type-from-integer-to-number"><a class="header" href="#assessing-the-type-of-compatibility-based-on-change-of-accepted-type-from-integer-to-number">assessing the type of compatibility based on change of accepted type from integer to number</a></h3>
 <p>In this situation, Because every integer is a number, but not vice
 versa, such a change is backward compatible.. Therefore, such a change
 is backward compatible.</p>
@@ -368,7 +368,7 @@ is backward compatible.</p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="assessing-compatibility-based-on-an-accepted-type-change-from-null-to-boolean"><a class="header" href="#assessing-compatibility-based-on-an-accepted-type-change-from-null-to-boolean">assessing compatibility based on an accepted type change from null to boolean</a></h3>
+<h3 id="assessing-the-type-of-compatibility-based-on-an-accepted-type-change-from-null-to-boolean"><a class="header" href="#assessing-the-type-of-compatibility-based-on-an-accepted-type-change-from-null-to-boolean">assessing the type of compatibility based on an accepted type change from null to boolean</a></h3>
 <p>In this situation, Because no boolean value can satisfy null JSON type
 constraint, and vice versa, such a change is incompatible.. Therefore,
 such a change is not compatible.</p>
@@ -416,7 +416,7 @@ such a change is not compatible.</p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="assessing-compatibility-based-on-change-of-accepted-type-from-number-to-integer"><a class="header" href="#assessing-compatibility-based-on-change-of-accepted-type-from-number-to-integer">assessing compatibility based on change of accepted type from number to integer</a></h3>
+<h3 id="assessing-the-type-of-compatibility-based-on-change-of-accepted-type-from-number-to-integer"><a class="header" href="#assessing-the-type-of-compatibility-based-on-change-of-accepted-type-from-number-to-integer">assessing the type of compatibility based on change of accepted type from number to integer</a></h3>
 <p>In this situation, Because every integer is a number, but not vice
 versa, such a change is forward compatible.. Therefore, such a change is
 forward compatible.</p>
@@ -453,7 +453,7 @@ forward compatible.</p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="assessing-compatibility-based-on-extending-set-of-accepted-value-types-from-numbers-to-numbers-and-integers"><a class="header" href="#assessing-compatibility-based-on-extending-set-of-accepted-value-types-from-numbers-to-numbers-and-integers">assessing compatibility based on extending set of accepted value types from numbers to numbers and integers</a></h3>
+<h3 id="assessing-the-type-of-compatibility-based-on-extending-set-of-accepted-value-types-from-numbers-to-numbers-and-integers"><a class="header" href="#assessing-the-type-of-compatibility-based-on-extending-set-of-accepted-value-types-from-numbers-to-numbers-and-integers">assessing the type of compatibility based on extending set of accepted value types from numbers to numbers and integers</a></h3>
 <p>In this situation, every integer is also a number so this kind of
 difference does not have any implact. Therefore, such a change is fully
 compatible.</p>
@@ -486,7 +486,7 @@ integers:</p>
 <p>✓</p>
 </blockquote>
 <hr />
-<h3 id="assessing-compatibility-based-on-no-differences"><a class="header" href="#assessing-compatibility-based-on-no-differences">assessing compatibility based on no differences</a></h3>
+<h3 id="assessing-the-type-of-compatibility-based-on-no-differences"><a class="header" href="#assessing-the-type-of-compatibility-based-on-no-differences">assessing the type of compatibility based on no differences</a></h3>
 <p>In this situation, identical schemata cannot be incompatible with each
 other. Therefore, such a change is fully compatible.</p>
 <p><em>Input:</em></p>
@@ -500,7 +500,7 @@ other. Therefore, such a change is fully compatible.</p>
 <p>✓</p>
 </blockquote>
 <hr />
-<h3 id="assessing-compatibility-based-on-extension-of-accepted-types-by-an-additional-type"><a class="header" href="#assessing-compatibility-based-on-extension-of-accepted-types-by-an-additional-type">assessing compatibility based on extension of accepted types by an additional type</a></h3>
+<h3 id="assessing-the-type-of-compatibility-based-on-extension-of-accepted-types-by-an-additional-type"><a class="header" href="#assessing-the-type-of-compatibility-based-on-extension-of-accepted-types-by-an-additional-type">assessing the type of compatibility based on extension of accepted types by an additional type</a></h3>
 <p>In this situation, Because more value types than before are accepted,
 this change is backward compatible.. Therefore, such a change is
 backward compatible.</p>
@@ -542,7 +542,7 @@ backward compatible.</p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="assessing-compatibility-based-on-old-and-new-value-of-multipleof-being-not-each-others-factors"><a class="header" href="#assessing-compatibility-based-on-old-and-new-value-of-multipleof-being-not-each-others-factors">assessing compatibility based on old and new value of multipleOf being not each other's factors</a></h3>
+<h3 id="assessing-the-type-of-compatibility-based-on-old-and-new-value-of-multipleof-being-not-each-others-factors"><a class="header" href="#assessing-the-type-of-compatibility-based-on-old-and-new-value-of-multipleof-being-not-each-others-factors">assessing the type of compatibility based on old and new value of multipleOf being not each other's factors</a></h3>
 <p>In this situation, there are potentially some numbers that are not
 divisible by neither of multipleOf values. Therefore, such a change is
 not compatible.</p>
@@ -583,7 +583,7 @@ not compatible.</p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="assessing-compatibility-based-on-reduction-of-accepted-types"><a class="header" href="#assessing-compatibility-based-on-reduction-of-accepted-types">assessing compatibility based on reduction of accepted types</a></h3>
+<h3 id="assessing-the-type-of-compatibility-based-on-reduction-of-accepted-types"><a class="header" href="#assessing-the-type-of-compatibility-based-on-reduction-of-accepted-types">assessing the type of compatibility based on reduction of accepted types</a></h3>
 <p>In this situation, Because less value types than before are accepted,
 this change is backward compatible.. Therefore, such a change is forward
 compatible.</p>
@@ -625,7 +625,7 @@ compatible.</p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="assessing-compatibility-based-on-the-range-of-allowed-number-values-being-extended"><a class="header" href="#assessing-compatibility-based-on-the-range-of-allowed-number-values-being-extended">assessing compatibility based on the range of allowed number values being extended</a></h3>
+<h3 id="assessing-the-type-of-compatibility-based-on-the-range-of-allowed-number-values-being-extended"><a class="header" href="#assessing-the-type-of-compatibility-based-on-the-range-of-allowed-number-values-being-extended">assessing the type of compatibility based on the range of allowed number values being extended</a></h3>
 <p>In this situation, all numbers from the new, longer range fall into the
 old, shorter range. Therefore, such a change is backward compatible.</p>
 <p><em>Input:</em></p>
@@ -658,7 +658,7 @@ old, shorter range. Therefore, such a change is backward compatible.</p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="assessing-compatibility-based-on-the-old-value-of-multipleof-being-divisible-by-the-new-one"><a class="header" href="#assessing-compatibility-based-on-the-old-value-of-multipleof-being-divisible-by-the-new-one">assessing compatibility based on the old value of multipleOf being divisible by the new one</a></h3>
+<h3 id="assessing-the-type-of-compatibility-based-on-the-old-value-of-multipleof-being-divisible-by-the-new-one"><a class="header" href="#assessing-the-type-of-compatibility-based-on-the-old-value-of-multipleof-being-divisible-by-the-new-one">assessing the type of compatibility based on the old value of multipleOf being divisible by the new one</a></h3>
 <p>In this situation, all numbers from the new range fall into the old,
 unconstrained one. Therefore, such a change is forward compatible.</p>
 <p><em>Input:</em></p>
@@ -691,7 +691,7 @@ unconstrained one. Therefore, such a change is forward compatible.</p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="assessing-compatibility-based-on-the-new-value-of-multipleof-being-divisible-by-the-old-one"><a class="header" href="#assessing-compatibility-based-on-the-new-value-of-multipleof-being-divisible-by-the-old-one">assessing compatibility based on the new value of multipleOf being divisible by the old one</a></h3>
+<h3 id="assessing-the-type-of-compatibility-based-on-the-new-value-of-multipleof-being-divisible-by-the-old-one"><a class="header" href="#assessing-the-type-of-compatibility-based-on-the-new-value-of-multipleof-being-divisible-by-the-old-one">assessing the type of compatibility based on the new value of multipleOf being divisible by the old one</a></h3>
 <p>In this situation, Because every multiple the new value is also a
 multiple of the old value, such a change is backward compatible.
 Therefore, such a change is backward compatible.</p>
@@ -721,7 +721,7 @@ Therefore, such a change is backward compatible.</p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="assessing-compatibility-based-on-the-range-gets-unconstrained"><a class="header" href="#assessing-compatibility-based-on-the-range-gets-unconstrained">assessing compatibility based on the range gets unconstrained</a></h3>
+<h3 id="assessing-the-type-of-compatibility-based-on-the-range-gets-unconstrained"><a class="header" href="#assessing-the-type-of-compatibility-based-on-the-range-gets-unconstrained">assessing the type of compatibility based on the range gets unconstrained</a></h3>
 <p>In this situation, all numbers from the old range fall into the new,
 unconstrained one. Therefore, such a change is backward compatible.</p>
 <p><em>Input:</em></p>
@@ -754,7 +754,7 @@ unconstrained one. Therefore, such a change is backward compatible.</p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="assessing-compatibility-based-on-the-range-of-allowed-number-values-being-extended-and-reduced-at-the-same-time-using-exclusive-versions-of-constraints"><a class="header" href="#assessing-compatibility-based-on-the-range-of-allowed-number-values-being-extended-and-reduced-at-the-same-time-using-exclusive-versions-of-constraints">assessing compatibility based on the range of allowed number values being extended and reduced at the same time using exclusive versions of constraints</a></h3>
+<h3 id="assessing-the-type-of-compatibility-based-on-the-range-of-allowed-number-values-being-extended-and-reduced-at-the-same-time-using-exclusive-versions-of-constraints"><a class="header" href="#assessing-the-type-of-compatibility-based-on-the-range-of-allowed-number-values-being-extended-and-reduced-at-the-same-time-using-exclusive-versions-of-constraints">assessing the type of compatibility based on the range of allowed number values being extended and reduced at the same time using exclusive versions of constraints</a></h3>
 <p>In this situation, there are some numbers which do not fall into neither
 old nor new range. Therefore, such a change is not compatible.</p>
 <p><em>Input:</em></p>
@@ -799,7 +799,7 @@ same time using exclusive versions of constraints:</p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="assessing-compatibility-based-on-the-range-of-allowed-values-being-reduced-using-the-exclusive-version-of-constraints"><a class="header" href="#assessing-compatibility-based-on-the-range-of-allowed-values-being-reduced-using-the-exclusive-version-of-constraints">assessing compatibility based on the range of allowed values being reduced using the exclusive version of constraints</a></h3>
+<h3 id="assessing-the-type-of-compatibility-based-on-the-range-of-allowed-values-being-reduced-using-the-exclusive-version-of-constraints"><a class="header" href="#assessing-the-type-of-compatibility-based-on-the-range-of-allowed-values-being-reduced-using-the-exclusive-version-of-constraints">assessing the type of compatibility based on the range of allowed values being reduced using the exclusive version of constraints</a></h3>
 <p>In this situation, all numbers from the new, shorted range fall into the
 old, longer range. Therefore, such a change is forward compatible.</p>
 <p><em>Input:</em></p>
@@ -833,7 +833,7 @@ constraints:</p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="assessing-compatibility-based-on-the-range-of-allowed-number-values-being-extended-and-reduced-at-the-same-time"><a class="header" href="#assessing-compatibility-based-on-the-range-of-allowed-number-values-being-extended-and-reduced-at-the-same-time">assessing compatibility based on the range of allowed number values being extended and reduced at the same time</a></h3>
+<h3 id="assessing-the-type-of-compatibility-based-on-the-range-of-allowed-number-values-being-extended-and-reduced-at-the-same-time"><a class="header" href="#assessing-the-type-of-compatibility-based-on-the-range-of-allowed-number-values-being-extended-and-reduced-at-the-same-time">assessing the type of compatibility based on the range of allowed number values being extended and reduced at the same time</a></h3>
 <p>In this situation, there are some numbers which do not fall into neither
 old nor new range. Therefore, such a change is not compatible.</p>
 <p><em>Input:</em></p>
@@ -878,7 +878,7 @@ same time:</p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="assessing-compatibility-based-on-the-range-of-allowed-values-being-reduced"><a class="header" href="#assessing-compatibility-based-on-the-range-of-allowed-values-being-reduced">assessing compatibility based on the range of allowed values being reduced</a></h3>
+<h3 id="assessing-the-type-of-compatibility-based-on-the-range-of-allowed-values-being-reduced"><a class="header" href="#assessing-the-type-of-compatibility-based-on-the-range-of-allowed-values-being-reduced">assessing the type of compatibility based on the range of allowed values being reduced</a></h3>
 <p>In this situation, all numbers from the new, shorted range fall into the
 old, longer range. Therefore, such a change is forward compatible.</p>
 <p><em>Input:</em></p>
@@ -911,7 +911,7 @@ old, longer range. Therefore, such a change is forward compatible.</p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="assessing-compatibility-based-on-the-range-of-allowed-values-being-shifted"><a class="header" href="#assessing-compatibility-based-on-the-range-of-allowed-values-being-shifted">assessing compatibility based on the range of allowed values being shifted</a></h3>
+<h3 id="assessing-the-type-of-compatibility-based-on-the-range-of-allowed-values-being-shifted"><a class="header" href="#assessing-the-type-of-compatibility-based-on-the-range-of-allowed-values-being-shifted">assessing the type of compatibility based on the range of allowed values being shifted</a></h3>
 <p>In this situation, all numbers from the new, longer range fall into the
 old, shorter range. Therefore, such a change is backward compatible.</p>
 <p><em>Input:</em></p>
@@ -943,7 +943,7 @@ old, shorter range. Therefore, such a change is backward compatible.</p>
 </li>
 </ul>
 </blockquote>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="calculating-differences-between-old-json-schema-and-new-json-schema"><a class="header" href="#calculating-differences-between-old-json-schema-and-new-json-schema">Calculating differences between old JSON schema and new JSON schema</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="calculating-differences-between-schemata-based-on-old-json-schema-and-new-json-schema"><a class="header" href="#calculating-differences-between-schemata-based-on-old-json-schema-and-new-json-schema">Calculating differences between schemata based on old JSON schema and new JSON schema</a></h1>
 <p>Calculating JSON Schema Difference is a process used to identify the
 changes between two JSON schemata.<br />
 It is used to to see what has been added, removed, or changed.<br />
@@ -953,34 +953,39 @@ It can also be used to generate a diff report or to automate the process
 of updating dependent systems or documentation when a schema changes.</p>
 <h2 id="properties"><a class="header" href="#properties">Properties</a></h2>
 <ul>
-<li>comparing identical schemata yields no differences</li>
+<li>
+<p>comparing identical schemata yields no differences</p>
+</li>
+<li>
+<p>comparing different schemata yields differences</p>
+</li>
 </ul>
 <h2 id="examples-1"><a class="header" href="#examples-1">Examples</a></h2>
 <ul>
 <li>
-<p><a href="calculating-differences-between-old-json-schema-and-new-json-schema.html#calculating-differences-between-json-schema-accepting-only-number-less-than-or-equal-to-some-number-and-json-schema-accepting-only-number-less-than-or-equal-to-other-number">calculating differences between JSON schema accepting only number less than or equal to some number and JSON schema accepting only number less than or equal to other number</a></p>
+<p><a href="calculating-differences-between-schemata-based-on-old-json-schema-and-new-json-schema.html#calculating-differences-between-schemata-based-on-json-schema-accepting-only-number-less-than-or-equal-to-some-number-and-json-schema-accepting-only-number-less-than-or-equal-to-other-number">calculating differences between schemata based on JSON schema accepting only number less than or equal to some number and JSON schema accepting only number less than or equal to other number</a></p>
 </li>
 <li>
-<p><a href="calculating-differences-between-old-json-schema-and-new-json-schema.html#calculating-differences-between-json-schema-accepting-only-number-greater-than-or-equal-to-some-number-and-json-schema-accepting-only-number-greater-than-or-equal-to-other-number">calculating differences between JSON schema accepting only number greater than or equal to some number and JSON schema accepting only number greater than or equal to other number</a></p>
+<p><a href="calculating-differences-between-schemata-based-on-old-json-schema-and-new-json-schema.html#calculating-differences-between-schemata-based-on-json-schema-accepting-only-number-greater-than-or-equal-to-some-number-and-json-schema-accepting-only-number-greater-than-or-equal-to-other-number">calculating differences between schemata based on JSON schema accepting only number greater than or equal to some number and JSON schema accepting only number greater than or equal to other number</a></p>
 </li>
 <li>
-<p><a href="calculating-differences-between-old-json-schema-and-new-json-schema.html#calculating-differences-between-json-schema-accepting-only-multiples-of-a-some-number-and-json-schema-accepting-only-multiples-of-other-number">calculating differences between JSON schema accepting only multiples of a some number and JSON schema accepting only multiples of other number</a></p>
+<p><a href="calculating-differences-between-schemata-based-on-old-json-schema-and-new-json-schema.html#calculating-differences-between-schemata-based-on-json-schema-accepting-only-multiples-of-a-some-number-and-json-schema-accepting-only-multiples-of-other-number">calculating differences between schemata based on JSON schema accepting only multiples of a some number and JSON schema accepting only multiples of other number</a></p>
 </li>
 <li>
-<p><a href="calculating-differences-between-old-json-schema-and-new-json-schema.html#calculating-differences-between-json-schema-accepting-only-number-greater-than-some-number-and-json-schema-accepting-only-number-greater-than-other-number">calculating differences between JSON schema accepting only number greater than some number and JSON schema accepting only number greater than other number</a></p>
+<p><a href="calculating-differences-between-schemata-based-on-old-json-schema-and-new-json-schema.html#calculating-differences-between-schemata-based-on-json-schema-accepting-only-number-greater-than-some-number-and-json-schema-accepting-only-number-greater-than-other-number">calculating differences between schemata based on JSON schema accepting only number greater than some number and JSON schema accepting only number greater than other number</a></p>
 </li>
 <li>
-<p><a href="calculating-differences-between-old-json-schema-and-new-json-schema.html#calculating-differences-between-json-schema-accepting-only-some-type-and-json-schema-accepting-only-other-type">calculating differences between JSON schema accepting only some type and JSON schema accepting only other type</a></p>
+<p><a href="calculating-differences-between-schemata-based-on-old-json-schema-and-new-json-schema.html#calculating-differences-between-schemata-based-on-json-schema-accepting-only-some-type-and-json-schema-accepting-only-other-type">calculating differences between schemata based on JSON schema accepting only some type and JSON schema accepting only other type</a></p>
 </li>
 <li>
-<p><a href="calculating-differences-between-old-json-schema-and-new-json-schema.html#calculating-differences-between-json-schema-accepting-only-number-less-than-some-number-and-json-schema-accepting-only-number-less-than-other-number">calculating differences between JSON schema accepting only number less than some number and JSON schema accepting only number less than other number</a></p>
+<p><a href="calculating-differences-between-schemata-based-on-old-json-schema-and-new-json-schema.html#calculating-differences-between-schemata-based-on-json-schema-accepting-only-number-less-than-some-number-and-json-schema-accepting-only-number-less-than-other-number">calculating differences between schemata based on JSON schema accepting only number less than some number and JSON schema accepting only number less than other number</a></p>
 </li>
 <li>
-<p><a href="calculating-differences-between-old-json-schema-and-new-json-schema.html#calculating-differences-between-same-schema-and-some-schema">calculating differences between same schema and some schema</a></p>
+<p><a href="calculating-differences-between-schemata-based-on-old-json-schema-and-new-json-schema.html#calculating-differences-between-schemata-based-on-same-schema-and-some-schema">calculating differences between schemata based on same schema and some schema</a></p>
 </li>
 </ul>
 <hr />
-<h3 id="calculating-differences-between-json-schema-accepting-only-number-less-than-or-equal-to-some-number-and-json-schema-accepting-only-number-less-than-or-equal-to-other-number"><a class="header" href="#calculating-differences-between-json-schema-accepting-only-number-less-than-or-equal-to-some-number-and-json-schema-accepting-only-number-less-than-or-equal-to-other-number">calculating differences between JSON schema accepting only number less than or equal to some number and JSON schema accepting only number less than or equal to other number</a></h3>
+<h3 id="calculating-differences-between-schemata-based-on-json-schema-accepting-only-number-less-than-or-equal-to-some-number-and-json-schema-accepting-only-number-less-than-or-equal-to-other-number"><a class="header" href="#calculating-differences-between-schemata-based-on-json-schema-accepting-only-number-less-than-or-equal-to-some-number-and-json-schema-accepting-only-number-less-than-or-equal-to-other-number">calculating differences between schemata based on JSON schema accepting only number less than or equal to some number and JSON schema accepting only number less than or equal to other number</a></h3>
 <p>Any change of maximum inclusive keyword value  is considered a
 difference.</p>
 <p><em>Input:</em></p>
@@ -1009,7 +1014,7 @@ difference.</p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="calculating-differences-between-json-schema-accepting-only-number-greater-than-or-equal-to-some-number-and-json-schema-accepting-only-number-greater-than-or-equal-to-other-number"><a class="header" href="#calculating-differences-between-json-schema-accepting-only-number-greater-than-or-equal-to-some-number-and-json-schema-accepting-only-number-greater-than-or-equal-to-other-number">calculating differences between JSON schema accepting only number greater than or equal to some number and JSON schema accepting only number greater than or equal to other number</a></h3>
+<h3 id="calculating-differences-between-schemata-based-on-json-schema-accepting-only-number-greater-than-or-equal-to-some-number-and-json-schema-accepting-only-number-greater-than-or-equal-to-other-number"><a class="header" href="#calculating-differences-between-schemata-based-on-json-schema-accepting-only-number-greater-than-or-equal-to-some-number-and-json-schema-accepting-only-number-greater-than-or-equal-to-other-number">calculating differences between schemata based on JSON schema accepting only number greater than or equal to some number and JSON schema accepting only number greater than or equal to other number</a></h3>
 <p>Any change of minimum inclusive keyword value is considered a
 difference.</p>
 <p><em>Input:</em></p>
@@ -1038,7 +1043,7 @@ difference.</p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="calculating-differences-between-json-schema-accepting-only-multiples-of-a-some-number-and-json-schema-accepting-only-multiples-of-other-number"><a class="header" href="#calculating-differences-between-json-schema-accepting-only-multiples-of-a-some-number-and-json-schema-accepting-only-multiples-of-other-number">calculating differences between JSON schema accepting only multiples of a some number and JSON schema accepting only multiples of other number</a></h3>
+<h3 id="calculating-differences-between-schemata-based-on-json-schema-accepting-only-multiples-of-a-some-number-and-json-schema-accepting-only-multiples-of-other-number"><a class="header" href="#calculating-differences-between-schemata-based-on-json-schema-accepting-only-multiples-of-a-some-number-and-json-schema-accepting-only-multiples-of-other-number">calculating differences between schemata based on JSON schema accepting only multiples of a some number and JSON schema accepting only multiples of other number</a></h3>
 <p>Any change of multipleOf keyword is considered a difference.</p>
 <p><em>Input:</em></p>
 <p>JSON schema accepting only multiples of other number:</p>
@@ -1066,7 +1071,7 @@ difference.</p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="calculating-differences-between-json-schema-accepting-only-number-greater-than-some-number-and-json-schema-accepting-only-number-greater-than-other-number"><a class="header" href="#calculating-differences-between-json-schema-accepting-only-number-greater-than-some-number-and-json-schema-accepting-only-number-greater-than-other-number">calculating differences between JSON schema accepting only number greater than some number and JSON schema accepting only number greater than other number</a></h3>
+<h3 id="calculating-differences-between-schemata-based-on-json-schema-accepting-only-number-greater-than-some-number-and-json-schema-accepting-only-number-greater-than-other-number"><a class="header" href="#calculating-differences-between-schemata-based-on-json-schema-accepting-only-number-greater-than-some-number-and-json-schema-accepting-only-number-greater-than-other-number">calculating differences between schemata based on JSON schema accepting only number greater than some number and JSON schema accepting only number greater than other number</a></h3>
 <p>Any change of minimum exclusive keyword value  is considered a
 difference.</p>
 <p><em>Input:</em></p>
@@ -1095,7 +1100,7 @@ difference.</p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="calculating-differences-between-json-schema-accepting-only-some-type-and-json-schema-accepting-only-other-type"><a class="header" href="#calculating-differences-between-json-schema-accepting-only-some-type-and-json-schema-accepting-only-other-type">calculating differences between JSON schema accepting only some type and JSON schema accepting only other type</a></h3>
+<h3 id="calculating-differences-between-schemata-based-on-json-schema-accepting-only-some-type-and-json-schema-accepting-only-other-type"><a class="header" href="#calculating-differences-between-schemata-based-on-json-schema-accepting-only-some-type-and-json-schema-accepting-only-other-type">calculating differences between schemata based on JSON schema accepting only some type and JSON schema accepting only other type</a></h3>
 <p>Any change of expected JSON value type  is considered a difference.</p>
 <p><em>Input:</em></p>
 <p>JSON schema accepting only other type:</p>
@@ -1134,7 +1139,7 @@ difference.</p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="calculating-differences-between-json-schema-accepting-only-number-less-than-some-number-and-json-schema-accepting-only-number-less-than-other-number"><a class="header" href="#calculating-differences-between-json-schema-accepting-only-number-less-than-some-number-and-json-schema-accepting-only-number-less-than-other-number">calculating differences between JSON schema accepting only number less than some number and JSON schema accepting only number less than other number</a></h3>
+<h3 id="calculating-differences-between-schemata-based-on-json-schema-accepting-only-number-less-than-some-number-and-json-schema-accepting-only-number-less-than-other-number"><a class="header" href="#calculating-differences-between-schemata-based-on-json-schema-accepting-only-number-less-than-some-number-and-json-schema-accepting-only-number-less-than-other-number">calculating differences between schemata based on JSON schema accepting only number less than some number and JSON schema accepting only number less than other number</a></h3>
 <p>Any change of maximum exclusive keyword value  is considered a
 difference.</p>
 <p><em>Input:</em></p>
@@ -1163,7 +1168,7 @@ difference.</p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="calculating-differences-between-same-schema-and-some-schema"><a class="header" href="#calculating-differences-between-same-schema-and-some-schema">calculating differences between same schema and some schema</a></h3>
+<h3 id="calculating-differences-between-schemata-based-on-same-schema-and-some-schema"><a class="header" href="#calculating-differences-between-schemata-based-on-same-schema-and-some-schema">calculating differences between schemata based on same schema and some schema</a></h3>
 <p>Comparison of two identical schemata yields no differences.</p>
 <p><em>Input:</em></p>
 <p>some schema:</p>
@@ -1181,285 +1186,7 @@ difference.</p>
 <blockquote>
 <p>∅</p>
 </blockquote>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="parsing-json-value"><a class="header" href="#parsing-json-value">Parsing JSON value</a></h1>
-<p>JSON schema is commonly expressed in a JSON format.However, not every JSON is a valid JSON schema.</p>
-<h2 id="examples-2"><a class="header" href="#examples-2">Examples</a></h2>
-<ul>
-<li>
-<p><a href="parsing-json-value.html#parsing-a-boolean-json-value">parsing a boolean JSON value</a></p>
-</li>
-<li>
-<p><a href="parsing-json-value.html#parsing-a-json-object-with-type-property-defined">parsing A JSON object with 'type' property defined</a></p>
-</li>
-<li>
-<p><a href="parsing-json-value.html#parsing-a-json-object-with-type-property-set-to-an-empty-array">parsing A JSON object with 'type' property set to an empty array</a></p>
-</li>
-<li>
-<p><a href="parsing-json-value.html#parsing-a-json-object-with-required-property-being-array-of-strings">parsing A JSON object with 'required' property being array of strings</a></p>
-</li>
-<li>
-<p><a href="parsing-json-value.html#parsing-a-json-object-with-type-property-set-to-an-array-with-array-null-and-string-strings-inside-it">parsing A JSON object with 'type' property set to an array with 'array', 'null' and 'string' strings inside it</a></p>
-</li>
-<li>
-<p><a href="parsing-json-value.html#parsing-a-json-object-with-type-property-set-to-an-array-with-a-single-null-string-inside-it">parsing A JSON object with 'type' property set to an array with a single 'null' string inside it</a></p>
-</li>
-<li>
-<p><a href="parsing-json-value.html#parsing-a-json-object-with-uniqueitems-property-set">parsing A JSON object with 'uniqueItems' property set</a></p>
-</li>
-<li>
-<p><a href="parsing-json-value.html#parsing-a-json-value-not-being-a-boolean-or-object">parsing a JSON value not being a boolean or object</a></p>
-</li>
-<li>
-<p><a href="parsing-json-value.html#parsing-an-json-object-with-the-not-property-defined">parsing an JSON object with the 'not' property defined</a></p>
-</li>
-<li>
-<p><a href="parsing-json-value.html#parsing-an-json-object-with-the-items-property-defined">parsing an JSON object with the 'items' property defined</a></p>
-</li>
-<li>
-<p><a href="parsing-json-value.html#parsing-an-empty-json-object">parsing an empty JSON object</a></p>
-</li>
-</ul>
-<hr />
-<h3 id="parsing-a-boolean-json-value"><a class="header" href="#parsing-a-boolean-json-value">parsing a boolean JSON value</a></h3>
-<p>Because a boolean value of false is a valid schema which passes
-validation of any JSON value, such a value represents a JSON schema.</p>
-<p><em>Input:</em></p>
-<p>a boolean JSON value:</p>
-<blockquote>
-<pre><code class="language-json">false
-</code></pre>
-</blockquote>
-<p><em>Output:</em></p>
-<p>a successfully parsed JSON schema:</p>
-<blockquote>
-<pre><code class="language-json">false
-</code></pre>
-</blockquote>
-<hr />
-<h3 id="parsing-a-json-object-with-type-property-defined"><a class="header" href="#parsing-a-json-object-with-type-property-defined">parsing A JSON object with 'type' property defined</a></h3>
-<p>Because the 'type' keyword defines acceptable JSON types. It can be in a
-form of a single string, such a value represents a JSON schema.</p>
-<p><em>Input:</em></p>
-<p>A JSON object with 'type' property defined:</p>
-<blockquote>
-<pre><code class="language-json">{
-  &quot;type&quot;: &quot;null&quot;
-}
-</code></pre>
-</blockquote>
-<p><em>Output:</em></p>
-<p>a successfully parsed JSON schema:</p>
-<blockquote>
-<pre><code class="language-json">{
-  &quot;type&quot;: [
-    &quot;null&quot;
-  ]
-}
-</code></pre>
-</blockquote>
-<hr />
-<h3 id="parsing-a-json-object-with-type-property-set-to-an-empty-array"><a class="header" href="#parsing-a-json-object-with-type-property-set-to-an-empty-array">parsing A JSON object with 'type' property set to an empty array</a></h3>
-<p>Because the 'type' keyword defines acceptable JSON types. It can be in a
-form of an array of string (here, with no types defined), such a value
-represents a JSON schema.</p>
-<p><em>Input:</em></p>
-<p>A JSON object with 'type' property set to an empty array:</p>
-<blockquote>
-<pre><code class="language-json">{
-  &quot;type&quot;: []
-}
-</code></pre>
-</blockquote>
-<p><em>Output:</em></p>
-<p>a successfully parsed JSON schema:</p>
-<blockquote>
-<pre><code class="language-json">{
-  &quot;type&quot;: []
-}
-</code></pre>
-</blockquote>
-<hr />
-<h3 id="parsing-a-json-object-with-required-property-being-array-of-strings"><a class="header" href="#parsing-a-json-object-with-required-property-being-array-of-strings">parsing A JSON object with 'required' property being array of strings</a></h3>
-<p>Because the 'required' constrain rejects any JSON object not containing
-properties defined by it, such a value represents a JSON schema.</p>
-<p><em>Input:</em></p>
-<p>A JSON object with 'required' property being array of strings:</p>
-<blockquote>
-<pre><code class="language-json">{
-  &quot;required&quot;: [
-    &quot;prop1&quot;,
-    &quot;prop2&quot;
-  ]
-}
-</code></pre>
-</blockquote>
-<p><em>Output:</em></p>
-<p>a successfully parsed JSON schema:</p>
-<blockquote>
-<pre><code class="language-json">{
-  &quot;required&quot;: [
-    &quot;prop1&quot;,
-    &quot;prop2&quot;
-  ]
-}
-</code></pre>
-</blockquote>
-<hr />
-<h3 id="parsing-a-json-object-with-type-property-set-to-an-array-with-array-null-and-string-strings-inside-it"><a class="header" href="#parsing-a-json-object-with-type-property-set-to-an-array-with-array-null-and-string-strings-inside-it">parsing A JSON object with 'type' property set to an array with 'array', 'null' and 'string' strings inside it</a></h3>
-<p>Because the 'type' keyword defines acceptable JSON types. It can be in a
-form of an array of string (here, with three types defined), such a
-value represents a JSON schema.</p>
-<p><em>Input:</em></p>
-<p>A JSON object with 'type' property set to an array with 'array', 'null'
-and 'string' strings inside it:</p>
-<blockquote>
-<pre><code class="language-json">{
-  &quot;type&quot;: [
-    &quot;array&quot;,
-    &quot;null&quot;,
-    &quot;string&quot;
-  ]
-}
-</code></pre>
-</blockquote>
-<p><em>Output:</em></p>
-<p>a successfully parsed JSON schema:</p>
-<blockquote>
-<pre><code class="language-json">{
-  &quot;type&quot;: [
-    &quot;array&quot;,
-    &quot;null&quot;,
-    &quot;string&quot;
-  ]
-}
-</code></pre>
-</blockquote>
-<hr />
-<h3 id="parsing-a-json-object-with-type-property-set-to-an-array-with-a-single-null-string-inside-it"><a class="header" href="#parsing-a-json-object-with-type-property-set-to-an-array-with-a-single-null-string-inside-it">parsing A JSON object with 'type' property set to an array with a single 'null' string inside it</a></h3>
-<p>Because the 'type' keyword defines acceptable JSON types. It can be in a
-form of an array of string (here, only with one type defined), such a
-value represents a JSON schema.</p>
-<p><em>Input:</em></p>
-<p>A JSON object with 'type' property set to an array with a single 'null'
-string inside it:</p>
-<blockquote>
-<pre><code class="language-json">{
-  &quot;type&quot;: [
-    &quot;null&quot;
-  ]
-}
-</code></pre>
-</blockquote>
-<p><em>Output:</em></p>
-<p>a successfully parsed JSON schema:</p>
-<blockquote>
-<pre><code class="language-json">{
-  &quot;type&quot;: [
-    &quot;null&quot;
-  ]
-}
-</code></pre>
-</blockquote>
-<hr />
-<h3 id="parsing-a-json-object-with-uniqueitems-property-set"><a class="header" href="#parsing-a-json-object-with-uniqueitems-property-set">parsing A JSON object with 'uniqueItems' property set</a></h3>
-<p>Because the 'uniqueItems' keyword makes sure that if JSON value is an
-array, its items do not contain any duplicates, such a value represents
-a JSON schema.</p>
-<p><em>Input:</em></p>
-<p>A JSON object with 'uniqueItems' property set:</p>
-<blockquote>
-<pre><code class="language-json">{
-  &quot;uniqueItems&quot;: true
-}
-</code></pre>
-</blockquote>
-<p><em>Output:</em></p>
-<p>a successfully parsed JSON schema:</p>
-<blockquote>
-<pre><code class="language-json">{
-  &quot;uniqueItems&quot;: true
-}
-</code></pre>
-</blockquote>
-<hr />
-<h3 id="parsing-a-json-value-not-being-a-boolean-or-object"><a class="header" href="#parsing-a-json-value-not-being-a-boolean-or-object">parsing a JSON value not being a boolean or object</a></h3>
-<p>Because booleans and objects are the only acceptable forms, such a value
-does not represent a JSON schema.</p>
-<p><em>Input:</em></p>
-<p>a JSON value not being a boolean or object:</p>
-<blockquote>
-<pre><code class="language-json">0
-</code></pre>
-</blockquote>
-<p><em>Output:</em></p>
-<p>a parsing error:</p>
-<blockquote>
-<p>an error:</p>
-<p><code>&quot;the JSON value is neither a boolean nor an object&quot;</code></p>
-</blockquote>
-<hr />
-<h3 id="parsing-an-json-object-with-the-not-property-defined"><a class="header" href="#parsing-an-json-object-with-the-not-property-defined">parsing an JSON object with the 'not' property defined</a></h3>
-<p>Because the 'not' constrain rejects any JSON value which conform to
-schema defined by it, such a value represents a JSON schema.</p>
-<p><em>Input:</em></p>
-<p>an JSON object with the 'not' property defined:</p>
-<blockquote>
-<pre><code class="language-json">{
-  &quot;not&quot;: true
-}
-</code></pre>
-</blockquote>
-<p><em>Output:</em></p>
-<p>a successfully parsed JSON schema:</p>
-<blockquote>
-<pre><code class="language-json">{
-  &quot;not&quot;: true
-}
-</code></pre>
-</blockquote>
-<hr />
-<h3 id="parsing-an-json-object-with-the-items-property-defined"><a class="header" href="#parsing-an-json-object-with-the-items-property-defined">parsing an JSON object with the 'items' property defined</a></h3>
-<p>Because the 'items' constrain makes sure than if a JSON value is an
-array, every item of that array conforms the schema defined by it, such
-a value represents a JSON schema.</p>
-<p><em>Input:</em></p>
-<p>an JSON object with the 'items' property defined:</p>
-<blockquote>
-<pre><code class="language-json">{
-  &quot;items&quot;: true
-}
-</code></pre>
-</blockquote>
-<p><em>Output:</em></p>
-<p>a successfully parsed JSON schema:</p>
-<blockquote>
-<pre><code class="language-json">{
-  &quot;items&quot;: true
-}
-</code></pre>
-</blockquote>
-<hr />
-<h3 id="parsing-an-empty-json-object"><a class="header" href="#parsing-an-empty-json-object">parsing an empty JSON object</a></h3>
-<p>Because an empty JSON object is a valid schema which passes validation
-of any JSON value, such a value represents a JSON schema.</p>
-<p><em>Input:</em></p>
-<p>an empty JSON object:</p>
-<blockquote>
-<pre><code class="language-json">{}
-</code></pre>
-</blockquote>
-<p><em>Output:</em></p>
-<p>a successfully parsed JSON schema:</p>
-<blockquote>
-<pre><code class="language-json">{}
-</code></pre>
-</blockquote>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="printing-json-schema"><a class="header" href="#printing-json-schema">Printing JSON schema</a></h1>
-<h2 id="properties-1"><a class="header" href="#properties-1">Properties</a></h2>
-<ul>
-<li>always prints a well-formatted schema JSON</li>
-</ul>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="validating-json-value-against-json-schema"><a class="header" href="#validating-json-value-against-json-schema">Validating JSON value against JSON schema</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema">Finding JSON schema violations as a result of validating JSON value against JSON schema</a></h1>
 <p>JSON validation is a specification for validating the structure and data
 types of JSON values.<br />
 It allows you to specify the required properties, the types of values,
@@ -1468,7 +1195,7 @@ This is useful for ensuring that the data received or sent in a JSON
 format is as expected and can be processed correctly.<br />
 It helps to catch errors early, improve data quality, and reduce the
 amount of code needed for data validation.</p>
-<h2 id="properties-2"><a class="header" href="#properties-2">Properties</a></h2>
+<h2 id="properties-1"><a class="header" href="#properties-1">Properties</a></h2>
 <ul>
 <li>
 <p>'true' JSON schema does not impose any constraints</p>
@@ -1480,65 +1207,65 @@ amount of code needed for data validation.</p>
 <p>any JSON value passes validation against 'empty object' JSON schema</p>
 </li>
 </ul>
-<h2 id="examples-3"><a class="header" href="#examples-3">Examples</a></h2>
+<h2 id="examples-2"><a class="header" href="#examples-2">Examples</a></h2>
 <ul>
 <li>
-<p><a href="validating-json-value-against-json-schema.html#validating-an-array-containing-some-duplicated-strings-against-schema-not-accepting-duplicates">validating an array containing some duplicated strings against schema not accepting duplicates</a></p>
+<p><a href="finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema.html#finding-json-schema-violations-as-a-result-of-validating-an-array-containing-some-duplicated-strings-against-schema-not-accepting-duplicates">finding JSON schema violations as a result of validating an array containing some duplicated strings against schema not accepting duplicates</a></p>
 </li>
 <li>
-<p><a href="validating-json-value-against-json-schema.html#validating-a-boolean-value-against-schema-accepting-only-nulls-or-strings">validating a boolean value against schema accepting only nulls or strings</a></p>
+<p><a href="finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema.html#finding-json-schema-violations-as-a-result-of-validating-a-boolean-value-against-schema-accepting-only-nulls-or-strings">finding JSON schema violations as a result of validating a boolean value against schema accepting only nulls or strings</a></p>
 </li>
 <li>
-<p><a href="validating-json-value-against-json-schema.html#validating-json-number-value-against-json-schema-accepting-only-numbers">validating JSON number value against JSON schema accepting only numbers</a></p>
+<p><a href="finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema.html#finding-json-schema-violations-as-a-result-of-validating-json-number-value-against-json-schema-accepting-only-numbers">finding JSON schema violations as a result of validating JSON number value against JSON schema accepting only numbers</a></p>
 </li>
 <li>
-<p><a href="validating-json-value-against-json-schema.html#validating-json-null-value-against-json-schema-accepting-booleans-nulls-and-strings">validating JSON null value against JSON schema accepting booleans, nulls and strings</a></p>
+<p><a href="finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema.html#finding-json-schema-violations-as-a-result-of-validating-json-null-value-against-json-schema-accepting-booleans-nulls-and-strings">finding JSON schema violations as a result of validating JSON null value against JSON schema accepting booleans, nulls and strings</a></p>
 </li>
 <li>
-<p><a href="validating-json-value-against-json-schema.html#validating-json-number-value-which-happens-to-be-an-integer-against-json-schema-accepting-any-numbers">validating JSON number value which happens to be an integer against JSON schema accepting any numbers</a></p>
+<p><a href="finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema.html#finding-json-schema-violations-as-a-result-of-validating-json-number-value-which-happens-to-be-an-integer-against-json-schema-accepting-any-numbers">finding JSON schema violations as a result of validating JSON number value which happens to be an integer against JSON schema accepting any numbers</a></p>
 </li>
 <li>
-<p><a href="validating-json-value-against-json-schema.html#validating-a-multiple-of-x-against-schema-accepting-only-numbers-which-are-multiples-of-x">validating a multiple of x against schema accepting only numbers which are multiples of x</a></p>
+<p><a href="finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema.html#finding-json-schema-violations-as-a-result-of-validating-a-multiple-of-x-against-schema-accepting-only-numbers-which-are-multiples-of-x">finding JSON schema violations as a result of validating a multiple of x against schema accepting only numbers which are multiples of x</a></p>
 </li>
 <li>
-<p><a href="validating-json-value-against-json-schema.html#validating-a-fractional-number-against-schema-accepting-only-whole-numbers">validating a fractional number against schema accepting only whole numbers</a></p>
+<p><a href="finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema.html#finding-json-schema-violations-as-a-result-of-validating-a-fractional-number-against-schema-accepting-only-whole-numbers">finding JSON schema violations as a result of validating a fractional number against schema accepting only whole numbers</a></p>
 </li>
 <li>
-<p><a href="validating-json-value-against-json-schema.html#validating-a-multiple-of-25-against-a-schema-accepting-only-multiples-of-25">validating a multiple of 2.5 against a schema accepting only multiples of 2.5</a></p>
+<p><a href="finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema.html#finding-json-schema-violations-as-a-result-of-validating-a-multiple-of-25-against-a-schema-accepting-only-multiples-of-25">finding JSON schema violations as a result of validating a multiple of 2.5 against a schema accepting only multiples of 2.5</a></p>
 </li>
 <li>
-<p><a href="validating-json-value-against-json-schema.html#validating-an-array-containing-a-mixture-of-null-and-boolean-values-to-a-schema-accepting-only-arrays-of-nulls-against-schema-accepting-only-arrays-of-nulls">validating an array containing a mixture of null and boolean values to a schema accepting only arrays of nulls against schema accepting only arrays of nulls</a></p>
+<p><a href="finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema.html#finding-json-schema-violations-as-a-result-of-validating-an-array-containing-a-mixture-of-null-and-boolean-values-to-a-schema-accepting-only-arrays-of-nulls-against-schema-accepting-only-arrays-of-nulls">finding JSON schema violations as a result of validating an array containing a mixture of null and boolean values to a schema accepting only arrays of nulls against schema accepting only arrays of nulls</a></p>
 </li>
 <li>
-<p><a href="validating-json-value-against-json-schema.html#validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set">validating number at the schema's minimum allowed values boundary against a schema with a minimum exclusive allowed value set</a></p>
+<p><a href="finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema.html#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's minimum allowed values boundary against a schema with a minimum exclusive allowed value set</a></p>
 </li>
 <li>
-<p><a href="validating-json-value-against-json-schema.html#validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set">validating number at the schema's maximum allowed values boundary against a schema with a maximum exclusive allowed value set</a></p>
+<p><a href="finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema.html#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's maximum allowed values boundary against a schema with a maximum exclusive allowed value set</a></p>
 </li>
 <li>
-<p><a href="validating-json-value-against-json-schema.html#validating-not-a-multiple-of-25-against-a-schema-accepting-only-multiples-of-25">validating not a multiple of 2.5 against a schema accepting only multiples of 2.5</a></p>
+<p><a href="finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema.html#finding-json-schema-violations-as-a-result-of-validating-not-a-multiple-of-25-against-a-schema-accepting-only-multiples-of-25">finding JSON schema violations as a result of validating not a multiple of 2.5 against a schema accepting only multiples of 2.5</a></p>
 </li>
 <li>
-<p><a href="validating-json-value-against-json-schema.html#validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set">validating number at the schema's maximum allowed values boundary against a schema with a maximum inclusive allowed value set</a></p>
+<p><a href="finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema.html#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's maximum allowed values boundary against a schema with a maximum inclusive allowed value set</a></p>
 </li>
 <li>
-<p><a href="validating-json-value-against-json-schema.html#validating-number-below-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set">validating number below the schema's maximum allowed values boundary against a schema with a maximum exclusive allowed value set</a></p>
+<p><a href="finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema.html#finding-json-schema-violations-as-a-result-of-validating-number-below-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set">finding JSON schema violations as a result of validating number below the schema's maximum allowed values boundary against a schema with a maximum exclusive allowed value set</a></p>
 </li>
 <li>
-<p><a href="validating-json-value-against-json-schema.html#validating-number-exceeding-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set">validating number exceeding the schema's maximum allowed values boundary against a schema with a maximum inclusive allowed value set</a></p>
+<p><a href="finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema.html#finding-json-schema-violations-as-a-result-of-validating-number-exceeding-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set">finding JSON schema violations as a result of validating number exceeding the schema's maximum allowed values boundary against a schema with a maximum inclusive allowed value set</a></p>
 </li>
 <li>
-<p><a href="validating-json-value-against-json-schema.html#validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set">validating number at the schema's minimum allowed values boundary against a schema with a minimum inclusive allowed value set</a></p>
+<p><a href="finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema.html#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's minimum allowed values boundary against a schema with a minimum inclusive allowed value set</a></p>
 </li>
 <li>
-<p><a href="validating-json-value-against-json-schema.html#validating-number-below-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set">validating number below the schema's minimum allowed values boundary against a schema with a minimum exclusive allowed value set</a></p>
+<p><a href="finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema.html#finding-json-schema-violations-as-a-result-of-validating-number-below-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set">finding JSON schema violations as a result of validating number below the schema's minimum allowed values boundary against a schema with a minimum exclusive allowed value set</a></p>
 </li>
 <li>
-<p><a href="validating-json-value-against-json-schema.html#validating-number-exceeding-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set">validating number exceeding the schema's minimum allowed values boundary against a schema with a minimum inclusive allowed value set</a></p>
+<p><a href="finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema.html#finding-json-schema-violations-as-a-result-of-validating-number-exceeding-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set">finding JSON schema violations as a result of validating number exceeding the schema's minimum allowed values boundary against a schema with a minimum inclusive allowed value set</a></p>
 </li>
 </ul>
 <hr />
-<h3 id="validating-an-array-containing-some-duplicated-strings-against-schema-not-accepting-duplicates"><a class="header" href="#validating-an-array-containing-some-duplicated-strings-against-schema-not-accepting-duplicates">validating an array containing some duplicated strings against schema not accepting duplicates</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-an-array-containing-some-duplicated-strings-against-schema-not-accepting-duplicates"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-an-array-containing-some-duplicated-strings-against-schema-not-accepting-duplicates">finding JSON schema violations as a result of validating an array containing some duplicated strings against schema not accepting duplicates</a></h3>
 <p>Because the schema requires items to be unique, and the value contains
 duplicate occurrence, such a value is invalid.</p>
 <p><em>Input:</em></p>
@@ -1596,7 +1323,7 @@ JSON schema path: <code>#/uniqueItems</code></p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="validating-a-boolean-value-against-schema-accepting-only-nulls-or-strings"><a class="header" href="#validating-a-boolean-value-against-schema-accepting-only-nulls-or-strings">validating a boolean value against schema accepting only nulls or strings</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-a-boolean-value-against-schema-accepting-only-nulls-or-strings"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-a-boolean-value-against-schema-accepting-only-nulls-or-strings">finding JSON schema violations as a result of validating a boolean value against schema accepting only nulls or strings</a></h3>
 <p>Because the value is neither null or string, such a value is invalid.</p>
 <p><em>Input:</em></p>
 <p>a boolean value:</p>
@@ -1626,7 +1353,7 @@ JSON schema path: <code>#/type</code></p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="validating-json-number-value-against-json-schema-accepting-only-numbers"><a class="header" href="#validating-json-number-value-against-json-schema-accepting-only-numbers">validating JSON number value against JSON schema accepting only numbers</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-json-number-value-against-json-schema-accepting-only-numbers"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-json-number-value-against-json-schema-accepting-only-numbers">finding JSON schema violations as a result of validating JSON number value against JSON schema accepting only numbers</a></h3>
 <p>Because a JSON value directly matches schema's only 'type' keyword item,
 such a value is valid.</p>
 <p><em>Input:</em></p>
@@ -1650,7 +1377,7 @@ such a value is valid.</p>
 <p>∅</p>
 </blockquote>
 <hr />
-<h3 id="validating-json-null-value-against-json-schema-accepting-booleans-nulls-and-strings"><a class="header" href="#validating-json-null-value-against-json-schema-accepting-booleans-nulls-and-strings">validating JSON null value against JSON schema accepting booleans, nulls and strings</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-json-null-value-against-json-schema-accepting-booleans-nulls-and-strings"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-json-null-value-against-json-schema-accepting-booleans-nulls-and-strings">finding JSON schema violations as a result of validating JSON null value against JSON schema accepting booleans, nulls and strings</a></h3>
 <p>Because a JSON value directly matches one of schema's 'type' keyword
 items, such a value is valid.</p>
 <p><em>Input:</em></p>
@@ -1676,7 +1403,7 @@ items, such a value is valid.</p>
 <p>∅</p>
 </blockquote>
 <hr />
-<h3 id="validating-json-number-value-which-happens-to-be-an-integer-against-json-schema-accepting-any-numbers"><a class="header" href="#validating-json-number-value-which-happens-to-be-an-integer-against-json-schema-accepting-any-numbers">validating JSON number value which happens to be an integer against JSON schema accepting any numbers</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-json-number-value-which-happens-to-be-an-integer-against-json-schema-accepting-any-numbers"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-json-number-value-which-happens-to-be-an-integer-against-json-schema-accepting-any-numbers">finding JSON schema violations as a result of validating JSON number value which happens to be an integer against JSON schema accepting any numbers</a></h3>
 <p>Because a JSON value indirectly matches schema's only 'type' keyword
 item, such a value is valid.</p>
 <p><em>Input:</em></p>
@@ -1700,7 +1427,7 @@ item, such a value is valid.</p>
 <p>∅</p>
 </blockquote>
 <hr />
-<h3 id="validating-a-multiple-of-x-against-schema-accepting-only-numbers-which-are-multiples-of-x"><a class="header" href="#validating-a-multiple-of-x-against-schema-accepting-only-numbers-which-are-multiples-of-x">validating a multiple of x against schema accepting only numbers which are multiples of x</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-a-multiple-of-x-against-schema-accepting-only-numbers-which-are-multiples-of-x"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-a-multiple-of-x-against-schema-accepting-only-numbers-which-are-multiples-of-x">finding JSON schema violations as a result of validating a multiple of x against schema accepting only numbers which are multiples of x</a></h3>
 <p>Because a JSON number value is a multiple of the factor desired by the
 schema, such a value is valid.</p>
 <p><em>Input:</em></p>
@@ -1725,7 +1452,7 @@ schema, such a value is valid.</p>
 <p>∅</p>
 </blockquote>
 <hr />
-<h3 id="validating-a-fractional-number-against-schema-accepting-only-whole-numbers"><a class="header" href="#validating-a-fractional-number-against-schema-accepting-only-whole-numbers">validating a fractional number against schema accepting only whole numbers</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-a-fractional-number-against-schema-accepting-only-whole-numbers"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-a-fractional-number-against-schema-accepting-only-whole-numbers">finding JSON schema violations as a result of validating a fractional number against schema accepting only whole numbers</a></h3>
 <p>Because the schema accepts only whole numbers, such a value is invalid.</p>
 <p><em>Input:</em></p>
 <p>a fractional number:</p>
@@ -1754,7 +1481,7 @@ JSON schema path: <code>#/type</code></p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="validating-a-multiple-of-25-against-a-schema-accepting-only-multiples-of-25"><a class="header" href="#validating-a-multiple-of-25-against-a-schema-accepting-only-multiples-of-25">validating a multiple of 2.5 against a schema accepting only multiples of 2.5</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-a-multiple-of-25-against-a-schema-accepting-only-multiples-of-25"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-a-multiple-of-25-against-a-schema-accepting-only-multiples-of-25">finding JSON schema violations as a result of validating a multiple of 2.5 against a schema accepting only multiples of 2.5</a></h3>
 <p>Because the schema accepts any multiples of 2.5, such a value is valid.</p>
 <p><em>Input:</em></p>
 <p>a multiple of 2.5:</p>
@@ -1778,7 +1505,7 @@ JSON schema path: <code>#/type</code></p>
 <p>∅</p>
 </blockquote>
 <hr />
-<h3 id="validating-an-array-containing-a-mixture-of-null-and-boolean-values-to-a-schema-accepting-only-arrays-of-nulls-against-schema-accepting-only-arrays-of-nulls"><a class="header" href="#validating-an-array-containing-a-mixture-of-null-and-boolean-values-to-a-schema-accepting-only-arrays-of-nulls-against-schema-accepting-only-arrays-of-nulls">validating an array containing a mixture of null and boolean values to a schema accepting only arrays of nulls against schema accepting only arrays of nulls</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-an-array-containing-a-mixture-of-null-and-boolean-values-to-a-schema-accepting-only-arrays-of-nulls-against-schema-accepting-only-arrays-of-nulls"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-an-array-containing-a-mixture-of-null-and-boolean-values-to-a-schema-accepting-only-arrays-of-nulls-against-schema-accepting-only-arrays-of-nulls">finding JSON schema violations as a result of validating an array containing a mixture of null and boolean values to a schema accepting only arrays of nulls against schema accepting only arrays of nulls</a></h3>
 <p>Because the schema requires items to conform to a certain schema and
 this is not the case here, such a value is invalid.</p>
 <p><em>Input:</em></p>
@@ -1832,7 +1559,7 @@ JSON schema path: <code>#/items/type</code></p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set"><a class="header" href="#validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set">validating number at the schema's minimum allowed values boundary against a schema with a minimum exclusive allowed value set</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's minimum allowed values boundary against a schema with a minimum exclusive allowed value set</a></h3>
 <p>Because the minimum value constraint is exclusive, such a value is
 invalid.</p>
 <p><em>Input:</em></p>
@@ -1860,7 +1587,7 @@ JSON schema path: <code>#/exclusiveMinimum</code></p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set"><a class="header" href="#validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set">validating number at the schema's maximum allowed values boundary against a schema with a maximum exclusive allowed value set</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's maximum allowed values boundary against a schema with a maximum exclusive allowed value set</a></h3>
 <p>Because the maximum value constraint is exclusive, such a value is
 invalid.</p>
 <p><em>Input:</em></p>
@@ -1888,7 +1615,7 @@ JSON schema path: <code>#/exclusiveMaximum</code></p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="validating-not-a-multiple-of-25-against-a-schema-accepting-only-multiples-of-25"><a class="header" href="#validating-not-a-multiple-of-25-against-a-schema-accepting-only-multiples-of-25">validating not a multiple of 2.5 against a schema accepting only multiples of 2.5</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-not-a-multiple-of-25-against-a-schema-accepting-only-multiples-of-25"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-not-a-multiple-of-25-against-a-schema-accepting-only-multiples-of-25">finding JSON schema violations as a result of validating not a multiple of 2.5 against a schema accepting only multiples of 2.5</a></h3>
 <p>Because the schema accepts only multiples of 2.5, such a value is
 invalid.</p>
 <p><em>Input:</em></p>
@@ -1914,12 +1641,12 @@ invalid.</p>
 <li>
 <p>JSON value path: <code>$</code><br />
 JSON schema path: <code>#/multipleOf</code></p>
-<p>is not a multiple of 2.5</p>
+<p>7.0 is not a multiple of 2.5</p>
 </li>
 </ul>
 </blockquote>
 <hr />
-<h3 id="validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set"><a class="header" href="#validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set">validating number at the schema's maximum allowed values boundary against a schema with a maximum inclusive allowed value set</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's maximum allowed values boundary against a schema with a maximum inclusive allowed value set</a></h3>
 <p>Because the maximum value constraint is inclusive, such a value is
 valid.</p>
 <p><em>Input:</em></p>
@@ -1941,7 +1668,7 @@ valid.</p>
 <p>∅</p>
 </blockquote>
 <hr />
-<h3 id="validating-number-below-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set"><a class="header" href="#validating-number-below-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set">validating number below the schema's maximum allowed values boundary against a schema with a maximum exclusive allowed value set</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-number-below-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-number-below-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set">finding JSON schema violations as a result of validating number below the schema's maximum allowed values boundary against a schema with a maximum exclusive allowed value set</a></h3>
 <p>Because the value is less than the maximum value constraint, such a
 value is valid.</p>
 <p><em>Input:</em></p>
@@ -1963,7 +1690,7 @@ value is valid.</p>
 <p>∅</p>
 </blockquote>
 <hr />
-<h3 id="validating-number-exceeding-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set"><a class="header" href="#validating-number-exceeding-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set">validating number exceeding the schema's maximum allowed values boundary against a schema with a maximum inclusive allowed value set</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-number-exceeding-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-number-exceeding-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set">finding JSON schema violations as a result of validating number exceeding the schema's maximum allowed values boundary against a schema with a maximum inclusive allowed value set</a></h3>
 <p>Because the value is greater than the maximum value constraint is
 exclusive, such a value is invalid.</p>
 <p><em>Input:</em></p>
@@ -1991,7 +1718,7 @@ JSON schema path: <code>#/maximum</code></p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set"><a class="header" href="#validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set">validating number at the schema's minimum allowed values boundary against a schema with a minimum inclusive allowed value set</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's minimum allowed values boundary against a schema with a minimum inclusive allowed value set</a></h3>
 <p>Because the minimum value constraint is inclusive, such a value is
 valid.</p>
 <p><em>Input:</em></p>
@@ -2013,7 +1740,7 @@ valid.</p>
 <p>∅</p>
 </blockquote>
 <hr />
-<h3 id="validating-number-below-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set"><a class="header" href="#validating-number-below-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set">validating number below the schema's minimum allowed values boundary against a schema with a minimum exclusive allowed value set</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-number-below-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-number-below-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set">finding JSON schema violations as a result of validating number below the schema's minimum allowed values boundary against a schema with a minimum exclusive allowed value set</a></h3>
 <p>Because the value is less than the minimum value constraint, such a
 value is valid.</p>
 <p><em>Input:</em></p>
@@ -2035,7 +1762,7 @@ value is valid.</p>
 <p>∅</p>
 </blockquote>
 <hr />
-<h3 id="validating-number-exceeding-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set"><a class="header" href="#validating-number-exceeding-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set">validating number exceeding the schema's minimum allowed values boundary against a schema with a minimum inclusive allowed value set</a></h3>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-number-exceeding-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-number-exceeding-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set">finding JSON schema violations as a result of validating number exceeding the schema's minimum allowed values boundary against a schema with a minimum inclusive allowed value set</a></h3>
 <p>Because the value is greater than the minimum value constraint is
 exclusive, such a value is invalid.</p>
 <p><em>Input:</em></p>
@@ -2061,6 +1788,284 @@ JSON schema path: <code>#/minimum</code></p>
 <p>3.0 is outside of the valid range of [4.0,Infinity)</p>
 </li>
 </ul>
+</blockquote>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="printing-a-json-valuerepresenting-a-json-schema"><a class="header" href="#printing-a-json-valuerepresenting-a-json-schema">Printing a JSON valuerepresenting a JSON schema</a></h1>
+<h2 id="properties-2"><a class="header" href="#properties-2">Properties</a></h2>
+<ul>
+<li>always prints a well-formatted schema JSON</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-json-value"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-json-value">Producing a JSON schema or an error as a result of parsing JSON value</a></h1>
+<p>JSON schema is commonly expressed in a JSON format.However, not every JSON is a valid JSON schema.</p>
+<h2 id="examples-3"><a class="header" href="#examples-3">Examples</a></h2>
+<ul>
+<li>
+<p><a href="producing-a-json-schema-or-an-error-as-a-result-of-parsing-json-value.html#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-boolean-json-value">producing a JSON schema or an error as a result of parsing a boolean JSON value</a></p>
+</li>
+<li>
+<p><a href="producing-a-json-schema-or-an-error-as-a-result-of-parsing-json-value.html#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-defined">producing a JSON schema or an error as a result of parsing A JSON object with 'type' property defined</a></p>
+</li>
+<li>
+<p><a href="producing-a-json-schema-or-an-error-as-a-result-of-parsing-json-value.html#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-empty-array">producing a JSON schema or an error as a result of parsing A JSON object with 'type' property set to an empty array</a></p>
+</li>
+<li>
+<p><a href="producing-a-json-schema-or-an-error-as-a-result-of-parsing-json-value.html#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-required-property-being-array-of-strings">producing a JSON schema or an error as a result of parsing A JSON object with 'required' property being array of strings</a></p>
+</li>
+<li>
+<p><a href="producing-a-json-schema-or-an-error-as-a-result-of-parsing-json-value.html#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-array-with-array-null-and-string-strings-inside-it">producing a JSON schema or an error as a result of parsing A JSON object with 'type' property set to an array with 'array', 'null' and 'string' strings inside it</a></p>
+</li>
+<li>
+<p><a href="producing-a-json-schema-or-an-error-as-a-result-of-parsing-json-value.html#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-array-with-a-single-null-string-inside-it">producing a JSON schema or an error as a result of parsing A JSON object with 'type' property set to an array with a single 'null' string inside it</a></p>
+</li>
+<li>
+<p><a href="producing-a-json-schema-or-an-error-as-a-result-of-parsing-json-value.html#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-uniqueitems-property-set">producing a JSON schema or an error as a result of parsing A JSON object with 'uniqueItems' property set</a></p>
+</li>
+<li>
+<p><a href="producing-a-json-schema-or-an-error-as-a-result-of-parsing-json-value.html#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-value-not-being-a-boolean-or-object">producing a JSON schema or an error as a result of parsing a JSON value not being a boolean or object</a></p>
+</li>
+<li>
+<p><a href="producing-a-json-schema-or-an-error-as-a-result-of-parsing-json-value.html#producing-a-json-schema-or-an-error-as-a-result-of-parsing-an-json-object-with-the-not-property-defined">producing a JSON schema or an error as a result of parsing an JSON object with the 'not' property defined</a></p>
+</li>
+<li>
+<p><a href="producing-a-json-schema-or-an-error-as-a-result-of-parsing-json-value.html#producing-a-json-schema-or-an-error-as-a-result-of-parsing-an-json-object-with-the-items-property-defined">producing a JSON schema or an error as a result of parsing an JSON object with the 'items' property defined</a></p>
+</li>
+<li>
+<p><a href="producing-a-json-schema-or-an-error-as-a-result-of-parsing-json-value.html#producing-a-json-schema-or-an-error-as-a-result-of-parsing-an-empty-json-object">producing a JSON schema or an error as a result of parsing an empty JSON object</a></p>
+</li>
+</ul>
+<hr />
+<h3 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-boolean-json-value"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-boolean-json-value">producing a JSON schema or an error as a result of parsing a boolean JSON value</a></h3>
+<p>Because a boolean value of false is a valid schema which passes
+validation of any JSON value, such a value represents a JSON schema.</p>
+<p><em>Input:</em></p>
+<p>a boolean JSON value:</p>
+<blockquote>
+<pre><code class="language-json">false
+</code></pre>
+</blockquote>
+<p><em>Output:</em></p>
+<p>a successfully parsed JSON schema:</p>
+<blockquote>
+<pre><code class="language-json">false
+</code></pre>
+</blockquote>
+<hr />
+<h3 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-defined"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-defined">producing a JSON schema or an error as a result of parsing A JSON object with 'type' property defined</a></h3>
+<p>Because the 'type' keyword defines acceptable JSON types. It can be in a
+form of a single string, such a value represents a JSON schema.</p>
+<p><em>Input:</em></p>
+<p>A JSON object with 'type' property defined:</p>
+<blockquote>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;null&quot;
+}
+</code></pre>
+</blockquote>
+<p><em>Output:</em></p>
+<p>a successfully parsed JSON schema:</p>
+<blockquote>
+<pre><code class="language-json">{
+  &quot;type&quot;: [
+    &quot;null&quot;
+  ]
+}
+</code></pre>
+</blockquote>
+<hr />
+<h3 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-empty-array"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-empty-array">producing a JSON schema or an error as a result of parsing A JSON object with 'type' property set to an empty array</a></h3>
+<p>Because the 'type' keyword defines acceptable JSON types. It can be in a
+form of an array of string (here, with no types defined), such a value
+represents a JSON schema.</p>
+<p><em>Input:</em></p>
+<p>A JSON object with 'type' property set to an empty array:</p>
+<blockquote>
+<pre><code class="language-json">{
+  &quot;type&quot;: []
+}
+</code></pre>
+</blockquote>
+<p><em>Output:</em></p>
+<p>a successfully parsed JSON schema:</p>
+<blockquote>
+<pre><code class="language-json">{
+  &quot;type&quot;: []
+}
+</code></pre>
+</blockquote>
+<hr />
+<h3 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-required-property-being-array-of-strings"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-required-property-being-array-of-strings">producing a JSON schema or an error as a result of parsing A JSON object with 'required' property being array of strings</a></h3>
+<p>Because the 'required' constrain rejects any JSON object not containing
+properties defined by it, such a value represents a JSON schema.</p>
+<p><em>Input:</em></p>
+<p>A JSON object with 'required' property being array of strings:</p>
+<blockquote>
+<pre><code class="language-json">{
+  &quot;required&quot;: [
+    &quot;prop1&quot;,
+    &quot;prop2&quot;
+  ]
+}
+</code></pre>
+</blockquote>
+<p><em>Output:</em></p>
+<p>a successfully parsed JSON schema:</p>
+<blockquote>
+<pre><code class="language-json">{
+  &quot;required&quot;: [
+    &quot;prop1&quot;,
+    &quot;prop2&quot;
+  ]
+}
+</code></pre>
+</blockquote>
+<hr />
+<h3 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-array-with-array-null-and-string-strings-inside-it"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-array-with-array-null-and-string-strings-inside-it">producing a JSON schema or an error as a result of parsing A JSON object with 'type' property set to an array with 'array', 'null' and 'string' strings inside it</a></h3>
+<p>Because the 'type' keyword defines acceptable JSON types. It can be in a
+form of an array of string (here, with three types defined), such a
+value represents a JSON schema.</p>
+<p><em>Input:</em></p>
+<p>A JSON object with 'type' property set to an array with 'array', 'null'
+and 'string' strings inside it:</p>
+<blockquote>
+<pre><code class="language-json">{
+  &quot;type&quot;: [
+    &quot;array&quot;,
+    &quot;null&quot;,
+    &quot;string&quot;
+  ]
+}
+</code></pre>
+</blockquote>
+<p><em>Output:</em></p>
+<p>a successfully parsed JSON schema:</p>
+<blockquote>
+<pre><code class="language-json">{
+  &quot;type&quot;: [
+    &quot;array&quot;,
+    &quot;null&quot;,
+    &quot;string&quot;
+  ]
+}
+</code></pre>
+</blockquote>
+<hr />
+<h3 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-array-with-a-single-null-string-inside-it"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-array-with-a-single-null-string-inside-it">producing a JSON schema or an error as a result of parsing A JSON object with 'type' property set to an array with a single 'null' string inside it</a></h3>
+<p>Because the 'type' keyword defines acceptable JSON types. It can be in a
+form of an array of string (here, only with one type defined), such a
+value represents a JSON schema.</p>
+<p><em>Input:</em></p>
+<p>A JSON object with 'type' property set to an array with a single 'null'
+string inside it:</p>
+<blockquote>
+<pre><code class="language-json">{
+  &quot;type&quot;: [
+    &quot;null&quot;
+  ]
+}
+</code></pre>
+</blockquote>
+<p><em>Output:</em></p>
+<p>a successfully parsed JSON schema:</p>
+<blockquote>
+<pre><code class="language-json">{
+  &quot;type&quot;: [
+    &quot;null&quot;
+  ]
+}
+</code></pre>
+</blockquote>
+<hr />
+<h3 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-uniqueitems-property-set"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-uniqueitems-property-set">producing a JSON schema or an error as a result of parsing A JSON object with 'uniqueItems' property set</a></h3>
+<p>Because the 'uniqueItems' keyword makes sure that if JSON value is an
+array, its items do not contain any duplicates, such a value represents
+a JSON schema.</p>
+<p><em>Input:</em></p>
+<p>A JSON object with 'uniqueItems' property set:</p>
+<blockquote>
+<pre><code class="language-json">{
+  &quot;uniqueItems&quot;: true
+}
+</code></pre>
+</blockquote>
+<p><em>Output:</em></p>
+<p>a successfully parsed JSON schema:</p>
+<blockquote>
+<pre><code class="language-json">{
+  &quot;uniqueItems&quot;: true
+}
+</code></pre>
+</blockquote>
+<hr />
+<h3 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-value-not-being-a-boolean-or-object"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-value-not-being-a-boolean-or-object">producing a JSON schema or an error as a result of parsing a JSON value not being a boolean or object</a></h3>
+<p>Because booleans and objects are the only acceptable forms, such a value
+does not represent a JSON schema.</p>
+<p><em>Input:</em></p>
+<p>a JSON value not being a boolean or object:</p>
+<blockquote>
+<pre><code class="language-json">0
+</code></pre>
+</blockquote>
+<p><em>Output:</em></p>
+<p>a parsing error:</p>
+<blockquote>
+<p>an error:</p>
+<p><code>&quot;the JSON value is neither a boolean nor an object&quot;</code></p>
+</blockquote>
+<hr />
+<h3 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-an-json-object-with-the-not-property-defined"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-an-json-object-with-the-not-property-defined">producing a JSON schema or an error as a result of parsing an JSON object with the 'not' property defined</a></h3>
+<p>Because the 'not' constrain rejects any JSON value which conform to
+schema defined by it, such a value represents a JSON schema.</p>
+<p><em>Input:</em></p>
+<p>an JSON object with the 'not' property defined:</p>
+<blockquote>
+<pre><code class="language-json">{
+  &quot;not&quot;: true
+}
+</code></pre>
+</blockquote>
+<p><em>Output:</em></p>
+<p>a successfully parsed JSON schema:</p>
+<blockquote>
+<pre><code class="language-json">{
+  &quot;not&quot;: true
+}
+</code></pre>
+</blockquote>
+<hr />
+<h3 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-an-json-object-with-the-items-property-defined"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-an-json-object-with-the-items-property-defined">producing a JSON schema or an error as a result of parsing an JSON object with the 'items' property defined</a></h3>
+<p>Because the 'items' constrain makes sure than if a JSON value is an
+array, every item of that array conforms the schema defined by it, such
+a value represents a JSON schema.</p>
+<p><em>Input:</em></p>
+<p>an JSON object with the 'items' property defined:</p>
+<blockquote>
+<pre><code class="language-json">{
+  &quot;items&quot;: true
+}
+</code></pre>
+</blockquote>
+<p><em>Output:</em></p>
+<p>a successfully parsed JSON schema:</p>
+<blockquote>
+<pre><code class="language-json">{
+  &quot;items&quot;: true
+}
+</code></pre>
+</blockquote>
+<hr />
+<h3 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-an-empty-json-object"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-an-empty-json-object">producing a JSON schema or an error as a result of parsing an empty JSON object</a></h3>
+<p>Because an empty JSON object is a valid schema which passes validation
+of any JSON value, such a value represents a JSON schema.</p>
+<p><em>Input:</em></p>
+<p>an empty JSON object:</p>
+<blockquote>
+<pre><code class="language-json">{}
+</code></pre>
+</blockquote>
+<p><em>Output:</em></p>
+<p>a successfully parsed JSON schema:</p>
+<blockquote>
+<pre><code class="language-json">{}
+</code></pre>
 </blockquote>
 
                     </main>

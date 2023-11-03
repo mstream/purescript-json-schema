@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Calculating differences between old JSON schema and new JSON schema - PureScript JSON Schema</title>
+        <title>Calculating differences between schemata based on old JSON schema and new JSON schema - PureScript JSON Schema</title>
 
 
         <!-- Custom HTML head -->
@@ -83,7 +83,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="assessing-compatibility-based-on-schemata-differences.html"><strong aria-hidden="true">1.</strong> Assessing compatibility based on schemata differences</a></li><li class="chapter-item expanded "><a href="calculating-differences-between-old-json-schema-and-new-json-schema.html" class="active"><strong aria-hidden="true">2.</strong> Calculating differences between old JSON schema and new JSON schema</a></li><li class="chapter-item expanded "><a href="parsing-json-value.html"><strong aria-hidden="true">3.</strong> Parsing JSON value</a></li><li class="chapter-item expanded "><a href="printing-json-schema.html"><strong aria-hidden="true">4.</strong> Printing JSON schema</a></li><li class="chapter-item expanded "><a href="validating-json-value-against-json-schema.html"><strong aria-hidden="true">5.</strong> Validating JSON value against JSON schema</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="assessing-the-type-of-compatibility-based-on-schemata-differences.html"><strong aria-hidden="true">1.</strong> Assessing the type of compatibility based on schemata differences</a></li><li class="chapter-item expanded "><a href="calculating-differences-between-schemata-based-on-old-json-schema-and-new-json-schema.html" class="active"><strong aria-hidden="true">2.</strong> Calculating differences between schemata based on old JSON schema and new JSON schema</a></li><li class="chapter-item expanded "><a href="finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema.html"><strong aria-hidden="true">3.</strong> Finding JSON schema violations as a result of validating JSON value against JSON schema</a></li><li class="chapter-item expanded "><a href="printing-a-json-valuerepresenting-a-json-schema.html"><strong aria-hidden="true">4.</strong> Printing a JSON valuerepresenting a JSON schema</a></li><li class="chapter-item expanded "><a href="producing-a-json-schema-or-an-error-as-a-result-of-parsing-json-value.html"><strong aria-hidden="true">5.</strong> Producing a JSON schema or an error as a result of parsing JSON value</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -144,7 +144,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="calculating-differences-between-old-json-schema-and-new-json-schema"><a class="header" href="#calculating-differences-between-old-json-schema-and-new-json-schema">Calculating differences between old JSON schema and new JSON schema</a></h1>
+                        <h1 id="calculating-differences-between-schemata-based-on-old-json-schema-and-new-json-schema"><a class="header" href="#calculating-differences-between-schemata-based-on-old-json-schema-and-new-json-schema">Calculating differences between schemata based on old JSON schema and new JSON schema</a></h1>
 <p>Calculating JSON Schema Difference is a process used to identify the
 changes between two JSON schemata.<br />
 It is used to to see what has been added, removed, or changed.<br />
@@ -154,34 +154,39 @@ It can also be used to generate a diff report or to automate the process
 of updating dependent systems or documentation when a schema changes.</p>
 <h2 id="properties"><a class="header" href="#properties">Properties</a></h2>
 <ul>
-<li>comparing identical schemata yields no differences</li>
+<li>
+<p>comparing identical schemata yields no differences</p>
+</li>
+<li>
+<p>comparing different schemata yields differences</p>
+</li>
 </ul>
 <h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
 <ul>
 <li>
-<p><a href="#calculating-differences-between-json-schema-accepting-only-number-less-than-or-equal-to-some-number-and-json-schema-accepting-only-number-less-than-or-equal-to-other-number">calculating differences between JSON schema accepting only number less than or equal to some number and JSON schema accepting only number less than or equal to other number</a></p>
+<p><a href="#calculating-differences-between-schemata-based-on-json-schema-accepting-only-number-less-than-or-equal-to-some-number-and-json-schema-accepting-only-number-less-than-or-equal-to-other-number">calculating differences between schemata based on JSON schema accepting only number less than or equal to some number and JSON schema accepting only number less than or equal to other number</a></p>
 </li>
 <li>
-<p><a href="#calculating-differences-between-json-schema-accepting-only-number-greater-than-or-equal-to-some-number-and-json-schema-accepting-only-number-greater-than-or-equal-to-other-number">calculating differences between JSON schema accepting only number greater than or equal to some number and JSON schema accepting only number greater than or equal to other number</a></p>
+<p><a href="#calculating-differences-between-schemata-based-on-json-schema-accepting-only-number-greater-than-or-equal-to-some-number-and-json-schema-accepting-only-number-greater-than-or-equal-to-other-number">calculating differences between schemata based on JSON schema accepting only number greater than or equal to some number and JSON schema accepting only number greater than or equal to other number</a></p>
 </li>
 <li>
-<p><a href="#calculating-differences-between-json-schema-accepting-only-multiples-of-a-some-number-and-json-schema-accepting-only-multiples-of-other-number">calculating differences between JSON schema accepting only multiples of a some number and JSON schema accepting only multiples of other number</a></p>
+<p><a href="#calculating-differences-between-schemata-based-on-json-schema-accepting-only-multiples-of-a-some-number-and-json-schema-accepting-only-multiples-of-other-number">calculating differences between schemata based on JSON schema accepting only multiples of a some number and JSON schema accepting only multiples of other number</a></p>
 </li>
 <li>
-<p><a href="#calculating-differences-between-json-schema-accepting-only-number-greater-than-some-number-and-json-schema-accepting-only-number-greater-than-other-number">calculating differences between JSON schema accepting only number greater than some number and JSON schema accepting only number greater than other number</a></p>
+<p><a href="#calculating-differences-between-schemata-based-on-json-schema-accepting-only-number-greater-than-some-number-and-json-schema-accepting-only-number-greater-than-other-number">calculating differences between schemata based on JSON schema accepting only number greater than some number and JSON schema accepting only number greater than other number</a></p>
 </li>
 <li>
-<p><a href="#calculating-differences-between-json-schema-accepting-only-some-type-and-json-schema-accepting-only-other-type">calculating differences between JSON schema accepting only some type and JSON schema accepting only other type</a></p>
+<p><a href="#calculating-differences-between-schemata-based-on-json-schema-accepting-only-some-type-and-json-schema-accepting-only-other-type">calculating differences between schemata based on JSON schema accepting only some type and JSON schema accepting only other type</a></p>
 </li>
 <li>
-<p><a href="#calculating-differences-between-json-schema-accepting-only-number-less-than-some-number-and-json-schema-accepting-only-number-less-than-other-number">calculating differences between JSON schema accepting only number less than some number and JSON schema accepting only number less than other number</a></p>
+<p><a href="#calculating-differences-between-schemata-based-on-json-schema-accepting-only-number-less-than-some-number-and-json-schema-accepting-only-number-less-than-other-number">calculating differences between schemata based on JSON schema accepting only number less than some number and JSON schema accepting only number less than other number</a></p>
 </li>
 <li>
-<p><a href="#calculating-differences-between-same-schema-and-some-schema">calculating differences between same schema and some schema</a></p>
+<p><a href="#calculating-differences-between-schemata-based-on-same-schema-and-some-schema">calculating differences between schemata based on same schema and some schema</a></p>
 </li>
 </ul>
 <hr />
-<h3 id="calculating-differences-between-json-schema-accepting-only-number-less-than-or-equal-to-some-number-and-json-schema-accepting-only-number-less-than-or-equal-to-other-number"><a class="header" href="#calculating-differences-between-json-schema-accepting-only-number-less-than-or-equal-to-some-number-and-json-schema-accepting-only-number-less-than-or-equal-to-other-number">calculating differences between JSON schema accepting only number less than or equal to some number and JSON schema accepting only number less than or equal to other number</a></h3>
+<h3 id="calculating-differences-between-schemata-based-on-json-schema-accepting-only-number-less-than-or-equal-to-some-number-and-json-schema-accepting-only-number-less-than-or-equal-to-other-number"><a class="header" href="#calculating-differences-between-schemata-based-on-json-schema-accepting-only-number-less-than-or-equal-to-some-number-and-json-schema-accepting-only-number-less-than-or-equal-to-other-number">calculating differences between schemata based on JSON schema accepting only number less than or equal to some number and JSON schema accepting only number less than or equal to other number</a></h3>
 <p>Any change of maximum inclusive keyword value  is considered a
 difference.</p>
 <p><em>Input:</em></p>
@@ -210,7 +215,7 @@ difference.</p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="calculating-differences-between-json-schema-accepting-only-number-greater-than-or-equal-to-some-number-and-json-schema-accepting-only-number-greater-than-or-equal-to-other-number"><a class="header" href="#calculating-differences-between-json-schema-accepting-only-number-greater-than-or-equal-to-some-number-and-json-schema-accepting-only-number-greater-than-or-equal-to-other-number">calculating differences between JSON schema accepting only number greater than or equal to some number and JSON schema accepting only number greater than or equal to other number</a></h3>
+<h3 id="calculating-differences-between-schemata-based-on-json-schema-accepting-only-number-greater-than-or-equal-to-some-number-and-json-schema-accepting-only-number-greater-than-or-equal-to-other-number"><a class="header" href="#calculating-differences-between-schemata-based-on-json-schema-accepting-only-number-greater-than-or-equal-to-some-number-and-json-schema-accepting-only-number-greater-than-or-equal-to-other-number">calculating differences between schemata based on JSON schema accepting only number greater than or equal to some number and JSON schema accepting only number greater than or equal to other number</a></h3>
 <p>Any change of minimum inclusive keyword value is considered a
 difference.</p>
 <p><em>Input:</em></p>
@@ -239,7 +244,7 @@ difference.</p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="calculating-differences-between-json-schema-accepting-only-multiples-of-a-some-number-and-json-schema-accepting-only-multiples-of-other-number"><a class="header" href="#calculating-differences-between-json-schema-accepting-only-multiples-of-a-some-number-and-json-schema-accepting-only-multiples-of-other-number">calculating differences between JSON schema accepting only multiples of a some number and JSON schema accepting only multiples of other number</a></h3>
+<h3 id="calculating-differences-between-schemata-based-on-json-schema-accepting-only-multiples-of-a-some-number-and-json-schema-accepting-only-multiples-of-other-number"><a class="header" href="#calculating-differences-between-schemata-based-on-json-schema-accepting-only-multiples-of-a-some-number-and-json-schema-accepting-only-multiples-of-other-number">calculating differences between schemata based on JSON schema accepting only multiples of a some number and JSON schema accepting only multiples of other number</a></h3>
 <p>Any change of multipleOf keyword is considered a difference.</p>
 <p><em>Input:</em></p>
 <p>JSON schema accepting only multiples of other number:</p>
@@ -267,7 +272,7 @@ difference.</p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="calculating-differences-between-json-schema-accepting-only-number-greater-than-some-number-and-json-schema-accepting-only-number-greater-than-other-number"><a class="header" href="#calculating-differences-between-json-schema-accepting-only-number-greater-than-some-number-and-json-schema-accepting-only-number-greater-than-other-number">calculating differences between JSON schema accepting only number greater than some number and JSON schema accepting only number greater than other number</a></h3>
+<h3 id="calculating-differences-between-schemata-based-on-json-schema-accepting-only-number-greater-than-some-number-and-json-schema-accepting-only-number-greater-than-other-number"><a class="header" href="#calculating-differences-between-schemata-based-on-json-schema-accepting-only-number-greater-than-some-number-and-json-schema-accepting-only-number-greater-than-other-number">calculating differences between schemata based on JSON schema accepting only number greater than some number and JSON schema accepting only number greater than other number</a></h3>
 <p>Any change of minimum exclusive keyword value  is considered a
 difference.</p>
 <p><em>Input:</em></p>
@@ -296,7 +301,7 @@ difference.</p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="calculating-differences-between-json-schema-accepting-only-some-type-and-json-schema-accepting-only-other-type"><a class="header" href="#calculating-differences-between-json-schema-accepting-only-some-type-and-json-schema-accepting-only-other-type">calculating differences between JSON schema accepting only some type and JSON schema accepting only other type</a></h3>
+<h3 id="calculating-differences-between-schemata-based-on-json-schema-accepting-only-some-type-and-json-schema-accepting-only-other-type"><a class="header" href="#calculating-differences-between-schemata-based-on-json-schema-accepting-only-some-type-and-json-schema-accepting-only-other-type">calculating differences between schemata based on JSON schema accepting only some type and JSON schema accepting only other type</a></h3>
 <p>Any change of expected JSON value type  is considered a difference.</p>
 <p><em>Input:</em></p>
 <p>JSON schema accepting only other type:</p>
@@ -335,7 +340,7 @@ difference.</p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="calculating-differences-between-json-schema-accepting-only-number-less-than-some-number-and-json-schema-accepting-only-number-less-than-other-number"><a class="header" href="#calculating-differences-between-json-schema-accepting-only-number-less-than-some-number-and-json-schema-accepting-only-number-less-than-other-number">calculating differences between JSON schema accepting only number less than some number and JSON schema accepting only number less than other number</a></h3>
+<h3 id="calculating-differences-between-schemata-based-on-json-schema-accepting-only-number-less-than-some-number-and-json-schema-accepting-only-number-less-than-other-number"><a class="header" href="#calculating-differences-between-schemata-based-on-json-schema-accepting-only-number-less-than-some-number-and-json-schema-accepting-only-number-less-than-other-number">calculating differences between schemata based on JSON schema accepting only number less than some number and JSON schema accepting only number less than other number</a></h3>
 <p>Any change of maximum exclusive keyword value  is considered a
 difference.</p>
 <p><em>Input:</em></p>
@@ -364,7 +369,7 @@ difference.</p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="calculating-differences-between-same-schema-and-some-schema"><a class="header" href="#calculating-differences-between-same-schema-and-some-schema">calculating differences between same schema and some schema</a></h3>
+<h3 id="calculating-differences-between-schemata-based-on-same-schema-and-some-schema"><a class="header" href="#calculating-differences-between-schemata-based-on-same-schema-and-some-schema">calculating differences between schemata based on same schema and some schema</a></h3>
 <p>Comparison of two identical schemata yields no differences.</p>
 <p><em>Input:</em></p>
 <p>some schema:</p>
@@ -387,11 +392,11 @@ difference.</p>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="assessing-compatibility-based-on-schemata-differences.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="assessing-the-type-of-compatibility-based-on-schemata-differences.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next" href="parsing-json-value.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -401,11 +406,11 @@ difference.</p>
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="assessing-compatibility-based-on-schemata-differences.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="assessing-the-type-of-compatibility-based-on-schemata-differences.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next" href="parsing-json-value.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

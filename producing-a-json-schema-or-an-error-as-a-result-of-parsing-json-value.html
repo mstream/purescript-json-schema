@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Parsing JSON value - PureScript JSON Schema</title>
+        <title>Producing a JSON schema or an error as a result of parsing JSON value - PureScript JSON Schema</title>
 
 
         <!-- Custom HTML head -->
@@ -83,7 +83,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="assessing-compatibility-based-on-schemata-differences.html"><strong aria-hidden="true">1.</strong> Assessing compatibility based on schemata differences</a></li><li class="chapter-item expanded "><a href="calculating-differences-between-old-json-schema-and-new-json-schema.html"><strong aria-hidden="true">2.</strong> Calculating differences between old JSON schema and new JSON schema</a></li><li class="chapter-item expanded "><a href="parsing-json-value.html" class="active"><strong aria-hidden="true">3.</strong> Parsing JSON value</a></li><li class="chapter-item expanded "><a href="printing-json-schema.html"><strong aria-hidden="true">4.</strong> Printing JSON schema</a></li><li class="chapter-item expanded "><a href="validating-json-value-against-json-schema.html"><strong aria-hidden="true">5.</strong> Validating JSON value against JSON schema</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="assessing-the-type-of-compatibility-based-on-schemata-differences.html"><strong aria-hidden="true">1.</strong> Assessing the type of compatibility based on schemata differences</a></li><li class="chapter-item expanded "><a href="calculating-differences-between-schemata-based-on-old-json-schema-and-new-json-schema.html"><strong aria-hidden="true">2.</strong> Calculating differences between schemata based on old JSON schema and new JSON schema</a></li><li class="chapter-item expanded "><a href="finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema.html"><strong aria-hidden="true">3.</strong> Finding JSON schema violations as a result of validating JSON value against JSON schema</a></li><li class="chapter-item expanded "><a href="printing-a-json-valuerepresenting-a-json-schema.html"><strong aria-hidden="true">4.</strong> Printing a JSON valuerepresenting a JSON schema</a></li><li class="chapter-item expanded "><a href="producing-a-json-schema-or-an-error-as-a-result-of-parsing-json-value.html" class="active"><strong aria-hidden="true">5.</strong> Producing a JSON schema or an error as a result of parsing JSON value</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -144,46 +144,46 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="parsing-json-value"><a class="header" href="#parsing-json-value">Parsing JSON value</a></h1>
+                        <h1 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-json-value"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-json-value">Producing a JSON schema or an error as a result of parsing JSON value</a></h1>
 <p>JSON schema is commonly expressed in a JSON format.However, not every JSON is a valid JSON schema.</p>
 <h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
 <ul>
 <li>
-<p><a href="#parsing-a-boolean-json-value">parsing a boolean JSON value</a></p>
+<p><a href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-boolean-json-value">producing a JSON schema or an error as a result of parsing a boolean JSON value</a></p>
 </li>
 <li>
-<p><a href="#parsing-a-json-object-with-type-property-defined">parsing A JSON object with 'type' property defined</a></p>
+<p><a href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-defined">producing a JSON schema or an error as a result of parsing A JSON object with 'type' property defined</a></p>
 </li>
 <li>
-<p><a href="#parsing-a-json-object-with-type-property-set-to-an-empty-array">parsing A JSON object with 'type' property set to an empty array</a></p>
+<p><a href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-empty-array">producing a JSON schema or an error as a result of parsing A JSON object with 'type' property set to an empty array</a></p>
 </li>
 <li>
-<p><a href="#parsing-a-json-object-with-required-property-being-array-of-strings">parsing A JSON object with 'required' property being array of strings</a></p>
+<p><a href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-required-property-being-array-of-strings">producing a JSON schema or an error as a result of parsing A JSON object with 'required' property being array of strings</a></p>
 </li>
 <li>
-<p><a href="#parsing-a-json-object-with-type-property-set-to-an-array-with-array-null-and-string-strings-inside-it">parsing A JSON object with 'type' property set to an array with 'array', 'null' and 'string' strings inside it</a></p>
+<p><a href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-array-with-array-null-and-string-strings-inside-it">producing a JSON schema or an error as a result of parsing A JSON object with 'type' property set to an array with 'array', 'null' and 'string' strings inside it</a></p>
 </li>
 <li>
-<p><a href="#parsing-a-json-object-with-type-property-set-to-an-array-with-a-single-null-string-inside-it">parsing A JSON object with 'type' property set to an array with a single 'null' string inside it</a></p>
+<p><a href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-array-with-a-single-null-string-inside-it">producing a JSON schema or an error as a result of parsing A JSON object with 'type' property set to an array with a single 'null' string inside it</a></p>
 </li>
 <li>
-<p><a href="#parsing-a-json-object-with-uniqueitems-property-set">parsing A JSON object with 'uniqueItems' property set</a></p>
+<p><a href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-uniqueitems-property-set">producing a JSON schema or an error as a result of parsing A JSON object with 'uniqueItems' property set</a></p>
 </li>
 <li>
-<p><a href="#parsing-a-json-value-not-being-a-boolean-or-object">parsing a JSON value not being a boolean or object</a></p>
+<p><a href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-value-not-being-a-boolean-or-object">producing a JSON schema or an error as a result of parsing a JSON value not being a boolean or object</a></p>
 </li>
 <li>
-<p><a href="#parsing-an-json-object-with-the-not-property-defined">parsing an JSON object with the 'not' property defined</a></p>
+<p><a href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-an-json-object-with-the-not-property-defined">producing a JSON schema or an error as a result of parsing an JSON object with the 'not' property defined</a></p>
 </li>
 <li>
-<p><a href="#parsing-an-json-object-with-the-items-property-defined">parsing an JSON object with the 'items' property defined</a></p>
+<p><a href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-an-json-object-with-the-items-property-defined">producing a JSON schema or an error as a result of parsing an JSON object with the 'items' property defined</a></p>
 </li>
 <li>
-<p><a href="#parsing-an-empty-json-object">parsing an empty JSON object</a></p>
+<p><a href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-an-empty-json-object">producing a JSON schema or an error as a result of parsing an empty JSON object</a></p>
 </li>
 </ul>
 <hr />
-<h3 id="parsing-a-boolean-json-value"><a class="header" href="#parsing-a-boolean-json-value">parsing a boolean JSON value</a></h3>
+<h3 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-boolean-json-value"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-boolean-json-value">producing a JSON schema or an error as a result of parsing a boolean JSON value</a></h3>
 <p>Because a boolean value of false is a valid schema which passes
 validation of any JSON value, such a value represents a JSON schema.</p>
 <p><em>Input:</em></p>
@@ -199,7 +199,7 @@ validation of any JSON value, such a value represents a JSON schema.</p>
 </code></pre>
 </blockquote>
 <hr />
-<h3 id="parsing-a-json-object-with-type-property-defined"><a class="header" href="#parsing-a-json-object-with-type-property-defined">parsing A JSON object with 'type' property defined</a></h3>
+<h3 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-defined"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-defined">producing a JSON schema or an error as a result of parsing A JSON object with 'type' property defined</a></h3>
 <p>Because the 'type' keyword defines acceptable JSON types. It can be in a
 form of a single string, such a value represents a JSON schema.</p>
 <p><em>Input:</em></p>
@@ -221,7 +221,7 @@ form of a single string, such a value represents a JSON schema.</p>
 </code></pre>
 </blockquote>
 <hr />
-<h3 id="parsing-a-json-object-with-type-property-set-to-an-empty-array"><a class="header" href="#parsing-a-json-object-with-type-property-set-to-an-empty-array">parsing A JSON object with 'type' property set to an empty array</a></h3>
+<h3 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-empty-array"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-empty-array">producing a JSON schema or an error as a result of parsing A JSON object with 'type' property set to an empty array</a></h3>
 <p>Because the 'type' keyword defines acceptable JSON types. It can be in a
 form of an array of string (here, with no types defined), such a value
 represents a JSON schema.</p>
@@ -242,7 +242,7 @@ represents a JSON schema.</p>
 </code></pre>
 </blockquote>
 <hr />
-<h3 id="parsing-a-json-object-with-required-property-being-array-of-strings"><a class="header" href="#parsing-a-json-object-with-required-property-being-array-of-strings">parsing A JSON object with 'required' property being array of strings</a></h3>
+<h3 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-required-property-being-array-of-strings"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-required-property-being-array-of-strings">producing a JSON schema or an error as a result of parsing A JSON object with 'required' property being array of strings</a></h3>
 <p>Because the 'required' constrain rejects any JSON object not containing
 properties defined by it, such a value represents a JSON schema.</p>
 <p><em>Input:</em></p>
@@ -268,7 +268,7 @@ properties defined by it, such a value represents a JSON schema.</p>
 </code></pre>
 </blockquote>
 <hr />
-<h3 id="parsing-a-json-object-with-type-property-set-to-an-array-with-array-null-and-string-strings-inside-it"><a class="header" href="#parsing-a-json-object-with-type-property-set-to-an-array-with-array-null-and-string-strings-inside-it">parsing A JSON object with 'type' property set to an array with 'array', 'null' and 'string' strings inside it</a></h3>
+<h3 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-array-with-array-null-and-string-strings-inside-it"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-array-with-array-null-and-string-strings-inside-it">producing a JSON schema or an error as a result of parsing A JSON object with 'type' property set to an array with 'array', 'null' and 'string' strings inside it</a></h3>
 <p>Because the 'type' keyword defines acceptable JSON types. It can be in a
 form of an array of string (here, with three types defined), such a
 value represents a JSON schema.</p>
@@ -298,7 +298,7 @@ and 'string' strings inside it:</p>
 </code></pre>
 </blockquote>
 <hr />
-<h3 id="parsing-a-json-object-with-type-property-set-to-an-array-with-a-single-null-string-inside-it"><a class="header" href="#parsing-a-json-object-with-type-property-set-to-an-array-with-a-single-null-string-inside-it">parsing A JSON object with 'type' property set to an array with a single 'null' string inside it</a></h3>
+<h3 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-array-with-a-single-null-string-inside-it"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-array-with-a-single-null-string-inside-it">producing a JSON schema or an error as a result of parsing A JSON object with 'type' property set to an array with a single 'null' string inside it</a></h3>
 <p>Because the 'type' keyword defines acceptable JSON types. It can be in a
 form of an array of string (here, only with one type defined), such a
 value represents a JSON schema.</p>
@@ -324,7 +324,7 @@ string inside it:</p>
 </code></pre>
 </blockquote>
 <hr />
-<h3 id="parsing-a-json-object-with-uniqueitems-property-set"><a class="header" href="#parsing-a-json-object-with-uniqueitems-property-set">parsing A JSON object with 'uniqueItems' property set</a></h3>
+<h3 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-uniqueitems-property-set"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-uniqueitems-property-set">producing a JSON schema or an error as a result of parsing A JSON object with 'uniqueItems' property set</a></h3>
 <p>Because the 'uniqueItems' keyword makes sure that if JSON value is an
 array, its items do not contain any duplicates, such a value represents
 a JSON schema.</p>
@@ -345,7 +345,7 @@ a JSON schema.</p>
 </code></pre>
 </blockquote>
 <hr />
-<h3 id="parsing-a-json-value-not-being-a-boolean-or-object"><a class="header" href="#parsing-a-json-value-not-being-a-boolean-or-object">parsing a JSON value not being a boolean or object</a></h3>
+<h3 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-value-not-being-a-boolean-or-object"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-value-not-being-a-boolean-or-object">producing a JSON schema or an error as a result of parsing a JSON value not being a boolean or object</a></h3>
 <p>Because booleans and objects are the only acceptable forms, such a value
 does not represent a JSON schema.</p>
 <p><em>Input:</em></p>
@@ -361,7 +361,7 @@ does not represent a JSON schema.</p>
 <p><code>&quot;the JSON value is neither a boolean nor an object&quot;</code></p>
 </blockquote>
 <hr />
-<h3 id="parsing-an-json-object-with-the-not-property-defined"><a class="header" href="#parsing-an-json-object-with-the-not-property-defined">parsing an JSON object with the 'not' property defined</a></h3>
+<h3 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-an-json-object-with-the-not-property-defined"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-an-json-object-with-the-not-property-defined">producing a JSON schema or an error as a result of parsing an JSON object with the 'not' property defined</a></h3>
 <p>Because the 'not' constrain rejects any JSON value which conform to
 schema defined by it, such a value represents a JSON schema.</p>
 <p><em>Input:</em></p>
@@ -381,7 +381,7 @@ schema defined by it, such a value represents a JSON schema.</p>
 </code></pre>
 </blockquote>
 <hr />
-<h3 id="parsing-an-json-object-with-the-items-property-defined"><a class="header" href="#parsing-an-json-object-with-the-items-property-defined">parsing an JSON object with the 'items' property defined</a></h3>
+<h3 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-an-json-object-with-the-items-property-defined"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-an-json-object-with-the-items-property-defined">producing a JSON schema or an error as a result of parsing an JSON object with the 'items' property defined</a></h3>
 <p>Because the 'items' constrain makes sure than if a JSON value is an
 array, every item of that array conforms the schema defined by it, such
 a value represents a JSON schema.</p>
@@ -402,7 +402,7 @@ a value represents a JSON schema.</p>
 </code></pre>
 </blockquote>
 <hr />
-<h3 id="parsing-an-empty-json-object"><a class="header" href="#parsing-an-empty-json-object">parsing an empty JSON object</a></h3>
+<h3 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-an-empty-json-object"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-an-empty-json-object">producing a JSON schema or an error as a result of parsing an empty JSON object</a></h3>
 <p>Because an empty JSON object is a valid schema which passes validation
 of any JSON value, such a value represents a JSON schema.</p>
 <p><em>Input:</em></p>
@@ -422,13 +422,10 @@ of any JSON value, such a value represents a JSON schema.</p>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="calculating-differences-between-old-json-schema-and-new-json-schema.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="printing-a-json-valuerepresenting-a-json-schema.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next" href="printing-json-schema.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
-                            </a>
 
                         <div style="clear: both"></div>
                     </nav>
@@ -436,13 +433,10 @@ of any JSON value, such a value represents a JSON schema.</p>
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="calculating-differences-between-old-json-schema-and-new-json-schema.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="printing-a-json-valuerepresenting-a-json-schema.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next" href="printing-json-schema.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
-                    </a>
             </nav>
 
         </div>
