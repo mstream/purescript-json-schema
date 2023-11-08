@@ -55,7 +55,7 @@
           spago
         ];
 
-        node-packages = with pkgs.nodePackages; [ ];
+        node-packages = with pkgs.nodePackages; [ prettier ];
 
         pkgs = with pkgs; [
           act
