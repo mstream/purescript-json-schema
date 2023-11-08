@@ -152,10 +152,10 @@
 <p><a href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-boolean-json-value">producing a JSON schema or an error as a result of parsing a boolean JSON value</a></p>
 </li>
 <li>
-<p><a href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-defined">producing a JSON schema or an error as a result of parsing A JSON object with 'type' property defined</a></p>
+<p><a href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-array-with-a-single-null-string-inside-it">producing a JSON schema or an error as a result of parsing A JSON object with 'type' property set to an array with a single 'null' string inside it</a></p>
 </li>
 <li>
-<p><a href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-empty-array">producing a JSON schema or an error as a result of parsing A JSON object with 'type' property set to an empty array</a></p>
+<p><a href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-defined">producing a JSON schema or an error as a result of parsing A JSON object with 'type' property defined</a></p>
 </li>
 <li>
 <p><a href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-required-property-being-array-of-strings">producing a JSON schema or an error as a result of parsing A JSON object with 'required' property being array of strings</a></p>
@@ -164,10 +164,10 @@
 <p><a href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-array-with-array-null-and-string-strings-inside-it">producing a JSON schema or an error as a result of parsing A JSON object with 'type' property set to an array with 'array', 'null' and 'string' strings inside it</a></p>
 </li>
 <li>
-<p><a href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-array-with-a-single-null-string-inside-it">producing a JSON schema or an error as a result of parsing A JSON object with 'type' property set to an array with a single 'null' string inside it</a></p>
+<p><a href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-uniqueitems-property-set">producing a JSON schema or an error as a result of parsing A JSON object with 'uniqueItems' property set</a></p>
 </li>
 <li>
-<p><a href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-uniqueitems-property-set">producing a JSON schema or an error as a result of parsing A JSON object with 'uniqueItems' property set</a></p>
+<p><a href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-empty-array">producing a JSON schema or an error as a result of parsing A JSON object with 'type' property set to an empty array</a></p>
 </li>
 <li>
 <p><a href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-value-not-being-a-boolean-or-object">producing a JSON schema or an error as a result of parsing a JSON value not being a boolean or object</a></p>
@@ -199,6 +199,32 @@ validation of any JSON value, such a value represents a JSON schema.</p>
 </code></pre>
 </blockquote>
 <hr />
+<h3 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-array-with-a-single-null-string-inside-it"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-array-with-a-single-null-string-inside-it">producing a JSON schema or an error as a result of parsing A JSON object with 'type' property set to an array with a single 'null' string inside it</a></h3>
+<p>Because the 'type' keyword defines acceptable JSON types. It can be in a
+form of an array of string (here, only with one type defined), such a
+value represents a JSON schema.</p>
+<p><em>Input:</em></p>
+<p>A JSON object with 'type' property set to an array with a single 'null'
+string inside it:</p>
+<blockquote>
+<pre><code class="language-json">{
+  &quot;type&quot;: [
+    &quot;null&quot;
+  ]
+}
+</code></pre>
+</blockquote>
+<p><em>Output:</em></p>
+<p>a successfully parsed JSON schema:</p>
+<blockquote>
+<pre><code class="language-json">{
+  &quot;type&quot;: [
+    &quot;null&quot;
+  ]
+}
+</code></pre>
+</blockquote>
+<hr />
 <h3 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-defined"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-defined">producing a JSON schema or an error as a result of parsing A JSON object with 'type' property defined</a></h3>
 <p>Because the 'type' keyword defines acceptable JSON types. It can be in a
 form of a single string, such a value represents a JSON schema.</p>
@@ -217,27 +243,6 @@ form of a single string, such a value represents a JSON schema.</p>
   &quot;type&quot;: [
     &quot;null&quot;
   ]
-}
-</code></pre>
-</blockquote>
-<hr />
-<h3 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-empty-array"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-empty-array">producing a JSON schema or an error as a result of parsing A JSON object with 'type' property set to an empty array</a></h3>
-<p>Because the 'type' keyword defines acceptable JSON types. It can be in a
-form of an array of string (here, with no types defined), such a value
-represents a JSON schema.</p>
-<p><em>Input:</em></p>
-<p>A JSON object with 'type' property set to an empty array:</p>
-<blockquote>
-<pre><code class="language-json">{
-  &quot;type&quot;: []
-}
-</code></pre>
-</blockquote>
-<p><em>Output:</em></p>
-<p>a successfully parsed JSON schema:</p>
-<blockquote>
-<pre><code class="language-json">{
-  &quot;type&quot;: []
 }
 </code></pre>
 </blockquote>
@@ -298,32 +303,6 @@ and 'string' strings inside it:</p>
 </code></pre>
 </blockquote>
 <hr />
-<h3 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-array-with-a-single-null-string-inside-it"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-array-with-a-single-null-string-inside-it">producing a JSON schema or an error as a result of parsing A JSON object with 'type' property set to an array with a single 'null' string inside it</a></h3>
-<p>Because the 'type' keyword defines acceptable JSON types. It can be in a
-form of an array of string (here, only with one type defined), such a
-value represents a JSON schema.</p>
-<p><em>Input:</em></p>
-<p>A JSON object with 'type' property set to an array with a single 'null'
-string inside it:</p>
-<blockquote>
-<pre><code class="language-json">{
-  &quot;type&quot;: [
-    &quot;null&quot;
-  ]
-}
-</code></pre>
-</blockquote>
-<p><em>Output:</em></p>
-<p>a successfully parsed JSON schema:</p>
-<blockquote>
-<pre><code class="language-json">{
-  &quot;type&quot;: [
-    &quot;null&quot;
-  ]
-}
-</code></pre>
-</blockquote>
-<hr />
 <h3 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-uniqueitems-property-set"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-uniqueitems-property-set">producing a JSON schema or an error as a result of parsing A JSON object with 'uniqueItems' property set</a></h3>
 <p>Because the 'uniqueItems' keyword makes sure that if JSON value is an
 array, its items do not contain any duplicates, such a value represents
@@ -341,6 +320,27 @@ a JSON schema.</p>
 <blockquote>
 <pre><code class="language-json">{
   &quot;uniqueItems&quot;: true
+}
+</code></pre>
+</blockquote>
+<hr />
+<h3 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-empty-array"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-a-json-object-with-type-property-set-to-an-empty-array">producing a JSON schema or an error as a result of parsing A JSON object with 'type' property set to an empty array</a></h3>
+<p>Because the 'type' keyword defines acceptable JSON types. It can be in a
+form of an array of string (here, with no types defined), such a value
+represents a JSON schema.</p>
+<p><em>Input:</em></p>
+<p>A JSON object with 'type' property set to an empty array:</p>
+<blockquote>
+<pre><code class="language-json">{
+  &quot;type&quot;: []
+}
+</code></pre>
+</blockquote>
+<p><em>Output:</em></p>
+<p>a successfully parsed JSON schema:</p>
+<blockquote>
+<pre><code class="language-json">{
+  &quot;type&quot;: []
 }
 </code></pre>
 </blockquote>

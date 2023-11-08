@@ -168,7 +168,7 @@ amount of code needed for data validation.</p>
 <h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
 <ul>
 <li>
-<p><a href="#finding-json-schema-violations-as-a-result-of-validating-an-array-containing-some-duplicated-strings-against-schema-not-accepting-duplicates">finding JSON schema violations as a result of validating an array containing some duplicated strings against schema not accepting duplicates</a></p>
+<p><a href="#finding-json-schema-violations-as-a-result-of-validating-a-multiple-of-x-against-schema-accepting-only-numbers-which-are-multiples-of-x">finding JSON schema violations as a result of validating a multiple of x against schema accepting only numbers which are multiples of x</a></p>
 </li>
 <li>
 <p><a href="#finding-json-schema-violations-as-a-result-of-validating-a-boolean-value-against-schema-accepting-only-nulls-or-strings">finding JSON schema violations as a result of validating a boolean value against schema accepting only nulls or strings</a></p>
@@ -183,37 +183,37 @@ amount of code needed for data validation.</p>
 <p><a href="#finding-json-schema-violations-as-a-result-of-validating-json-number-value-which-happens-to-be-an-integer-against-json-schema-accepting-any-numbers">finding JSON schema violations as a result of validating JSON number value which happens to be an integer against JSON schema accepting any numbers</a></p>
 </li>
 <li>
-<p><a href="#finding-json-schema-violations-as-a-result-of-validating-a-multiple-of-x-against-schema-accepting-only-numbers-which-are-multiples-of-x">finding JSON schema violations as a result of validating a multiple of x against schema accepting only numbers which are multiples of x</a></p>
-</li>
-<li>
 <p><a href="#finding-json-schema-violations-as-a-result-of-validating-a-fractional-number-against-schema-accepting-only-whole-numbers">finding JSON schema violations as a result of validating a fractional number against schema accepting only whole numbers</a></p>
 </li>
 <li>
 <p><a href="#finding-json-schema-violations-as-a-result-of-validating-a-multiple-of-25-against-a-schema-accepting-only-multiples-of-25">finding JSON schema violations as a result of validating a multiple of 2.5 against a schema accepting only multiples of 2.5</a></p>
 </li>
 <li>
-<p><a href="#finding-json-schema-violations-as-a-result-of-validating-an-array-containing-a-mixture-of-null-and-boolean-values-to-a-schema-accepting-only-arrays-of-nulls-against-schema-accepting-only-arrays-of-nulls">finding JSON schema violations as a result of validating an array containing a mixture of null and boolean values to a schema accepting only arrays of nulls against schema accepting only arrays of nulls</a></p>
-</li>
-<li>
-<p><a href="#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's minimum allowed values boundary against a schema with a minimum exclusive allowed value set</a></p>
-</li>
-<li>
 <p><a href="#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's maximum allowed values boundary against a schema with a maximum exclusive allowed value set</a></p>
+</li>
+<li>
+<p><a href="#finding-json-schema-violations-as-a-result-of-validating-an-array-containing-some-duplicated-strings-against-schema-not-accepting-duplicates">finding JSON schema violations as a result of validating an array containing some duplicated strings against schema not accepting duplicates</a></p>
+</li>
+<li>
+<p><a href="#finding-json-schema-violations-as-a-result-of-validating-an-array-containing-a-mixture-of-null-and-boolean-values-to-a-schema-accepting-only-arrays-of-nulls-against-schema-accepting-only-arrays-of-nulls">finding JSON schema violations as a result of validating an array containing a mixture of null and boolean values to a schema accepting only arrays of nulls against schema accepting only arrays of nulls</a></p>
 </li>
 <li>
 <p><a href="#finding-json-schema-violations-as-a-result-of-validating-not-a-multiple-of-25-against-a-schema-accepting-only-multiples-of-25">finding JSON schema violations as a result of validating not a multiple of 2.5 against a schema accepting only multiples of 2.5</a></p>
 </li>
 <li>
-<p><a href="#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's maximum allowed values boundary against a schema with a maximum inclusive allowed value set</a></p>
-</li>
-<li>
 <p><a href="#finding-json-schema-violations-as-a-result-of-validating-number-below-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set">finding JSON schema violations as a result of validating number below the schema's maximum allowed values boundary against a schema with a maximum exclusive allowed value set</a></p>
 </li>
 <li>
-<p><a href="#finding-json-schema-violations-as-a-result-of-validating-number-exceeding-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set">finding JSON schema violations as a result of validating number exceeding the schema's maximum allowed values boundary against a schema with a maximum inclusive allowed value set</a></p>
+<p><a href="#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's minimum allowed values boundary against a schema with a minimum exclusive allowed value set</a></p>
+</li>
+<li>
+<p><a href="#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's maximum allowed values boundary against a schema with a maximum inclusive allowed value set</a></p>
 </li>
 <li>
 <p><a href="#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's minimum allowed values boundary against a schema with a minimum inclusive allowed value set</a></p>
+</li>
+<li>
+<p><a href="#finding-json-schema-violations-as-a-result-of-validating-number-exceeding-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set">finding JSON schema violations as a result of validating number exceeding the schema's maximum allowed values boundary against a schema with a maximum inclusive allowed value set</a></p>
 </li>
 <li>
 <p><a href="#finding-json-schema-violations-as-a-result-of-validating-number-below-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set">finding JSON schema violations as a result of validating number below the schema's minimum allowed values boundary against a schema with a minimum exclusive allowed value set</a></p>
@@ -223,62 +223,29 @@ amount of code needed for data validation.</p>
 </li>
 </ul>
 <hr />
-<h3 id="finding-json-schema-violations-as-a-result-of-validating-an-array-containing-some-duplicated-strings-against-schema-not-accepting-duplicates"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-an-array-containing-some-duplicated-strings-against-schema-not-accepting-duplicates">finding JSON schema violations as a result of validating an array containing some duplicated strings against schema not accepting duplicates</a></h3>
-<p>Because the schema requires items to be unique, and the value contains
-duplicate occurrence, such a value is invalid.</p>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-a-multiple-of-x-against-schema-accepting-only-numbers-which-are-multiples-of-x"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-a-multiple-of-x-against-schema-accepting-only-numbers-which-are-multiples-of-x">finding JSON schema violations as a result of validating a multiple of x against schema accepting only numbers which are multiples of x</a></h3>
+<p>Because a JSON number value is a multiple of the factor desired by the
+schema, such a value is valid.</p>
 <p><em>Input:</em></p>
-<p>an array containing some duplicated strings:</p>
+<p>a multiple of x:</p>
 <blockquote>
-<pre><code class="language-json">[
-  &quot;a&quot;,
-  &quot;b&quot;,
-  &quot;b&quot;,
-  &quot;c&quot;,
-  &quot;d&quot;,
-  &quot;d&quot;,
-  &quot;e&quot;
-]
+<pre><code class="language-json">7.5
 </code></pre>
 </blockquote>
-<p>schema not accepting duplicates:</p>
+<p>schema accepting only numbers which are multiples of x:</p>
 <blockquote>
 <pre><code class="language-json">{
-  &quot;uniqueItems&quot;: true
+  &quot;multipleOf&quot;: 2.5,
+  &quot;type&quot;: [
+    &quot;number&quot;
+  ]
 }
 </code></pre>
 </blockquote>
 <p><em>Output:</em></p>
-<p>an invalid array violation:</p>
+<p>no violations:</p>
 <blockquote>
-<ul>
-<li>
-<p>JSON value path: <code>$</code><br />
-JSON schema path: <code>#</code></p>
-<p>Invalid array:</p>
-<ul>
-<li>
-<p>JSON value path: <code>$[1]</code><br />
-JSON schema path: <code>#/uniqueItems</code></p>
-<p>Non-unique array item.</p>
-</li>
-<li>
-<p>JSON value path: <code>$[2]</code><br />
-JSON schema path: <code>#/uniqueItems</code></p>
-<p>Non-unique array item.</p>
-</li>
-<li>
-<p>JSON value path: <code>$[4]</code><br />
-JSON schema path: <code>#/uniqueItems</code></p>
-<p>Non-unique array item.</p>
-</li>
-<li>
-<p>JSON value path: <code>$[5]</code><br />
-JSON schema path: <code>#/uniqueItems</code></p>
-<p>Non-unique array item.</p>
-</li>
-</ul>
-</li>
-</ul>
+<p>∅</p>
 </blockquote>
 <hr />
 <h3 id="finding-json-schema-violations-as-a-result-of-validating-a-boolean-value-against-schema-accepting-only-nulls-or-strings"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-a-boolean-value-against-schema-accepting-only-nulls-or-strings">finding JSON schema violations as a result of validating a boolean value against schema accepting only nulls or strings</a></h3>
@@ -385,31 +352,6 @@ item, such a value is valid.</p>
 <p>∅</p>
 </blockquote>
 <hr />
-<h3 id="finding-json-schema-violations-as-a-result-of-validating-a-multiple-of-x-against-schema-accepting-only-numbers-which-are-multiples-of-x"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-a-multiple-of-x-against-schema-accepting-only-numbers-which-are-multiples-of-x">finding JSON schema violations as a result of validating a multiple of x against schema accepting only numbers which are multiples of x</a></h3>
-<p>Because a JSON number value is a multiple of the factor desired by the
-schema, such a value is valid.</p>
-<p><em>Input:</em></p>
-<p>a multiple of x:</p>
-<blockquote>
-<pre><code class="language-json">7.5
-</code></pre>
-</blockquote>
-<p>schema accepting only numbers which are multiples of x:</p>
-<blockquote>
-<pre><code class="language-json">{
-  &quot;multipleOf&quot;: 2.5,
-  &quot;type&quot;: [
-    &quot;number&quot;
-  ]
-}
-</code></pre>
-</blockquote>
-<p><em>Output:</em></p>
-<p>no violations:</p>
-<blockquote>
-<p>∅</p>
-</blockquote>
-<hr />
 <h3 id="finding-json-schema-violations-as-a-result-of-validating-a-fractional-number-against-schema-accepting-only-whole-numbers"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-a-fractional-number-against-schema-accepting-only-whole-numbers">finding JSON schema violations as a result of validating a fractional number against schema accepting only whole numbers</a></h3>
 <p>Because the schema accepts only whole numbers, such a value is invalid.</p>
 <p><em>Input:</em></p>
@@ -461,6 +403,92 @@ JSON schema path: <code>#/type</code></p>
 <p>no violations:</p>
 <blockquote>
 <p>∅</p>
+</blockquote>
+<hr />
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's maximum allowed values boundary against a schema with a maximum exclusive allowed value set</a></h3>
+<p>Because the maximum value constraint is exclusive, such a value is
+invalid.</p>
+<p><em>Input:</em></p>
+<p>number at the schema's maximum allowed values boundary:</p>
+<blockquote>
+<pre><code class="language-json">4
+</code></pre>
+</blockquote>
+<p>a schema with a maximum exclusive allowed value set:</p>
+<blockquote>
+<pre><code class="language-json">{
+  &quot;exclusiveMaximum&quot;: 4
+}
+</code></pre>
+</blockquote>
+<p><em>Output:</em></p>
+<p>an invalid range violation:</p>
+<blockquote>
+<ul>
+<li>
+<p>JSON value path: <code>$</code><br />
+JSON schema path: <code>#/exclusiveMaximum</code></p>
+<p>4.0 is outside of the valid range of (-Infinity,4.0)</p>
+</li>
+</ul>
+</blockquote>
+<hr />
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-an-array-containing-some-duplicated-strings-against-schema-not-accepting-duplicates"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-an-array-containing-some-duplicated-strings-against-schema-not-accepting-duplicates">finding JSON schema violations as a result of validating an array containing some duplicated strings against schema not accepting duplicates</a></h3>
+<p>Because the schema requires items to be unique, and the value contains
+duplicate occurrence, such a value is invalid.</p>
+<p><em>Input:</em></p>
+<p>an array containing some duplicated strings:</p>
+<blockquote>
+<pre><code class="language-json">[
+  &quot;a&quot;,
+  &quot;b&quot;,
+  &quot;b&quot;,
+  &quot;c&quot;,
+  &quot;d&quot;,
+  &quot;d&quot;,
+  &quot;e&quot;
+]
+</code></pre>
+</blockquote>
+<p>schema not accepting duplicates:</p>
+<blockquote>
+<pre><code class="language-json">{
+  &quot;uniqueItems&quot;: true
+}
+</code></pre>
+</blockquote>
+<p><em>Output:</em></p>
+<p>an invalid array violation:</p>
+<blockquote>
+<ul>
+<li>
+<p>JSON value path: <code>$</code><br />
+JSON schema path: <code>#</code></p>
+<p>Invalid array:</p>
+<ul>
+<li>
+<p>JSON value path: <code>$[1]</code><br />
+JSON schema path: <code>#/uniqueItems</code></p>
+<p>Non-unique array item.</p>
+</li>
+<li>
+<p>JSON value path: <code>$[2]</code><br />
+JSON schema path: <code>#/uniqueItems</code></p>
+<p>Non-unique array item.</p>
+</li>
+<li>
+<p>JSON value path: <code>$[4]</code><br />
+JSON schema path: <code>#/uniqueItems</code></p>
+<p>Non-unique array item.</p>
+</li>
+<li>
+<p>JSON value path: <code>$[5]</code><br />
+JSON schema path: <code>#/uniqueItems</code></p>
+<p>Non-unique array item.</p>
+</li>
+</ul>
+</li>
+</ul>
 </blockquote>
 <hr />
 <h3 id="finding-json-schema-violations-as-a-result-of-validating-an-array-containing-a-mixture-of-null-and-boolean-values-to-a-schema-accepting-only-arrays-of-nulls-against-schema-accepting-only-arrays-of-nulls"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-an-array-containing-a-mixture-of-null-and-boolean-values-to-a-schema-accepting-only-arrays-of-nulls-against-schema-accepting-only-arrays-of-nulls">finding JSON schema violations as a result of validating an array containing a mixture of null and boolean values to a schema accepting only arrays of nulls against schema accepting only arrays of nulls</a></h3>
@@ -517,62 +545,6 @@ JSON schema path: <code>#/items/type</code></p>
 </ul>
 </blockquote>
 <hr />
-<h3 id="finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's minimum allowed values boundary against a schema with a minimum exclusive allowed value set</a></h3>
-<p>Because the minimum value constraint is exclusive, such a value is
-invalid.</p>
-<p><em>Input:</em></p>
-<p>number at the schema's minimum allowed values boundary:</p>
-<blockquote>
-<pre><code class="language-json">4
-</code></pre>
-</blockquote>
-<p>a schema with a minimum exclusive allowed value set:</p>
-<blockquote>
-<pre><code class="language-json">{
-  &quot;exclusiveMinimum&quot;: 4
-}
-</code></pre>
-</blockquote>
-<p><em>Output:</em></p>
-<p>an invalid range violation:</p>
-<blockquote>
-<ul>
-<li>
-<p>JSON value path: <code>$</code><br />
-JSON schema path: <code>#/exclusiveMinimum</code></p>
-<p>4.0 is outside of the valid range of (4.0,Infinity)</p>
-</li>
-</ul>
-</blockquote>
-<hr />
-<h3 id="finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's maximum allowed values boundary against a schema with a maximum exclusive allowed value set</a></h3>
-<p>Because the maximum value constraint is exclusive, such a value is
-invalid.</p>
-<p><em>Input:</em></p>
-<p>number at the schema's maximum allowed values boundary:</p>
-<blockquote>
-<pre><code class="language-json">4
-</code></pre>
-</blockquote>
-<p>a schema with a maximum exclusive allowed value set:</p>
-<blockquote>
-<pre><code class="language-json">{
-  &quot;exclusiveMaximum&quot;: 4
-}
-</code></pre>
-</blockquote>
-<p><em>Output:</em></p>
-<p>an invalid range violation:</p>
-<blockquote>
-<ul>
-<li>
-<p>JSON value path: <code>$</code><br />
-JSON schema path: <code>#/exclusiveMaximum</code></p>
-<p>4.0 is outside of the valid range of (-Infinity,4.0)</p>
-</li>
-</ul>
-</blockquote>
-<hr />
 <h3 id="finding-json-schema-violations-as-a-result-of-validating-not-a-multiple-of-25-against-a-schema-accepting-only-multiples-of-25"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-not-a-multiple-of-25-against-a-schema-accepting-only-multiples-of-25">finding JSON schema violations as a result of validating not a multiple of 2.5 against a schema accepting only multiples of 2.5</a></h3>
 <p>Because the schema accepts only multiples of 2.5, such a value is
 invalid.</p>
@@ -604,6 +576,56 @@ JSON schema path: <code>#/multipleOf</code></p>
 </ul>
 </blockquote>
 <hr />
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-number-below-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-number-below-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set">finding JSON schema violations as a result of validating number below the schema's maximum allowed values boundary against a schema with a maximum exclusive allowed value set</a></h3>
+<p>Because the value is less than the maximum value constraint, such a
+value is valid.</p>
+<p><em>Input:</em></p>
+<p>number below the schema's maximum allowed values boundary:</p>
+<blockquote>
+<pre><code class="language-json">3
+</code></pre>
+</blockquote>
+<p>a schema with a maximum exclusive allowed value set:</p>
+<blockquote>
+<pre><code class="language-json">{
+  &quot;exclusiveMaximum&quot;: 4
+}
+</code></pre>
+</blockquote>
+<p><em>Output:</em></p>
+<p>no violations:</p>
+<blockquote>
+<p>∅</p>
+</blockquote>
+<hr />
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's minimum allowed values boundary against a schema with a minimum exclusive allowed value set</a></h3>
+<p>Because the minimum value constraint is exclusive, such a value is
+invalid.</p>
+<p><em>Input:</em></p>
+<p>number at the schema's minimum allowed values boundary:</p>
+<blockquote>
+<pre><code class="language-json">4
+</code></pre>
+</blockquote>
+<p>a schema with a minimum exclusive allowed value set:</p>
+<blockquote>
+<pre><code class="language-json">{
+  &quot;exclusiveMinimum&quot;: 4
+}
+</code></pre>
+</blockquote>
+<p><em>Output:</em></p>
+<p>an invalid range violation:</p>
+<blockquote>
+<ul>
+<li>
+<p>JSON value path: <code>$</code><br />
+JSON schema path: <code>#/exclusiveMinimum</code></p>
+<p>4.0 is outside of the valid range of (4.0,Infinity)</p>
+</li>
+</ul>
+</blockquote>
+<hr />
 <h3 id="finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-inclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's maximum allowed values boundary against a schema with a maximum inclusive allowed value set</a></h3>
 <p>Because the maximum value constraint is inclusive, such a value is
 valid.</p>
@@ -626,19 +648,19 @@ valid.</p>
 <p>∅</p>
 </blockquote>
 <hr />
-<h3 id="finding-json-schema-violations-as-a-result-of-validating-number-below-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-number-below-the-schemas-maximum-allowed-values-boundary-against-a-schema-with-a-maximum-exclusive-allowed-value-set">finding JSON schema violations as a result of validating number below the schema's maximum allowed values boundary against a schema with a maximum exclusive allowed value set</a></h3>
-<p>Because the value is less than the maximum value constraint, such a
-value is valid.</p>
+<h3 id="finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's minimum allowed values boundary against a schema with a minimum inclusive allowed value set</a></h3>
+<p>Because the minimum value constraint is inclusive, such a value is
+valid.</p>
 <p><em>Input:</em></p>
-<p>number below the schema's maximum allowed values boundary:</p>
+<p>number at the schema's minimum allowed values boundary:</p>
 <blockquote>
-<pre><code class="language-json">3
+<pre><code class="language-json">4
 </code></pre>
 </blockquote>
-<p>a schema with a maximum exclusive allowed value set:</p>
+<p>a schema with a minimum inclusive allowed value set:</p>
 <blockquote>
 <pre><code class="language-json">{
-  &quot;exclusiveMaximum&quot;: 4
+  &quot;minimum&quot;: 4
 }
 </code></pre>
 </blockquote>
@@ -674,28 +696,6 @@ JSON schema path: <code>#/maximum</code></p>
 <p>5.0 is outside of the valid range of (-Infinity,4.0]</p>
 </li>
 </ul>
-</blockquote>
-<hr />
-<h3 id="finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-number-at-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-inclusive-allowed-value-set">finding JSON schema violations as a result of validating number at the schema's minimum allowed values boundary against a schema with a minimum inclusive allowed value set</a></h3>
-<p>Because the minimum value constraint is inclusive, such a value is
-valid.</p>
-<p><em>Input:</em></p>
-<p>number at the schema's minimum allowed values boundary:</p>
-<blockquote>
-<pre><code class="language-json">4
-</code></pre>
-</blockquote>
-<p>a schema with a minimum inclusive allowed value set:</p>
-<blockquote>
-<pre><code class="language-json">{
-  &quot;minimum&quot;: 4
-}
-</code></pre>
-</blockquote>
-<p><em>Output:</em></p>
-<p>no violations:</p>
-<blockquote>
-<p>∅</p>
 </blockquote>
 <hr />
 <h3 id="finding-json-schema-violations-as-a-result-of-validating-number-below-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-number-below-the-schemas-minimum-allowed-values-boundary-against-a-schema-with-a-minimum-exclusive-allowed-value-set">finding JSON schema violations as a result of validating number below the schema's minimum allowed values boundary against a schema with a minimum exclusive allowed value set</a></h3>
