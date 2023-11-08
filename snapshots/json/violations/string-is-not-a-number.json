@@ -1,0 +1,10 @@
+[
+  {
+    "schemaPath": ["type"],
+    "reason": {
+      "allowedJsonValueTypes": ["number"],
+      "actualJsonValueType": "string"
+    },
+    "jsonPath": []
+  }
+]

@@ -1,5 +1,7 @@
-let upstream =
-      https://github.com/purescript/package-sets/releases/download/psc-0.15.10-20230811/packages.dhall
-        sha256:df2ac9c0d9332b58cf1fa281ee28e732bbcf7e216c8587a25622429f841bcc31
+let optparse = ./lib/purescript-optparse/spago.dhall as Location
 
-in  upstream
+let upstream =
+      https://github.com/purescript/package-sets/releases/download/psc-0.15.10-20231023/packages.dhall
+        sha256:b9a482e743055ba8f2d65b08a88cd772b59c6e2084d0e5ad854025fa90417fd4
+
+in  upstream // { optparse }

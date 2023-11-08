@@ -5,6 +5,7 @@ import Prelude
 import Data.Foldable (class Foldable, sequence_)
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
+import Test.Snapshot.Spec.CLI as CLI
 import Test.Snapshot.Spec.Docs as Docs
 import Test.Snapshot.Spec.Markdown as Markdown
 import Test.Snapshot.TestSpec (TestSpec)
@@ -19,7 +20,8 @@ main = do
   where
   specs ∷ Array TestSpec
   specs =
-    [ Spec.describe "Docs" $ testSnapshot Docs.spec
+    [ Spec.describe "CLI" $ testSnapshot CLI.spec
+    , Spec.describe "Docs" $ testSnapshot Docs.spec
     , Spec.describe "Markdown" $ testSnapshot Markdown.spec
     ]
 

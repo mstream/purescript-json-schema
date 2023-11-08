@@ -106,14 +106,16 @@ run { command } = case command of
         Right json →
           pure json
 
-    Console.info case outputFormat of
-      Json →
-        A.stringify $ AE.encodeJson $ JsonValue jsonValue
-          `Validation.validateAgainst` schema
-      Markdown →
-        M.render { maxLineLength: 72 }
-          $ M.document
-          $ document
-          $ JsonValue jsonValue `Validation.validateAgainst` schema
+    let
+      output = case outputFormat of
+        Json →
+          A.stringifyWithIndent 2 $ AE.encodeJson $ JsonValue jsonValue
+            `Validation.validateAgainst` schema
+        Markdown →
+          M.render { maxLineLength: 72 }
+            $ M.document
+            $ document
+            $ JsonValue jsonValue `Validation.validateAgainst` schema
 
+    Console.info $ output <> "\n"
     pure unit
