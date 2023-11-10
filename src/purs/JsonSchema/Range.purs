@@ -3,8 +3,10 @@ module JsonSchema.Range (Boundary(..), Range, renderRange) where
 import Prelude
 
 import Data.Argonaut.Core as A
-import Data.Argonaut.Encode (class EncodeJson, encodeJson)
+import Data.Argonaut.Encode (class EncodeJson)
 import Data.Generic.Rep (class Generic)
+import Data.Markdown (PhrasingContentNode)
+import Data.Markdown as M
 import Data.Show.Generic (genericShow)
 import Data.String.NonEmpty (NonEmptyString)
 import Data.String.NonEmpty as StringNE
@@ -12,10 +14,9 @@ import Type.Proxy (Proxy(..))
 
 type Range = { from ∷ Boundary, to ∷ Boundary }
 
-renderRange ∷ Range → NonEmptyString
-renderRange range = renderFrom
-  <> StringNE.nes (Proxy ∷ Proxy ",")
-  <> renderTo
+renderRange ∷ Range → PhrasingContentNode
+renderRange range = M.inlineCode
+  $ renderFrom <> StringNE.nes (Proxy ∷ Proxy ",") <> renderTo
   where
   renderFrom ∷ NonEmptyString
   renderFrom = case range.from of

@@ -326,7 +326,7 @@ an invalid range violation:
 > - JSON value path: `$`\
 >   JSON schema path: `#/exclusiveMaximum`
 >
->   4.0 is outside of the valid range of (-Infinity,4.0)
+>   4.0 is outside of the valid range of `(-Infinity,4.0)`
 
 ---
 
@@ -538,7 +538,7 @@ an invalid range violation:
 > - JSON value path: `$`\
 >   JSON schema path: `#/exclusiveMinimum`
 >
->   4.0 is outside of the valid range of (4.0,Infinity)
+>   4.0 is outside of the valid range of `(4.0,Infinity)`
 
 ---
 
@@ -628,7 +628,7 @@ an invalid range violation:
 > - JSON value path: `$`\
 >   JSON schema path: `#/maximum`
 >
->   5.0 is outside of the valid range of (-Infinity,4.0]
+>   5.0 is outside of the valid range of `(-Infinity,4.0]`
 
 ---
 
@@ -689,4 +689,4 @@ an invalid range violation:
 > - JSON value path: `$`\
 >   JSON schema path: `#/minimum`
 >
->   3.0 is outside of the valid range of [4.0,Infinity)
+>   3.0 is outside of the valid range of `[4.0,Infinity)`

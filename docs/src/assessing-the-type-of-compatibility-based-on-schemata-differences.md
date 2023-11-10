@@ -445,7 +445,7 @@ backward compatibility:
 >
 > - - schema path: #
 >
->     the range of allowed values has been extended by [5.0,10.0) and (15.0,20.0]
+>     the range of allowed values has been extended by `[5.0,10.0)` and `(15.0,20.0]`
 
 ---
 
@@ -474,7 +474,7 @@ forward compatibility:
 >
 > - - schema path: #
 >
->     the range of allowed values has been reduced by (-Infinity,5.0) and (20.0,Infinity)
+>     the range of allowed values has been reduced by `(-Infinity,5.0)` and `(20.0,Infinity)`
 
 ---
 
@@ -529,7 +529,7 @@ backward compatibility:
 >
 > - - schema path: #
 >
->     the range of allowed values has been extended by (-Infinity,5.0] and (20.0,Infinity)
+>     the range of allowed values has been extended by `(-Infinity,5.0]` and `(20.0,Infinity)`
 
 ---
 
@@ -559,7 +559,7 @@ forward compatibility:
 >
 > - - schema path: #
 >
->     the range of allowed values has been reduced by (5.0,10.0] and [15.0,20.0)
+>     the range of allowed values has been reduced by `(5.0,10.0]` and `[15.0,20.0)`
 
 ---
 
@@ -589,13 +589,13 @@ no compatibility:
 >
 > - - schema path: #
 >
->     the range of allowed values has been extended by [15.0,20.0)
+>     the range of allowed values has been extended by `[15.0,20.0)`
 >
 > Reasons for breaking the backward compatibility:
 >
 > - - schema path: #
 >
->     the range of allowed values has been reduced by (5.0,10.0]
+>     the range of allowed values has been reduced by `(5.0,10.0]`
 
 ---
 
@@ -625,13 +625,13 @@ no compatibility:
 >
 > - - schema path: #
 >
->     the range of allowed values has been extended by (15.0,20.0]
+>     the range of allowed values has been extended by `(15.0,20.0]`
 >
 > Reasons for breaking the backward compatibility:
 >
 > - - schema path: #
 >
->     the range of allowed values has been reduced by [5.0,10.0)
+>     the range of allowed values has been reduced by `[5.0,10.0)`
 
 ---
 
@@ -660,7 +660,7 @@ forward compatibility:
 >
 > - - schema path: #
 >
->     the range of allowed values has been reduced by [5.0,10.0) and (15.0,20.0]
+>     the range of allowed values has been reduced by `[5.0,10.0)` and `(15.0,20.0]`
 
 ---
 
@@ -689,4 +689,4 @@ backward compatibility:
 >
 > - - schema path: #
 >
->     the range of allowed values has been extended by (5.0,10.0] and [15.0,20.0)
+>     the range of allowed values has been extended by `(5.0,10.0]` and `[15.0,20.0)`

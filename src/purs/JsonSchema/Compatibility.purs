@@ -11,10 +11,12 @@ module JsonSchema.Compatibility
 import Prelude
 
 import Data.Array as Array
+import Data.Array.NonEmpty (NonEmptyArray)
 import Data.Array.NonEmpty as ArrayNE
 import Data.Foldable (foldl)
 import Data.Generic.Rep (class Generic)
 import Data.List (List(..))
+import Data.Markdown (PhrasingContentNode)
 import Data.Markdown as M
 import Data.Maybe (Maybe(..))
 import Data.NonEmpty ((:|))
@@ -24,7 +26,6 @@ import Data.Set as Set
 import Data.Set.NonEmpty (NonEmptySet)
 import Data.Set.NonEmpty as SetNE
 import Data.Show.Generic (genericShow)
-import Data.String.NonEmpty (NonEmptyString)
 import Data.String.NonEmpty as StringNE
 import Docs.Document (class Document, document)
 import JsonSchema (JsonValueType(..))
@@ -150,44 +151,51 @@ instance Show BackwardIncompatibilityType where
   show = genericShow
 
 instance Document BackwardIncompatibilityType where
-  document = NE.singleton <<< M.paragraph <<< map M.text <<<
+  document = NE.singleton <<< M.paragraph <<<
     case _ of
       MultipleIntroduced multiple →
-        StringNE.nes
-          (Proxy ∷ Proxy "numerical values must be multiples of ")
+        ( M.text $
+            StringNE.nes
+              (Proxy ∷ Proxy "numerical values must be multiples of ")
+        )
           `ArrayNE.cons'`
-            [ show1 multiple
-            , StringNE.nes
-                (Proxy ∷ Proxy "now")
+            [ M.text $ show1 multiple
+            , M.text $ StringNE.nes (Proxy ∷ Proxy " now")
             ]
       OldMultipleIsNotFactorOfNewMultiple { new, old } →
-        StringNE.nes
-          (Proxy ∷ Proxy "the old multiple constraint of ")
+        ( M.text $
+            StringNE.nes
+              (Proxy ∷ Proxy "the old multiple constraint of ")
+        )
           `ArrayNE.cons'`
-            [ show1 old
-            , StringNE.nes
+            [ M.text $ show1 old
+            , M.text $ StringNE.nes
                 ( Proxy
                     ∷ Proxy
                         " is not a factor of the new multiple constraint of "
                 )
-            , show1 new
+            , M.text $ show1 new
             ]
       RangeOfAllowedNumbersReduced change →
-        StringNE.nes
-          ( Proxy
-              ∷ Proxy "the range of allowed values has been reduced by "
-          )
-          `ArrayNE.cons'` [ renderNumberRangeChange change ]
+        ( M.text $ StringNE.nes
+            ( Proxy
+                ∷ Proxy
+                    "the range of allowed values has been reduced by "
+            )
+        )
+          `ArrayNE.cons` renderNumberRangeChange change
       SetOfAllowedTypesReduced removedTypes →
-        StringNE.nes
-          ( Proxy
-              ∷ Proxy
-                  "the set of allowed JSON value types has been reduced by "
-          )
+        ( M.text $ StringNE.nes
+            ( Proxy
+                ∷ Proxy
+                    "the set of allowed JSON value types has been reduced by "
+            )
+        )
           `ArrayNE.cons'`
-            [ StringNE.join1With ", " $
-                Schema.renderJsonValueType <$> ArrayNE.fromFoldable1
-                  removedTypes
+            [ M.text
+                $ StringNE.join1With ", "
+                $ Schema.renderJsonValueType
+                    <$> ArrayNE.fromFoldable1 removedTypes
             ]
 
 data ForwardIncompatibilityType
@@ -205,42 +213,49 @@ instance Show ForwardIncompatibilityType where
   show = genericShow
 
 instance Document ForwardIncompatibilityType where
-  document = NE.singleton <<< M.paragraph <<< map M.text <<<
+  document = NE.singleton <<< M.paragraph <<<
     case _ of
       MultipleWithdrawn multiple →
-        StringNE.nes
-          (Proxy ∷ Proxy "numerical values must not be multiples of ")
+        ( M.text $ StringNE.nes
+            (Proxy ∷ Proxy "numerical values must not be multiples of ")
+        )
           `ArrayNE.cons'`
-            [ show1 multiple, StringNE.nes (Proxy ∷ Proxy "anymore") ]
+            [ M.text $ show1 multiple
+            , M.text $ StringNE.nes (Proxy ∷ Proxy "anymore")
+            ]
       NewMultipleIsNotFactorOfOldMultiple { new, old } →
-        StringNE.nes
-          (Proxy ∷ Proxy "the new multiple constraint of ")
+        ( M.text $ StringNE.nes
+            (Proxy ∷ Proxy "the new multiple constraint of ")
+        )
           `ArrayNE.cons'`
-            [ show1 new
-            , StringNE.nes
+            [ M.text $ show1 new
+            , M.text $ StringNE.nes
                 ( Proxy
                     ∷ Proxy
                         " is not a factor of the olf multiple constraint of "
                 )
-            , show1 old
+            , M.text $ show1 old
             ]
       RangeOfAllowedNumbersExtended change →
-        StringNE.nes
-          ( Proxy
-              ∷ Proxy
-                  "the range of allowed values has been extended by "
-          )
-          `ArrayNE.cons'` [ renderNumberRangeChange change ]
+        ( M.text $ StringNE.nes
+            ( Proxy
+                ∷ Proxy
+                    "the range of allowed values has been extended by "
+            )
+        )
+          `ArrayNE.cons` renderNumberRangeChange change
       SetOfAllowedTypesExtended removedTypes →
-        StringNE.nes
-          ( Proxy
-              ∷ Proxy
-                  "the set of allowed JSON value types has been extended by "
-          )
+        ( M.text $ StringNE.nes
+            ( Proxy
+                ∷ Proxy
+                    "the set of allowed JSON value types has been extended by "
+            )
+        )
           `ArrayNE.cons'`
-            [ StringNE.join1With ", " $
-                Schema.renderJsonValueType <$> ArrayNE.fromFoldable1
-                  removedTypes
+            [ M.text
+                $ StringNE.join1With ", "
+                $ Schema.renderJsonValueType
+                    <$> ArrayNE.fromFoldable1 removedTypes
             ]
 
 data NumberRangeChange
@@ -255,16 +270,19 @@ derive instance Ord NumberRangeChange
 instance Show NumberRangeChange where
   show = genericShow
 
-renderNumberRangeChange ∷ NumberRangeChange → NonEmptyString
+renderNumberRangeChange
+  ∷ NumberRangeChange → NonEmptyArray PhrasingContentNode
 renderNumberRangeChange = case _ of
   Lower lower →
-    Range.renderRange lower
+    ArrayNE.singleton $ Range.renderRange lower
   LowerAndUpper lower upper →
     Range.renderRange lower
-      <> StringNE.nes (Proxy ∷ Proxy " and ")
-      <> Range.renderRange upper
+      `ArrayNE.cons'`
+        [ M.text $ StringNE.nes (Proxy ∷ Proxy " and ")
+        , Range.renderRange upper
+        ]
   Upper upper →
-    Range.renderRange upper
+    ArrayNE.singleton $ Range.renderRange upper
 
 calculate ∷ Set Difference → Compatibility
 calculate differences = foldl

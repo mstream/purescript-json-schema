@@ -143,13 +143,13 @@ instance Document ViolationReason where
     InvalidRange { validRange, value } →
       NE.singleton
         $ M.paragraph
-        $ ArrayNE.singleton
-        $ M.text
         $
-          show value
-            `StringNE.prependString` StringNE.nes
-              (Proxy ∷ Proxy " is outside of the valid range of ")
-            <> Range.renderRange validRange
+          M.text
+            ( show value
+                `StringNE.prependString` StringNE.nes
+                  (Proxy ∷ Proxy " is outside of the valid range of ")
+            )
+            `ArrayNE.cons'` [ Range.renderRange validRange ]
     NonUniqueArrayItem →
       NE.singleton
         $ M.paragraph
