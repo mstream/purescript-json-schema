@@ -1,4 +1,20 @@
-# Computation of computation result based on integers and a string
+# Computation of some result based on integers and a string
+
+## Schema
+
+```mermaid
+flowchart LR
+    subgraph inputs
+        input_desc_0["integers"]
+        input_desc_1["a string"]
+    end
+    subgraph output
+        output_desc["some result"]
+    end
+    inputs --> output
+```
+
+## Context
 
 computation context
 
@@ -10,13 +26,13 @@ computation context
 
 ## Examples
 
-- [computation of computation result based on number one and two and a three letter word](#computation-of-computation-result-based-on-number-one-and-two-and-a-three-letter-word)
+- [computation of some result based on number one and two and a three letter word](#computation-of-some-result-based-on-number-one-and-two-and-a-three-letter-word)
 
-- [computation of computation result based on number two, three and four and a three letter word](#computation-of-computation-result-based-on-number-two-three-and-four-and-a-three-letter-word)
+- [computation of some result based on number two, three and four and a three letter word](#computation-of-some-result-based-on-number-two-three-and-four-and-a-three-letter-word)
 
 ---
 
-### computation of computation result based on number one and two and a three letter word
+### computation of some result based on number one and two and a three letter word
 
 example1 description
 
@@ -40,7 +56,7 @@ false value:
 
 ---
 
-### computation of computation result based on number two, three and four and a three letter word
+### computation of some result based on number two, three and four and a three letter word
 
 example2 description
 

@@ -1,5 +1,21 @@
 # Calculating differences between schemata based on old JSON schema and new JSON schema
 
+## Schema
+
+```mermaid
+flowchart LR
+    subgraph inputs
+        input_desc_0["new JSON schema"]
+        input_desc_1["old JSON schema"]
+    end
+    subgraph output
+        output_desc["differences between schemata"]
+    end
+    inputs --> output
+```
+
+## Context
+
 Calculating JSON Schema Difference is a process used to identify the
 changes between two JSON schemata.\
 It is used to to see what has been added, removed, or changed.\

@@ -4,8 +4,10 @@ import Prelude
 
 import Data.Array as Array
 import Data.Array.NonEmpty as ArrayNE
-import Data.Markdown (Document, FlowContentNode)
+import Data.Markdown (CodeLanguage(..), Document, FlowContentNode)
 import Data.Markdown as M
+import Data.Mermaid.FlowChart (FlowChartDef(..), Orientation(..))
+import Data.Mermaid.FlowChart as FlowChart
 import Data.String as String
 import Data.String.NonEmpty (NonEmptyString)
 import Data.String.NonEmpty as StringNE
@@ -24,8 +26,14 @@ spec =
 
 fixtures ∷ Array (Fixture DocumentExample)
 fixtures =
-  [ { input: documentExample1
-    , outputPath: "markdown/document1.md"
+  [ { input: longLinesExample
+    , outputPath: "markdown/long-lines.md"
+    }
+  , { input: codeBlockExample
+    , outputPath: "markdown/code-block.md"
+    }
+  , { input: mermaidFlowChartExample
+    , outputPath: "markdown/mermaid-flow-chart.md"
     }
   ]
 
@@ -38,8 +46,8 @@ renderMarkdownDocument { document } = M.render
   { maxLineLength: 80 }
   document
 
-documentExample1 ∷ DocumentExample
-documentExample1 =
+longLinesExample ∷ DocumentExample
+longLinesExample =
   { description: "very long text lines"
   , document
   }
@@ -58,6 +66,42 @@ documentExample1 =
       , paragraphWithLineOfLengthTenTimes 18
       , paragraphWithLineOfLengthTenTimes 20
       ]
+
+codeBlockExample ∷ DocumentExample
+codeBlockExample =
+  { description: "code block with an empty JSON inside it"
+  , document
+  }
+  where
+  document ∷ Document
+  document = Array.singleton
+    $ M.flowContent
+    $ M.codeBlock Json [ "{}" ]
+
+mermaidFlowChartExample ∷ DocumentExample
+mermaidFlowChartExample =
+  { description: "mermaid flow chart diagram"
+  , document
+  }
+  where
+  document ∷ Document
+  document = Array.singleton
+    $ M.flowContent
+    $ M.renderMermaid flowChartDef
+
+  flowChartDef ∷ FlowChartDef
+  flowChartDef = FlowChartDef LeftToRight
+    [ FlowChart.subGraph "subgraph1"
+        [ FlowChart.box "subgraph1_box1" "box1"
+        , FlowChart.box "subgraph1_box2" "box2"
+        ]
+    , FlowChart.box "box1" "box1"
+    , FlowChart.normalArrow "subgraph1" "box1"
+    , FlowChart.normalArrowWithAnnotation
+        "arrow description"
+        "subgraph1_box1"
+        "subgraph1_box2"
+    ]
 
 paragraphWithLineOfLengthTenTimes ∷ Int → FlowContentNode
 paragraphWithLineOfLengthTenTimes n = M.paragraph

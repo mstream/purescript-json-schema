@@ -1,5 +1,20 @@
 # Assessing the type of compatibility based on schemata differences
 
+## Schema
+
+```mermaid
+flowchart LR
+    subgraph inputs
+        input_desc_0["schemata differences"]
+    end
+    subgraph output
+        output_desc["the type of compatibility"]
+    end
+    inputs --> output
+```
+
+## Context
+
 _Backward compatibility_ - an ability of a system to understand input intended for previous
 versions of itself
 
@@ -19,17 +34,14 @@ flowchart LR
     subgraph data writers
         current_writer("writer")
         next_writer("writer<sub>+1</sub>")
-
     end
     subgraph data readers
         current_reader("reader")
         next_reader("reader<sub>+1</sub>")
-
     end
-    current_writer -->  current_reader
-    current_writer --> |backward compatibility| next_reader
-    next_writer --> |forward compatibility| current_reader
-
+    current_writer --> current_reader
+    current_writer -->|backward compatibility| next_reader
+    next_writer -->|forward compatibility| current_reader
 ```
 
 ```mermaid
@@ -37,17 +49,14 @@ flowchart LR
     subgraph data writers
         current_writer("writer")
         next_writer("writer<sub>+1</sub>")
-
     end
     subgraph data readers
         current_reader("reader")
         next_reader("reader<sub>+1</sub>")
-
     end
-    current_writer -->  current_reader
-    current_writer --> |backward compatibility| next_reader
-    next_writer --> |forward compatibility| current_reader
-
+    current_writer --> current_reader
+    current_writer -->|backward compatibility| next_reader
+    next_writer -->|forward compatibility| current_reader
 ```
 
 ## Examples
@@ -60,17 +69,17 @@ flowchart LR
 
 - [assessing the type of compatibility based on an accepted type change from null to boolean](#assessing-the-type-of-compatibility-based-on-an-accepted-type-change-from-null-to-boolean)
 
-- [assessing the type of compatibility based on change of accepted type from number to integer](#assessing-the-type-of-compatibility-based-on-change-of-accepted-type-from-number-to-integer)
-
 - [assessing the type of compatibility based on extending set of accepted value types from numbers to numbers and integers](#assessing-the-type-of-compatibility-based-on-extending-set-of-accepted-value-types-from-numbers-to-numbers-and-integers)
+
+- [assessing the type of compatibility based on change of accepted type from number to integer](#assessing-the-type-of-compatibility-based-on-change-of-accepted-type-from-number-to-integer)
 
 - [assessing the type of compatibility based on no differences](#assessing-the-type-of-compatibility-based-on-no-differences)
 
 - [assessing the type of compatibility based on extension of accepted types by an additional type](#assessing-the-type-of-compatibility-based-on-extension-of-accepted-types-by-an-additional-type)
 
-- [assessing the type of compatibility based on old and new value of multipleOf being not each other's factors](#assessing-the-type-of-compatibility-based-on-old-and-new-value-of-multipleof-being-not-each-others-factors)
-
 - [assessing the type of compatibility based on reduction of accepted types](#assessing-the-type-of-compatibility-based-on-reduction-of-accepted-types)
+
+- [assessing the type of compatibility based on old and new value of multipleOf being not each other's factors](#assessing-the-type-of-compatibility-based-on-old-and-new-value-of-multipleof-being-not-each-others-factors)
 
 - [assessing the type of compatibility based on the range of allowed number values being extended](#assessing-the-type-of-compatibility-based-on-the-range-of-allowed-number-values-being-extended)
 
@@ -80,9 +89,9 @@ flowchart LR
 
 - [assessing the type of compatibility based on the range gets unconstrained](#assessing-the-type-of-compatibility-based-on-the-range-gets-unconstrained)
 
-- [assessing the type of compatibility based on the range of allowed number values being extended and reduced at the same time using exclusive versions of constraints](#assessing-the-type-of-compatibility-based-on-the-range-of-allowed-number-values-being-extended-and-reduced-at-the-same-time-using-exclusive-versions-of-constraints)
-
 - [assessing the type of compatibility based on the range of allowed values being reduced using the exclusive version of constraints](#assessing-the-type-of-compatibility-based-on-the-range-of-allowed-values-being-reduced-using-the-exclusive-version-of-constraints)
+
+- [assessing the type of compatibility based on the range of allowed number values being extended and reduced at the same time using exclusive versions of constraints](#assessing-the-type-of-compatibility-based-on-the-range-of-allowed-number-values-being-extended-and-reduced-at-the-same-time-using-exclusive-versions-of-constraints)
 
 - [assessing the type of compatibility based on the range of allowed number values being extended and reduced at the same time](#assessing-the-type-of-compatibility-based-on-the-range-of-allowed-number-values-being-extended-and-reduced-at-the-same-time)
 
@@ -229,6 +238,37 @@ no compatibility:
 
 ---
 
+### assessing the type of compatibility based on extending set of accepted value types from numbers to numbers and integers
+
+In this situation, every integer is also a number so this kind of
+difference does not have any implact. Therefore, such a change is fully
+compatible.
+
+_Input:_
+
+extending set of accepted value types from numbers to numbers and
+integers:
+
+> - JSON schema path: #
+>
+>   change of accepted JSON value types from
+>
+>   - number
+>
+>   to
+>
+>   - integer
+>
+>   - number
+
+_Output:_
+
+full compatibility:
+
+> ✓
+
+---
+
 ### assessing the type of compatibility based on change of accepted type from number to integer
 
 In this situation, Because every integer is a number, but not vice
@@ -258,37 +298,6 @@ forward compatibility:
 > - - schema path: #
 >
 >     the set of allowed JSON value types has been reduced by number
-
----
-
-### assessing the type of compatibility based on extending set of accepted value types from numbers to numbers and integers
-
-In this situation, every integer is also a number so this kind of
-difference does not have any implact. Therefore, such a change is fully
-compatible.
-
-_Input:_
-
-extending set of accepted value types from numbers to numbers and
-integers:
-
-> - JSON schema path: #
->
->   change of accepted JSON value types from
->
->   - number
->
->   to
->
->   - integer
->
->   - number
-
-_Output:_
-
-full compatibility:
-
-> ✓
 
 ---
 
@@ -345,38 +354,6 @@ backward compatibility:
 
 ---
 
-### assessing the type of compatibility based on old and new value of multipleOf being not each other's factors
-
-In this situation, there are potentially some numbers that are not
-divisible by neither of multipleOf values. Therefore, such a change is
-not compatible.
-
-_Input:_
-
-old and new value of multipleOf being not each other's factors:
-
-> - JSON schema path: #
->
->   change of multipleOf from 2.0 to 5.0
-
-_Output:_
-
-no compatibility:
-
-> Reasons for breaking the forward compatibility:
->
-> - - schema path: #
->
->     the new multiple constraint of 5.0 is not a factor of the olf multiple constraint of 2.0
->
-> Reasons for breaking the backward compatibility:
->
-> - - schema path: #
->
->     the old multiple constraint of 2.0 is not a factor of the new multiple constraint of 5.0
-
----
-
 ### assessing the type of compatibility based on reduction of accepted types
 
 In this situation, Because less value types than before are accepted,
@@ -408,6 +385,38 @@ forward compatibility:
 > - - schema path: #
 >
 >     the set of allowed JSON value types has been reduced by boolean
+
+---
+
+### assessing the type of compatibility based on old and new value of multipleOf being not each other's factors
+
+In this situation, there are potentially some numbers that are not
+divisible by neither of multipleOf values. Therefore, such a change is
+not compatible.
+
+_Input:_
+
+old and new value of multipleOf being not each other's factors:
+
+> - JSON schema path: #
+>
+>   change of multipleOf from 2.0 to 5.0
+
+_Output:_
+
+no compatibility:
+
+> Reasons for breaking the forward compatibility:
+>
+> - - schema path: #
+>
+>     the new multiple constraint of 5.0 is not a factor of the olf multiple constraint of 2.0
+>
+> Reasons for breaking the backward compatibility:
+>
+> - - schema path: #
+>
+>     the old multiple constraint of 2.0 is not a factor of the new multiple constraint of 5.0
 
 ---
 
@@ -524,6 +533,36 @@ backward compatibility:
 
 ---
 
+### assessing the type of compatibility based on the range of allowed values being reduced using the exclusive version of constraints
+
+In this situation, all numbers from the new, shorted range fall into the
+old, longer range. Therefore, such a change is forward compatible.
+
+_Input:_
+
+the range of allowed values being reduced using the exclusive version of
+constraints:
+
+> - JSON schema path: #
+>
+>   change of exclusiveMaximum from 20.0 to 15.0
+>
+> - JSON schema path: #
+>
+>   change of exclusiveMinimum from 5.0 to 10.0
+
+_Output:_
+
+forward compatibility:
+
+> Reasons for breaking the backward compatibility:
+>
+> - - schema path: #
+>
+>     the range of allowed values has been reduced by (5.0,10.0] and [15.0,20.0)
+
+---
+
 ### assessing the type of compatibility based on the range of allowed number values being extended and reduced at the same time using exclusive versions of constraints
 
 In this situation, there are some numbers which do not fall into neither
@@ -557,36 +596,6 @@ no compatibility:
 > - - schema path: #
 >
 >     the range of allowed values has been reduced by (5.0,10.0]
-
----
-
-### assessing the type of compatibility based on the range of allowed values being reduced using the exclusive version of constraints
-
-In this situation, all numbers from the new, shorted range fall into the
-old, longer range. Therefore, such a change is forward compatible.
-
-_Input:_
-
-the range of allowed values being reduced using the exclusive version of
-constraints:
-
-> - JSON schema path: #
->
->   change of exclusiveMaximum from 20.0 to 15.0
->
-> - JSON schema path: #
->
->   change of exclusiveMinimum from 5.0 to 10.0
-
-_Output:_
-
-forward compatibility:
-
-> Reasons for breaking the backward compatibility:
->
-> - - schema path: #
->
->     the range of allowed values has been reduced by (5.0,10.0] and [15.0,20.0)
 
 ---
 

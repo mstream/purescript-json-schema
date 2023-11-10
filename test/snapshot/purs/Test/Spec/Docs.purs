@@ -126,10 +126,7 @@ computation1 =
        } →
         String.length s == Array.length i
   , output: ValueSpec $ StringNE.nes
-      ( Proxy
-          ∷ Proxy
-              "computation result"
-      )
+      (Proxy ∷ Proxy "some result")
   , properties:
       [ { description: StringNE.nes
             (Proxy ∷ Proxy "property1 description")

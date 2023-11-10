@@ -9,11 +9,18 @@ import Prelude
 import Data.Array as Array
 import Data.Array.NonEmpty (NonEmptyArray)
 import Data.Array.NonEmpty as ArrayNE
+import Data.FunctorWithIndex (mapWithIndex)
 import Data.Map (Map)
 import Data.Map as Map
 import Data.Markdown (Document, FlowContentNode)
 import Data.Markdown as M
 import Data.Maybe (Maybe(..), maybe)
+import Data.Mermaid.FlowChart
+  ( FlowChartDef(..)
+  , Orientation(..)
+  , Segment
+  )
+import Data.Mermaid.FlowChart as FlowChart
 import Data.String.NonEmpty (NonEmptyString)
 import Data.String.NonEmpty as StringNE
 import Data.Tuple as Tuple
@@ -42,7 +49,7 @@ import Test.Unit.Computation
   , GetValueSample(..)
   , ToValueSpec(..)
   , ValueSample
-  , ValueSpec
+  , ValueSpec(..)
   )
 import Type.Proxy (Proxy(..))
 
@@ -60,8 +67,55 @@ instance
     <<< ArrayNE.fromNonEmpty
     <<< document
 
+instance
+  Folding
+    DocumentInput
+    (Array NonEmptyString)
+    (ValueSpec a)
+    (Array NonEmptyString) where
+  folding DocumentInput acc =
+    (acc <> _) <<< (\(ValueSpec desc) → [ desc ])
+
+documentSchema
+  ∷ ∀ isp o rlsp
+  . FoldlRecord
+      (ConstFolding DocumentInput)
+      (Array NonEmptyString)
+      rlsp
+      isp
+      (Array NonEmptyString)
+  ⇒ RowToList isp rlsp
+  ⇒ { | isp }
+  → ValueSpec o
+  → NonEmptyArray FlowContentNode
+documentSchema inputSpecs (ValueSpec outputDesc) =
+  ArrayNE.singleton $ M.renderMermaid flowChartDef
+  where
+  flowChartDef ∷ FlowChartDef
+  flowChartDef = FlowChartDef LeftToRight
+    [ FlowChart.subGraph "inputs" inputBoxes
+    , FlowChart.subGraph "output"
+        [ FlowChart.box "output_desc" (StringNE.toString outputDesc)
+        ]
+    , FlowChart.normalArrow "inputs" "output"
+    ]
+
+  inputBoxes ∷ Array Segment
+  inputBoxes =
+    ( \inputIdx inputDesc → FlowChart.box
+        ("input_desc_" <> show inputIdx)
+        (StringNE.toString inputDesc)
+    )
+      `mapWithIndex` inputDescriptions
+
+  inputDescriptions ∷ Array NonEmptyString
+  inputDescriptions = hfoldl
+    DocumentInput
+    (mempty ∷ Array NonEmptyString)
+    inputSpecs
+
 documentInput
-  ∷ ∀ rlsa isa
+  ∷ ∀ isa rlsa
   . FoldlRecord
       (ConstFolding DocumentInput)
       (NonEmptyArray FlowContentNode)
@@ -122,7 +176,7 @@ type ComputationDocsSpec isa isp o osa r =
   }
 
 documentComputation
-  ∷ ∀ i isa isp o osa r rlsa
+  ∷ ∀ i isa isp o osa r rlsa rlsp
   . Document o
   ⇒ FoldlRecord
       (ConstFolding DocumentInput)
@@ -130,11 +184,18 @@ documentComputation
       rlsa
       isa
       (NonEmptyArray FlowContentNode)
+  ⇒ FoldlRecord
+      (ConstFolding DocumentInput)
+      (Array NonEmptyString)
+      rlsp
+      isp
+      (Array NonEmptyString)
   ⇒ Mapping GetValueSample osa o
   ⇒ Mapping GetValueDescription osa NonEmptyString
   ⇒ MapRecordWithIndex rlsa (ConstMapping GetValueSample) isa i
   ⇒ MapRecordWithIndex rlsa (ConstMapping ToValueSpec) isa isp
   ⇒ RowToList isa rlsa
+  ⇒ RowToList isp rlsp
   ⇒ ComputationDocsSpec isa isp o osa r
   → NonEmptyString /\ Document
 documentComputation
@@ -149,9 +210,25 @@ documentComputation
           $ M.text
           $ docTitle
       ]
-        <> context
-        <> renderProperties properties
+        <> renderSchema
+        <> renderContext
+        <> renderProperties
         <> (renderExamples $ Map.toUnfoldableUnordered examplesByTitle)
+
+  renderSchema ∷ Array FlowContentNode
+  renderSchema =
+    [ M.heading2 $ ArrayNE.singleton $ M.text $ StringNE.nes
+        (Proxy ∷ Proxy "Schema")
+    ] <> (ArrayNE.toArray $ documentSchema input output)
+
+  renderContext ∷ Array FlowContentNode
+  renderContext =
+    [ M.heading2
+        $ ArrayNE.singleton
+        $ M.text
+        $ StringNE.nes
+            (Proxy ∷ Proxy "Context")
+    ] <> context
 
   renderExamples
     ∷ Array (NonEmptyString /\ (NonEmptyArray FlowContentNode))
@@ -174,9 +251,8 @@ documentComputation
       Nothing →
         []
 
-  renderProperties
-    ∷ Array (ComputationProperty isa o) → Array FlowContentNode
-  renderProperties = ArrayNE.fromFoldable >>> case _ of
+  renderProperties ∷ Array FlowContentNode
+  renderProperties = case ArrayNE.fromFoldable properties of
     Just props →
       [ M.heading2
           $ ArrayNE.singleton
