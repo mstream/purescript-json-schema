@@ -77,7 +77,7 @@ context =
         [ StringNE.nes
             ( Proxy
                 ∷ Proxy
-                    "However, not every JSON is a valid JSON schema."
+                    " However, not every JSON is a valid JSON schema."
             )
         ]
 

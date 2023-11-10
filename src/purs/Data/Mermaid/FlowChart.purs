@@ -96,8 +96,7 @@ render = case _ of
     "flowchart "
       <> renderOrientation orientation
       <> "\n"
-      <> Array.foldMap (\segment → renderSegment 4 segment <> "\n")
-        segments
+      <> String.joinWith "\n" (renderSegment 4 <$> segments)
 
 renderSegment ∷ Int → Segment → String
 renderSegment indentation = case _ of
@@ -120,7 +119,6 @@ renderSegment indentation = case _ of
             (\segment → renderSegment (indentation + 4) segment <> "\n")
             segments
         )
-      <> "\n"
       <> renderIndentation indentation
       <> "end"
 
@@ -130,7 +128,6 @@ renderLink indentation def =
     <> def.from
     <> " "
     <> arrow
-    <> " "
     <> annotation
     <> " "
     <> def.to
