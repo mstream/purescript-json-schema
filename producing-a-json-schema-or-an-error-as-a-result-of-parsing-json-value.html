@@ -145,7 +145,18 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-json-value"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-json-value">Producing a JSON schema or an error as a result of parsing JSON value</a></h1>
-<p>JSON schema is commonly expressed in a JSON format.However, not every JSON is a valid JSON schema.</p>
+<h2 id="schema"><a class="header" href="#schema">Schema</a></h2>
+<pre class="mermaid">flowchart LR
+    subgraph inputs
+        input_desc_0[&quot;JSON value&quot;]
+    end
+    subgraph output
+        output_desc[&quot;a JSON schema or an error&quot;]
+    end
+    inputs --&gt; output
+</pre>
+<h2 id="context"><a class="header" href="#context">Context</a></h2>
+<p>JSON schema is commonly expressed in a JSON format. However, not every JSON is a valid JSON schema.</p>
 <h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
 <ul>
 <li>

@@ -145,6 +145,17 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="assessing-the-type-of-compatibility-based-on-schemata-differences"><a class="header" href="#assessing-the-type-of-compatibility-based-on-schemata-differences">Assessing the type of compatibility based on schemata differences</a></h1>
+<h2 id="schema"><a class="header" href="#schema">Schema</a></h2>
+<pre class="mermaid">flowchart LR
+    subgraph inputs
+        input_desc_0[&quot;schemata differences&quot;]
+    end
+    subgraph output
+        output_desc[&quot;the type of compatibility&quot;]
+    end
+    inputs --&gt; output
+</pre>
+<h2 id="context"><a class="header" href="#context">Context</a></h2>
 <p><em>Backward compatibility</em> - an ability of a system to understand input intended for previous
 versions of itself</p>
 <p><em>Forward compatibility</em> - an ability of a system to understand input intended for future versions
@@ -158,33 +169,27 @@ and ensuring smooth transitions when updating JSON schemas.</p>
     subgraph data writers
         current_writer(&quot;writer&quot;)
         next_writer(&quot;writer&lt;sub&gt;+1&lt;/sub&gt;&quot;)
-
     end
     subgraph data readers
         current_reader(&quot;reader&quot;)
         next_reader(&quot;reader&lt;sub&gt;+1&lt;/sub&gt;&quot;)
-
     end
-    current_writer --&gt;  current_reader
-    current_writer --&gt; |backward compatibility| next_reader
-    next_writer --&gt; |forward compatibility| current_reader
-
+    current_writer --&gt; current_reader
+    current_writer --&gt;|backward compatibility| next_reader
+    next_writer --&gt;|forward compatibility| current_reader
 </pre>
 <pre class="mermaid">flowchart LR
     subgraph data writers
         current_writer(&quot;writer&quot;)
         next_writer(&quot;writer&lt;sub&gt;+1&lt;/sub&gt;&quot;)
-
     end
     subgraph data readers
         current_reader(&quot;reader&quot;)
         next_reader(&quot;reader&lt;sub&gt;+1&lt;/sub&gt;&quot;)
-
     end
-    current_writer --&gt;  current_reader
-    current_writer --&gt; |backward compatibility| next_reader
-    next_writer --&gt; |forward compatibility| current_reader
-
+    current_writer --&gt; current_reader
+    current_writer --&gt;|backward compatibility| next_reader
+    next_writer --&gt;|forward compatibility| current_reader
 </pre>
 <h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
 <ul>

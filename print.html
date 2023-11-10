@@ -146,6 +146,17 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="assessing-the-type-of-compatibility-based-on-schemata-differences"><a class="header" href="#assessing-the-type-of-compatibility-based-on-schemata-differences">Assessing the type of compatibility based on schemata differences</a></h1>
+<h2 id="schema"><a class="header" href="#schema">Schema</a></h2>
+<pre class="mermaid">flowchart LR
+    subgraph inputs
+        input_desc_0[&quot;schemata differences&quot;]
+    end
+    subgraph output
+        output_desc[&quot;the type of compatibility&quot;]
+    end
+    inputs --&gt; output
+</pre>
+<h2 id="context"><a class="header" href="#context">Context</a></h2>
 <p><em>Backward compatibility</em> - an ability of a system to understand input intended for previous
 versions of itself</p>
 <p><em>Forward compatibility</em> - an ability of a system to understand input intended for future versions
@@ -159,33 +170,27 @@ and ensuring smooth transitions when updating JSON schemas.</p>
     subgraph data writers
         current_writer(&quot;writer&quot;)
         next_writer(&quot;writer&lt;sub&gt;+1&lt;/sub&gt;&quot;)
-
     end
     subgraph data readers
         current_reader(&quot;reader&quot;)
         next_reader(&quot;reader&lt;sub&gt;+1&lt;/sub&gt;&quot;)
-
     end
-    current_writer --&gt;  current_reader
-    current_writer --&gt; |backward compatibility| next_reader
-    next_writer --&gt; |forward compatibility| current_reader
-
+    current_writer --&gt; current_reader
+    current_writer --&gt;|backward compatibility| next_reader
+    next_writer --&gt;|forward compatibility| current_reader
 </pre>
 <pre class="mermaid">flowchart LR
     subgraph data writers
         current_writer(&quot;writer&quot;)
         next_writer(&quot;writer&lt;sub&gt;+1&lt;/sub&gt;&quot;)
-
     end
     subgraph data readers
         current_reader(&quot;reader&quot;)
         next_reader(&quot;reader&lt;sub&gt;+1&lt;/sub&gt;&quot;)
-
     end
-    current_writer --&gt;  current_reader
-    current_writer --&gt; |backward compatibility| next_reader
-    next_writer --&gt; |forward compatibility| current_reader
-
+    current_writer --&gt; current_reader
+    current_writer --&gt;|backward compatibility| next_reader
+    next_writer --&gt;|forward compatibility| current_reader
 </pre>
 <h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
 <ul>
@@ -944,6 +949,18 @@ old, shorter range. Therefore, such a change is backward compatible.</p>
 </ul>
 </blockquote>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="calculating-differences-between-schemata-based-on-old-json-schema-and-new-json-schema"><a class="header" href="#calculating-differences-between-schemata-based-on-old-json-schema-and-new-json-schema">Calculating differences between schemata based on old JSON schema and new JSON schema</a></h1>
+<h2 id="schema-1"><a class="header" href="#schema-1">Schema</a></h2>
+<pre class="mermaid">flowchart LR
+    subgraph inputs
+        input_desc_0[&quot;new JSON schema&quot;]
+        input_desc_1[&quot;old JSON schema&quot;]
+    end
+    subgraph output
+        output_desc[&quot;differences between schemata&quot;]
+    end
+    inputs --&gt; output
+</pre>
+<h2 id="context-1"><a class="header" href="#context-1">Context</a></h2>
 <p>Calculating JSON Schema Difference is a process used to identify the
 changes between two JSON schemata.<br />
 It is used to to see what has been added, removed, or changed.<br />
@@ -1187,6 +1204,18 @@ difference.</p>
 <p>∅</p>
 </blockquote>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema">Finding JSON schema violations as a result of validating JSON value against JSON schema</a></h1>
+<h2 id="schema-2"><a class="header" href="#schema-2">Schema</a></h2>
+<pre class="mermaid">flowchart LR
+    subgraph inputs
+        input_desc_0[&quot;JSON value&quot;]
+        input_desc_1[&quot;JSON schema&quot;]
+    end
+    subgraph output
+        output_desc[&quot;JSON schema violations&quot;]
+    end
+    inputs --&gt; output
+</pre>
+<h2 id="context-2"><a class="header" href="#context-2">Context</a></h2>
 <p>JSON validation is a specification for validating the structure and data
 types of JSON values.<br />
 It allows you to specify the required properties, the types of values,
@@ -1790,12 +1819,34 @@ JSON schema path: <code>#/minimum</code></p>
 </ul>
 </blockquote>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="printing-a-json-valuerepresenting-a-json-schema"><a class="header" href="#printing-a-json-valuerepresenting-a-json-schema">Printing a JSON valuerepresenting a JSON schema</a></h1>
+<h2 id="schema-3"><a class="header" href="#schema-3">Schema</a></h2>
+<pre class="mermaid">flowchart LR
+    subgraph inputs
+        input_desc_0[&quot;JSON schema&quot;]
+    end
+    subgraph output
+        output_desc[&quot;a JSON value&quot;]
+    end
+    inputs --&gt; output
+</pre>
+<h2 id="context-3"><a class="header" href="#context-3">Context</a></h2>
 <h2 id="properties-2"><a class="header" href="#properties-2">Properties</a></h2>
 <ul>
 <li>always prints a well-formatted schema JSON</li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="producing-a-json-schema-or-an-error-as-a-result-of-parsing-json-value"><a class="header" href="#producing-a-json-schema-or-an-error-as-a-result-of-parsing-json-value">Producing a JSON schema or an error as a result of parsing JSON value</a></h1>
-<p>JSON schema is commonly expressed in a JSON format.However, not every JSON is a valid JSON schema.</p>
+<h2 id="schema-4"><a class="header" href="#schema-4">Schema</a></h2>
+<pre class="mermaid">flowchart LR
+    subgraph inputs
+        input_desc_0[&quot;JSON value&quot;]
+    end
+    subgraph output
+        output_desc[&quot;a JSON schema or an error&quot;]
+    end
+    inputs --&gt; output
+</pre>
+<h2 id="context-4"><a class="header" href="#context-4">Context</a></h2>
+<p>JSON schema is commonly expressed in a JSON format. However, not every JSON is a valid JSON schema.</p>
 <h2 id="examples-3"><a class="header" href="#examples-3">Examples</a></h2>
 <ul>
 <li>

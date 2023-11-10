@@ -145,6 +145,18 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema"><a class="header" href="#finding-json-schema-violations-as-a-result-of-validating-json-value-against-json-schema">Finding JSON schema violations as a result of validating JSON value against JSON schema</a></h1>
+<h2 id="schema"><a class="header" href="#schema">Schema</a></h2>
+<pre class="mermaid">flowchart LR
+    subgraph inputs
+        input_desc_0[&quot;JSON value&quot;]
+        input_desc_1[&quot;JSON schema&quot;]
+    end
+    subgraph output
+        output_desc[&quot;JSON schema violations&quot;]
+    end
+    inputs --&gt; output
+</pre>
+<h2 id="context"><a class="header" href="#context">Context</a></h2>
 <p>JSON validation is a specification for validating the structure and data
 types of JSON values.<br />
 It allows you to specify the required properties, the types of values,

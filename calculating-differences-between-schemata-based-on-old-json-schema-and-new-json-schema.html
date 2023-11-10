@@ -145,6 +145,18 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="calculating-differences-between-schemata-based-on-old-json-schema-and-new-json-schema"><a class="header" href="#calculating-differences-between-schemata-based-on-old-json-schema-and-new-json-schema">Calculating differences between schemata based on old JSON schema and new JSON schema</a></h1>
+<h2 id="schema"><a class="header" href="#schema">Schema</a></h2>
+<pre class="mermaid">flowchart LR
+    subgraph inputs
+        input_desc_0[&quot;new JSON schema&quot;]
+        input_desc_1[&quot;old JSON schema&quot;]
+    end
+    subgraph output
+        output_desc[&quot;differences between schemata&quot;]
+    end
+    inputs --&gt; output
+</pre>
+<h2 id="context"><a class="header" href="#context">Context</a></h2>
 <p>Calculating JSON Schema Difference is a process used to identify the
 changes between two JSON schemata.<br />
 It is used to to see what has been added, removed, or changed.<br />
