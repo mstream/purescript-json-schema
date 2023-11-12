@@ -123,7 +123,7 @@ context =
               $ StringNE.nes
                   ( Proxy
                       ∷ Proxy
-                          "and ensuring smooth transitions when updating JSON schemas."
+                          "and ensuring smooth transitions when updating JSON schemata."
                   )
           ]
   , M.renderMermaid $ FlowChartDef LeftToRight
@@ -201,7 +201,7 @@ examples =
           }
       }
   , fullCompatibilityExample
-      "every integer is also a number so this kind of difference does not have any implact"
+      "every integer is also a number so this kind of difference does not have any impact"
       { differences: ValueSample
           { description: StringNE.nes
               ( Proxy

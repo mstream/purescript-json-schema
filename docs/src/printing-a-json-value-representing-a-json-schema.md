@@ -1,4 +1,4 @@
-# Printing a JSON valuerepresenting a JSON schema
+# Printing a JSON value representing a JSON schema
 
 ## Schema
 

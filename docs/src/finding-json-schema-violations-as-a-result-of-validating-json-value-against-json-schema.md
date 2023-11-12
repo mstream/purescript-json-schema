@@ -135,7 +135,7 @@ a type mismatch violation:
 > - JSON value path: `$`\
 >   JSON schema path: `#/type`
 >
->   Invalid type. Expected nullorstring but got boolean.
+>   Invalid type. Expected null or string but got boolean.
 
 ---
 
