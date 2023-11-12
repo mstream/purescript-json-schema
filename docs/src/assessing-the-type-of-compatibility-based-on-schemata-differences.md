@@ -27,7 +27,7 @@ _No compatibility_ - neither level of compatibility
 
 Maintaining backward and forward compatibility is important for
 minimizing disruption\
-and ensuring smooth transitions when updating JSON schemas.
+and ensuring smooth transitions when updating JSON schemata.
 
 ```mermaid
 flowchart LR
@@ -241,7 +241,7 @@ no compatibility:
 ### assessing the type of compatibility based on extending set of accepted value types from numbers to numbers and integers
 
 In this situation, every integer is also a number so this kind of
-difference does not have any implact. Therefore, such a change is fully
+difference does not have any impact. Therefore, such a change is fully
 compatible.
 
 _Input:_
@@ -410,7 +410,7 @@ no compatibility:
 >
 > - - schema path: #
 >
->     the new multiple constraint of 5.0 is not a factor of the olf multiple constraint of 2.0
+>     the new multiple constraint of 5.0 is not a factor of the old multiple constraint of 2.0
 >
 > Reasons for breaking the backward compatibility:
 >
@@ -500,7 +500,7 @@ backward compatibility:
 >
 > - - schema path: #
 >
->     the new multiple constraint of 4.0 is not a factor of the olf multiple constraint of 2.0
+>     the new multiple constraint of 4.0 is not a factor of the old multiple constraint of 2.0
 
 ---
 

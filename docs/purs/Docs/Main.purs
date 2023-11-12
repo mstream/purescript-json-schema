@@ -65,6 +65,9 @@ documentFilePath title =
 
 saveDocumentation ∷ NonEmptySet (NonEmptyString /\ Document) → Aff Unit
 saveDocumentation docsByTitle = do
+  FS.rm' prefix
+    { force: false, maxRetries: 0, recursive: true, retryDelay: 0 }
+
   FS.mkdir' prefix
     { mode: FSP.mkPerms
         FSP.all

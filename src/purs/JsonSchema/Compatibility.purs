@@ -62,7 +62,8 @@ instance Document Compatibility where
     Backward { forwardIncompatibilities } →
       ( M.paragraph $ ArrayNE.singleton $ M.text $ StringNE.nes
           ( Proxy
-              ∷ Proxy "Reasons for breaking the forward compatibility:"
+              ∷ Proxy
+                  "Reasons for breaking the forward compatibility:"
           )
       ) :|
         [ M.unorderedList $ ArrayNE.singleton
@@ -232,7 +233,7 @@ instance Document ForwardIncompatibilityType where
             , M.text $ StringNE.nes
                 ( Proxy
                     ∷ Proxy
-                        " is not a factor of the olf multiple constraint of "
+                        " is not a factor of the old multiple constraint of "
                 )
             , M.text $ show1 old
             ]

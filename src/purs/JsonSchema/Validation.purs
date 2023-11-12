@@ -164,7 +164,7 @@ instance Document ViolationReason where
                 Nothing →
                   StringNE.nes (Proxy ∷ Proxy "none")
                 Just allowedTypes →
-                  StringNE.join1With "or"
+                  StringNE.join1With " or "
                     $ Schema.renderJsonValueType <$> allowedTypes
             )
           <> StringNE.nes (Proxy ∷ Proxy " but got ")

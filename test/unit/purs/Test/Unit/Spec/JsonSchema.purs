@@ -44,7 +44,7 @@ spec =
   , description: \outputSpec { schema: schemaSpec } →
       StringNE.nes (Proxy ∷ Proxy "printing ")
         <> show1 outputSpec
-        <> StringNE.nes (Proxy ∷ Proxy "representing a ")
+        <> StringNE.nes (Proxy ∷ Proxy " representing a ")
         <> show1 schemaSpec
   , examples
   , execute: \{ schema: ValueSample schema } →
