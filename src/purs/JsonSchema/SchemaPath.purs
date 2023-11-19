@@ -7,7 +7,7 @@ module JsonSchema.SchemaPath
 import Prelude
 
 import Data.Argonaut.Core as A
-import Data.Argonaut.Encode (class EncodeJson, encodeJson)
+import Data.Argonaut.Encode (class EncodeJson)
 import Data.Foldable (foldl)
 import Data.Generic.Rep (class Generic)
 import Data.List (List)
