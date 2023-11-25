@@ -1,0 +1,21 @@
+{
+  "incompabilities": {
+    "forward": [
+      {
+        "path": [],
+        "incompatibilityType": {
+          "setOfAllowedTypesExtended": ["string"]
+        }
+      }
+    ],
+    "backward": [
+      {
+        "path": [],
+        "incompatibilityType": {
+          "setOfAllowedTypesReduced": ["integer", "number"]
+        }
+      }
+    ]
+  },
+  "compatibilityType": "none"
+}

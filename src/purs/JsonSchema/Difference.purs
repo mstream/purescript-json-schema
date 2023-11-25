@@ -6,6 +6,9 @@ module JsonSchema.Difference
 
 import Prelude
 
+import Data.Argonaut.Core as A
+import Data.Argonaut.Encode (class EncodeJson, (:=), (~>))
+import Data.Argonaut.Encode as AE
 import Data.Array as Array
 import Data.Array.NonEmpty as ArrayNE
 import Data.Foldable (foldMap)
@@ -36,6 +39,8 @@ derive instance Eq Difference
 derive instance Generic Difference _
 derive instance Ord Difference
 
+derive newtype instance EncodeJson Difference
+
 instance Show Difference where
   show = genericShow
 
@@ -62,6 +67,55 @@ data DifferenceType
 derive instance Eq DifferenceType
 derive instance Generic DifferenceType _
 derive instance Ord DifferenceType
+
+instance EncodeJson DifferenceType where
+  encodeJson = case _ of
+    BooleanSchemaChange b →
+      A.fromString $ "boolean schema changed to " <> show b
+    ExclusiveMaximumChange old new →
+      A.fromString $ "exclusive maximum value change from "
+        <> maybe "not set" show old
+        <> " to "
+        <> maybe "not set" show new
+
+    ExclusiveMinimumChange old new →
+      A.fromString $ "exclusive minimum value change from "
+        <> maybe "not set" show old
+        <> " to "
+        <> maybe "not set" show new
+
+    MaximumChange old new →
+      A.fromString $ "maximum value change from "
+        <> maybe "not set" show old
+        <> " to "
+        <> maybe "not set" show new
+
+    MinimumChange old new →
+      A.fromString $ "minimum value change from "
+        <> maybe "not set" show old
+        <> " to "
+        <> maybe "not set" show new
+
+    MultipleOfChange old new →
+      A.fromString $ "multiple of change from "
+        <> maybe "not set" show old
+        <> " to "
+        <> maybe "not set" show new
+
+    SchemaChangeFromBooleanToObject b keywords →
+      "newObjectSchema" := AE.encodeJson keywords
+        ~> "oldBooleanSchema" := A.fromBoolean b
+        ~> A.jsonEmptyObject
+
+    SchemaChangeFromObjectToBoolean keywords b →
+      "newSchema" := A.fromString ("boolean schema of " <> show b)
+        ~> "oldObjectSchema" := AE.encodeJson keywords
+        ~> A.jsonEmptyObject
+
+    TypeChange old new →
+      "newAcceptableTypes" := AE.encodeJson new
+        ~> "oldAcceptableTypes" := AE.encodeJson old
+        ~> A.jsonEmptyObject
 
 instance Show DifferenceType where
   show = genericShow

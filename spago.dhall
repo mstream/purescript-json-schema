@@ -6,6 +6,8 @@
   , "arrays"
   , "console"
   , "control"
+  , "datetime"
+  , "dom-indexed"
   , "effect"
   , "either"
   , "exceptions"

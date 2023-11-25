@@ -4,6 +4,7 @@ import Prelude
 
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Core as A
+import Data.Argonaut.Encode (class EncodeJson)
 import Data.Markdown (CodeLanguage(..))
 import Data.Markdown as M
 import Data.Newtype (class Newtype)
@@ -15,6 +16,7 @@ import Docs.Document (class Document)
 newtype JsonValue = JsonValue Json
 
 derive instance Newtype JsonValue _
+derive newtype instance EncodeJson JsonValue
 derive newtype instance Eq JsonValue
 derive newtype instance Ord JsonValue
 

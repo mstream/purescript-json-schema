@@ -686,6 +686,44 @@
     };
   };
 
+  // output/DOM.HTML.Indexed.ButtonType/index.js
+  var ButtonButton = /* @__PURE__ */ function() {
+    function ButtonButton2() {
+    }
+    ;
+    ButtonButton2.value = new ButtonButton2();
+    return ButtonButton2;
+  }();
+  var ButtonSubmit = /* @__PURE__ */ function() {
+    function ButtonSubmit2() {
+    }
+    ;
+    ButtonSubmit2.value = new ButtonSubmit2();
+    return ButtonSubmit2;
+  }();
+  var ButtonReset = /* @__PURE__ */ function() {
+    function ButtonReset2() {
+    }
+    ;
+    ButtonReset2.value = new ButtonReset2();
+    return ButtonReset2;
+  }();
+  var renderButtonType = function(v) {
+    if (v instanceof ButtonButton) {
+      return "button";
+    }
+    ;
+    if (v instanceof ButtonSubmit) {
+      return "submit";
+    }
+    ;
+    if (v instanceof ButtonReset) {
+      return "reset";
+    }
+    ;
+    throw new Error("Failed pattern match at DOM.HTML.Indexed.ButtonType (line 14, column 20 - line 17, column 25): " + [v.constructor.name]);
+  };
+
   // output/Data.Argonaut.Core/foreign.js
   function id(x) {
     return x;
@@ -6776,6 +6814,11 @@
   var isPropString = {
     toPropValue: propFromString
   };
+  var isPropButtonType = {
+    toPropValue: function($50) {
+      return propFromString(renderButtonType($50));
+    }
+  };
   var handler = /* @__PURE__ */ function() {
     return Handler.create;
   }();
@@ -7761,11 +7804,17 @@
   var element2 = /* @__PURE__ */ function() {
     return element(Nothing.value);
   }();
+  var form = /* @__PURE__ */ element2("form");
+  var form_ = /* @__PURE__ */ form([]);
   var input2 = function(props) {
     return element2("input")(props)([]);
   };
   var label4 = /* @__PURE__ */ element2("label");
   var label_ = /* @__PURE__ */ label4([]);
+  var pre = /* @__PURE__ */ element2("pre");
+  var pre_ = /* @__PURE__ */ pre([]);
+  var samp = /* @__PURE__ */ element2("samp");
+  var samp_ = /* @__PURE__ */ samp([]);
   var div2 = /* @__PURE__ */ element2("div");
   var div_ = /* @__PURE__ */ div2([]);
   var button = /* @__PURE__ */ element2("button");
@@ -7773,6 +7822,9 @@
   // output/Halogen.HTML.Properties/index.js
   var prop2 = function(dictIsProp) {
     return prop(dictIsProp);
+  };
+  var type_17 = function(dictIsProp) {
+    return prop2(dictIsProp)("type");
   };
   var value12 = function(dictIsProp) {
     return prop2(dictIsProp)("value");
@@ -12187,7 +12239,7 @@
         return new Right(v1.value0);
       }
       ;
-      throw new Error("Failed pattern match at Main.Validate (line 50, column 7 - line 57, column 21): " + [v1.constructor.name]);
+      throw new Error("Failed pattern match at Main.Validate (line 47, column 7 - line 54, column 21): " + [v1.constructor.name]);
     }())(function(schema) {
       return bind6(function() {
         var v1 = jsonParser(v.jsonText);
@@ -12199,7 +12251,7 @@
           return new Right(v1.value0);
         }
         ;
-        throw new Error("Failed pattern match at Main.Validate (line 59, column 17 - line 64, column 19): " + [v1.constructor.name]);
+        throw new Error("Failed pattern match at Main.Validate (line 56, column 17 - line 61, column 19): " + [v1.constructor.name]);
       }())(function(jsonValue) {
         var output2 = function() {
           if (v.outputFormat instanceof Json2) {
@@ -12212,7 +12264,7 @@
             })(document4(document1(validateAgainst(jsonValue)(schema))));
           }
           ;
-          throw new Error("Failed pattern match at Main.Validate (line 67, column 16 - line 75, column 70): " + [v.outputFormat.constructor.name]);
+          throw new Error("Failed pattern match at Main.Validate (line 64, column 16 - line 72, column 70): " + [v.outputFormat.constructor.name]);
         }();
         return new Right(output2 + "\n");
       });
@@ -12233,12 +12285,13 @@
       };
     }
     ;
-    throw new Error("Failed pattern match at Main.Validate (line 41, column 50 - line 45, column 48): " + [go2.constructor.name]);
+    throw new Error("Failed pattern match at Main.Validate (line 38, column 50 - line 42, column 48): " + [go2.constructor.name]);
   };
 
   // output/Sandbox.Main/index.js
   var show7 = /* @__PURE__ */ show(showInt);
   var value13 = /* @__PURE__ */ value12(isPropString);
+  var type_19 = /* @__PURE__ */ type_17(isPropButtonType);
   var show13 = /* @__PURE__ */ show(showJsonValue);
   var modify_3 = /* @__PURE__ */ modify_(monadStateHalogenM);
   var RunProgram = /* @__PURE__ */ function() {
@@ -12269,24 +12322,16 @@
     return UpdateSchema2;
   }();
   var renderProgramOutput = function(v) {
-    return div_([div_([label_([text5("Exit code:")]), text5(show7(v.exitCode))]), div_([label_([text5("Standard output:")]), text5(v.stdout)]), div_([label_([text5("Standard error:")]), text5(v.stderr)])]);
+    return div_([div_([label_([text5("Exit code:")]), text5(show7(v.exitCode))]), div_([label_([text5("Standard output:")]), pre_([samp_([text5(v.stdout)])])]), div_([label_([text5("Standard error:")]), pre_([samp_([text5(v.stderr)])])])]);
+  };
+  var renderProgramInput = function(v) {
+    return form_([div_([label_([text5("JSON schema:")]), input2([onValueInput(UpdateSchema.create), value13(v.schemaText)])]), div_([label_([text5("JSON value:")]), input2([onValueInput(UpdateJson.create), value13(v.jsonText)])]), button([onClick(function(v1) {
+      return RunProgram.value;
+    }), type_19(ButtonButton.value)])([text5("execute program")])]);
   };
   var render5 = function(v) {
-    var outputFormatLabel = function() {
-      if (v.programInput.outputFormat instanceof Json2) {
-        return "JSON";
-      }
-      ;
-      if (v.programInput.outputFormat instanceof Markdown) {
-        return "Markdown";
-      }
-      ;
-      throw new Error("Failed pattern match at Sandbox.Main (line 60, column 25 - line 64, column 19): " + [v.programInput.outputFormat.constructor.name]);
-    }();
-    return div_([div_([label_([text5("JSON schema:")]), input2([onValueInput(UpdateSchema.create), value13(v.programInput.schemaText)])]), div_([label_([text5("JSON value:")]), input2([onValueInput(UpdateJson.create), value13(v.programInput.jsonText)])]), button([onClick(function(v1) {
-      return RunProgram.value;
-    })])([text5("show program result in " + (outputFormatLabel + " format"))]), maybe(text5(""))(function($45) {
-      return fromPlainHTML(renderProgramOutput($45));
+    return div_([renderProgramInput(v.programInput), maybe(text5(""))(function($48) {
+      return fromPlainHTML(renderProgramOutput($48));
     })(v.programOutput)]);
   };
   var initialSchema = /* @__PURE__ */ function() {
@@ -12317,72 +12362,72 @@
   var handleAction = function(v) {
     if (v instanceof RunProgram) {
       return modify_3(function(st) {
-        var $28 = {};
-        for (var $29 in st) {
-          if ({}.hasOwnProperty.call(st, $29)) {
-            $28[$29] = st[$29];
+        var $31 = {};
+        for (var $32 in st) {
+          if ({}.hasOwnProperty.call(st, $32)) {
+            $31[$32] = st[$32];
           }
           ;
         }
         ;
-        $28.programOutput = new Just(compute(st.programInput));
-        return $28;
+        $31.programOutput = new Just(compute(st.programInput));
+        return $31;
       });
     }
     ;
     if (v instanceof UpdateJson) {
       return modify_3(function(st) {
-        var $34 = {};
-        for (var $35 in st) {
-          if ({}.hasOwnProperty.call(st, $35)) {
-            $34[$35] = st[$35];
+        var $37 = {};
+        for (var $38 in st) {
+          if ({}.hasOwnProperty.call(st, $38)) {
+            $37[$38] = st[$38];
           }
           ;
         }
         ;
-        $34.programInput = function() {
-          var $31 = {};
-          for (var $32 in st.programInput) {
-            if ({}.hasOwnProperty.call(st.programInput, $32)) {
-              $31[$32] = st["programInput"][$32];
+        $37.programInput = function() {
+          var $34 = {};
+          for (var $35 in st.programInput) {
+            if ({}.hasOwnProperty.call(st.programInput, $35)) {
+              $34[$35] = st["programInput"][$35];
             }
             ;
           }
           ;
-          $31.jsonText = v.value0;
-          return $31;
+          $34.jsonText = v.value0;
+          return $34;
         }();
-        return $34;
+        return $37;
       });
     }
     ;
     if (v instanceof UpdateSchema) {
       return modify_3(function(st) {
-        var $41 = {};
-        for (var $42 in st) {
-          if ({}.hasOwnProperty.call(st, $42)) {
-            $41[$42] = st[$42];
+        var $44 = {};
+        for (var $45 in st) {
+          if ({}.hasOwnProperty.call(st, $45)) {
+            $44[$45] = st[$45];
           }
           ;
         }
         ;
-        $41.programInput = function() {
-          var $38 = {};
-          for (var $39 in st.programInput) {
-            if ({}.hasOwnProperty.call(st.programInput, $39)) {
-              $38[$39] = st["programInput"][$39];
+        $44.programInput = function() {
+          var $41 = {};
+          for (var $42 in st.programInput) {
+            if ({}.hasOwnProperty.call(st.programInput, $42)) {
+              $41[$42] = st["programInput"][$42];
             }
             ;
           }
           ;
-          $38.schemaText = v.value0;
-          return $38;
+          $41.schemaText = v.value0;
+          return $41;
         }();
-        return $41;
+        return $44;
       });
     }
     ;
-    throw new Error("Failed pattern match at Sandbox.Main (line 113, column 16 - line 122, column 72): " + [v.constructor.name]);
+    throw new Error("Failed pattern match at Sandbox.Main (line 112, column 16 - line 121, column 72): " + [v.constructor.name]);
   };
   var component = /* @__PURE__ */ function() {
     return mkComponent({

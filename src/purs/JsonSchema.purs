@@ -12,6 +12,7 @@ import Prelude
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Core as A
 import Data.Argonaut.Encode (class EncodeJson)
+import Data.Argonaut.Encode as AE
 import Data.Array as Array
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(..), maybe)
@@ -34,6 +35,9 @@ data JsonSchema
 derive instance Eq JsonSchema
 derive instance Generic JsonSchema _
 derive instance Ord JsonSchema
+
+instance EncodeJson JsonSchema where
+  encodeJson = AE.encodeJson <<< print
 
 instance Show JsonSchema where
   show schema = genericShow schema

@@ -1,0 +1,9 @@
+[
+  {
+    "path": ["type"],
+    "differenceType": {
+      "oldAcceptableTypes": ["number"],
+      "newAcceptableTypes": ["string"]
+    }
+  }
+]
