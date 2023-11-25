@@ -26,16 +26,25 @@ spec =
 
 fixtures ∷ Array (Fixture DocumentExample)
 fixtures =
-  [ { input: longLinesExample
-    , outputPath: "markdown/long-lines.md"
-    }
-  , { input: codeBlockExample
-    , outputPath: "markdown/code-block.md"
-    }
-  , { input: mermaidFlowChartExample
-    , outputPath: "markdown/mermaid-flow-chart.md"
-    }
-  ]
+  renderFixture <$>
+    [ { document: longLinesExample
+      , outputFile: StringNE.nes (Proxy ∷ Proxy "long-lines.md")
+      }
+    , { document: codeBlockExample
+      , outputFile: StringNE.nes (Proxy ∷ Proxy "code-block.md")
+      }
+    , { document: mermaidFlowChartExample
+      , outputFile: StringNE.nes (Proxy ∷ Proxy "mermaid-flow-chart.md")
+      }
+    ]
+
+renderFixture
+  ∷ { document ∷ DocumentExample, outputFile ∷ NonEmptyString }
+  → Fixture DocumentExample
+renderFixture { document, outputFile } = { input: document, outputPath }
+  where
+  outputPath ∷ NonEmptyString
+  outputPath = StringNE.nes (Proxy ∷ Proxy "markdown/") <> outputFile
 
 describeInput ∷ DocumentExample → String
 describeInput { description } = "a markdown document featuring "

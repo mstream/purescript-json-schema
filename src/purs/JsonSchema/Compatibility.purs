@@ -10,6 +10,9 @@ module JsonSchema.Compatibility
 
 import Prelude
 
+import Data.Argonaut.Core as A
+import Data.Argonaut.Encode (class EncodeJson, (:=), (~>))
+import Data.Argonaut.Encode as AE
 import Data.Array as Array
 import Data.Array.NonEmpty (NonEmptyArray)
 import Data.Array.NonEmpty as ArrayNE
@@ -53,6 +56,52 @@ data Compatibility
 
 derive instance Eq Compatibility
 derive instance Generic Compatibility _
+
+instance EncodeJson Compatibility where
+  encodeJson = case _ of
+    Backward details →
+      "compatibilityType" := A.fromString "backward"
+        ~> "incompabilities"
+          :=
+            ( "forward"
+                :=
+                  ( AE.encodeJson $ SetNE.toSet
+                      details.forwardIncompatibilities
+                  )
+                ~> A.jsonEmptyString
+            )
+        ~> A.jsonEmptyObject
+    Forward details →
+      "compatibilityType" := A.fromString "forward"
+        ~> "incompabilities"
+          :=
+            ( "backward"
+                :=
+                  ( AE.encodeJson $ SetNE.toSet
+                      details.backwardIncompatibilities
+                  )
+                ~> A.jsonEmptyString
+            )
+        ~> A.jsonEmptyObject
+    Full →
+      A.jsonEmptyObject
+    None details →
+      "compatibilityType" := A.fromString "none"
+        ~> "incompabilities"
+          :=
+            ( "backward"
+                :=
+                  ( AE.encodeJson $ SetNE.toSet
+                      details.backwardIncompatibilities
+                  )
+                ~> "forward"
+                  :=
+                    ( AE.encodeJson $ SetNE.toSet
+                        details.forwardIncompatibilities
+                    )
+                ~> A.jsonEmptyString
+            )
+        ~> A.jsonEmptyObject
 
 instance Show Compatibility where
   show = genericShow
@@ -104,6 +153,7 @@ newtype BackwardIncompatibility = BackwardIncompatibility
   , path ∷ SchemaPath
   }
 
+derive newtype instance EncodeJson BackwardIncompatibility
 derive newtype instance Eq BackwardIncompatibility
 derive newtype instance Ord BackwardIncompatibility
 derive newtype instance Show BackwardIncompatibility
@@ -123,6 +173,7 @@ newtype ForwardIncompatibility = ForwardIncompatibility
   , path ∷ SchemaPath
   }
 
+derive newtype instance EncodeJson ForwardIncompatibility
 derive newtype instance Eq ForwardIncompatibility
 derive newtype instance Ord ForwardIncompatibility
 derive newtype instance Show ForwardIncompatibility
@@ -147,6 +198,23 @@ data BackwardIncompatibilityType
 derive instance Eq BackwardIncompatibilityType
 derive instance Generic BackwardIncompatibilityType _
 derive instance Ord BackwardIncompatibilityType
+
+instance EncodeJson BackwardIncompatibilityType where
+  encodeJson = case _ of
+    MultipleIntroduced value →
+      "multipleIntroduced" := A.fromNumber value
+        ~> A.jsonEmptyObject
+    OldMultipleIsNotFactorOfNewMultiple { new, old } →
+      "oldMultipleIsNotFactorOfNewMultiple" := AE.encodeJson
+        { new, old }
+        ~> A.jsonEmptyObject
+    RangeOfAllowedNumbersReduced removedRange →
+      "rangeOfAllowedNumbersReduced" := AE.encodeJson removedRange
+        ~> A.jsonEmptyObject
+    SetOfAllowedTypesReduced removedTypes →
+      "setOfAllowedTypesReduced" :=
+        (AE.encodeJson $ SetNE.toSet removedTypes)
+        ~> A.jsonEmptyObject
 
 instance Show BackwardIncompatibilityType where
   show = genericShow
@@ -210,6 +278,23 @@ derive instance Eq ForwardIncompatibilityType
 derive instance Generic ForwardIncompatibilityType _
 derive instance Ord ForwardIncompatibilityType
 
+instance EncodeJson ForwardIncompatibilityType where
+  encodeJson = case _ of
+    MultipleWithdrawn value →
+      "multipleWithdrawn" := A.fromNumber value
+        ~> A.jsonEmptyObject
+    NewMultipleIsNotFactorOfOldMultiple { new, old } →
+      "newMultipleIsNotFactorOfOldMultiple" := AE.encodeJson
+        { new, old }
+        ~> A.jsonEmptyObject
+    RangeOfAllowedNumbersExtended addedRange →
+      "rangeOfAllowedNumbersExtended" := AE.encodeJson addedRange
+        ~> A.jsonEmptyObject
+    SetOfAllowedTypesExtended addedTypes →
+      "setOfAllowedTypesExtended" :=
+        (AE.encodeJson $ SetNE.toSet addedTypes)
+        ~> A.jsonEmptyObject
+
 instance Show ForwardIncompatibilityType where
   show = genericShow
 
@@ -267,6 +352,19 @@ data NumberRangeChange
 derive instance Eq NumberRangeChange
 derive instance Generic NumberRangeChange _
 derive instance Ord NumberRangeChange
+
+instance EncodeJson NumberRangeChange where
+  encodeJson = case _ of
+    Lower range →
+      "lower" := AE.encodeJson range
+        ~> A.jsonEmptyObject
+    LowerAndUpper lowerRange upperRange →
+      "lower" := AE.encodeJson lowerRange
+        ~> "upper" := AE.encodeJson upperRange
+        ~> A.jsonEmptyObject
+    Upper range →
+      "upper" := AE.encodeJson range
+        ~> A.jsonEmptyObject
 
 instance Show NumberRangeChange where
   show = genericShow

@@ -6,6 +6,7 @@ import Data.Array as Array
 import Data.Array.NonEmpty as ArrayNE
 import Data.Markdown as M
 import Data.String as String
+import Data.String.NonEmpty (NonEmptyString)
 import Data.String.NonEmpty as StringNE
 import Data.Tuple as Tuple
 import Docs.Utils (documentComputation)
@@ -40,10 +41,20 @@ spec =
 
 fixtures ∷ Array (Fixture Spec)
 fixtures =
-  [ { input: computation1
-    , outputPath: "markdown/computation1.md"
-    }
-  ]
+  renderFixture <$>
+    [ { computationSpec: computation1
+      , outputFile: StringNE.nes (Proxy ∷ Proxy "computation1.md")
+      }
+    ]
+
+renderFixture
+  ∷ { computationSpec ∷ Spec, outputFile ∷ NonEmptyString }
+  → Fixture Spec
+renderFixture { computationSpec, outputFile } =
+  { input: computationSpec, outputPath }
+  where
+  outputPath ∷ NonEmptyString
+  outputPath = StringNE.nes (Proxy ∷ Proxy "markdown/") <> outputFile
 
 describeInput ∷ Spec → String
 describeInput { input, output } = "a computation with input of '"

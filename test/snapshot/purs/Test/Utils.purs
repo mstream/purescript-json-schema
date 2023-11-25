@@ -21,7 +21,7 @@ type SnapshotTestSpec i =
   , fixtures ∷ Array (Fixture i)
   }
 
-type Fixture i = { input ∷ i, outputPath ∷ String }
+type Fixture i = { input ∷ i, outputPath ∷ NonEmptyString }
 
 testSnapshot ∷ ∀ i. SnapshotTestSpec i → TestSpec
 testSnapshot { describeInput, description, executeCommand, fixtures } =
@@ -35,11 +35,12 @@ testSnapshot { describeInput, description, executeCommand, fixtures } =
         <> describeInput input
         <> " <=> "
         <> "(("
-        <> outputPath
+        <> StringNE.toString outputPath
         <> "))"
     in
       Spec.it title do
-        expected ← FS.readTextFile UTF8 ("snapshots/" <> outputPath)
+        expected ← FS.readTextFile UTF8
+          ("snapshots/" <> StringNE.toString outputPath)
         actual ← executeCommand input
         actual `shouldEqualTo` expected
 

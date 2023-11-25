@@ -59,10 +59,12 @@
 
         pkgs = with pkgs; [
           act
+          bash
           docker
           esbuild
           gh
           git
+          httplz
           imagemagick
           mdbook
           nodejs

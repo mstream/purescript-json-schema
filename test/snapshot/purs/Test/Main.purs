@@ -3,6 +3,8 @@ module Test.Snapshot.Main (main) where
 import Prelude
 
 import Data.Foldable (class Foldable, sequence_)
+import Data.Maybe (Maybe(..))
+import Data.Time.Duration (Milliseconds(..))
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
 import Test.Snapshot.Spec.CLI as CLI
@@ -29,7 +31,13 @@ runTestSpecs ∷ ∀ f. Foldable f ⇒ f TestSpec → Aff Unit
 runTestSpecs specs = do
   resultsAff ← runSpecT
     defaultConfig
+      { slow = Milliseconds $ timeoutInMillis / 10.0
+      , timeout = Just $ Milliseconds timeoutInMillis
+      }
     [ consoleReporter ]
     (sequence_ specs)
 
   void resultsAff
+  where
+  timeoutInMillis ∷ Number
+  timeoutInMillis = 2000.0

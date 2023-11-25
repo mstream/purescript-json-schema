@@ -2,6 +2,11 @@ module Sandbox.Main (main) where
 
 import Prelude
 
+import CLI (OutputFormat(..), ProgramOutput)
+import CLI as CLI
+import CLI.Validate (ProgramInput)
+import CLI.Validate as Validate
+import DOM.HTML.Indexed.ButtonType (ButtonType(..))
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Core as A
 import Data.Maybe (Maybe(..), maybe)
@@ -15,7 +20,6 @@ import Halogen.HTML.Properties as HP
 import Halogen.VDom.Driver (runUI)
 import JsonSchema (JsonSchema(..), JsonValueType(..))
 import JsonSchema as JsonSchema
-import Main.Validate as Validate
 
 main ∷ Effect Unit
 main = HA.runHalogenAff do
@@ -23,8 +27,9 @@ main = HA.runHalogenAff do
   runUI component unit body
 
 type State =
-  { programInput ∷ Validate.ProgramInput
-  , programOutput ∷ Maybe Validate.ProgramOutput
+  { outputFormat ∷ OutputFormat
+  , programInput ∷ Validate.ProgramInput
+  , programOutput ∷ Maybe ProgramOutput
   }
 
 data Action = RunProgram | UpdateJson String | UpdateSchema String
@@ -39,9 +44,9 @@ component =
 
 initialState ∷ ∀ i. i → State
 initialState _ =
-  { programInput:
+  { outputFormat: Json
+  , programInput:
       { jsonText: A.stringify initialJson
-      , outputFormat: Validate.Json
       , schemaText: show $ JsonSchema.print initialSchema
       }
   , programOutput: Nothing
@@ -56,44 +61,40 @@ initialSchema = ObjectSchema JsonSchema.defaultKeywords
 
 render ∷ ∀ m. State → H.ComponentHTML Action () m
 render { programInput, programOutput } =
-  let
-    outputFormatLabel = case programInput.outputFormat of
-      Validate.Json →
-        "JSON"
-      Validate.Markdown →
-        "Markdown"
-  in
-    HH.div_
-      [ HH.div_
-          [ HH.label_
-              [ HH.text "JSON schema:"
-              ]
-          , HH.input
-              [ HE.onValueInput UpdateSchema
-              , HP.value programInput.schemaText
-              ]
-          ]
-      , HH.div_
-          [ HH.label_ [ HH.text "JSON value:" ]
-          , HH.input
-              [ HE.onValueInput UpdateJson
-              , HP.value programInput.jsonText
-              ]
-          ]
-      , HH.button
-          [ HE.onClick \_ → RunProgram
-          ]
-          [ HH.text $ "show program result in "
-              <> outputFormatLabel
-              <> " format"
-          ]
-      , maybe
-          (HH.text "")
-          (HH.fromPlainHTML <<< renderProgramOutput)
-          programOutput
-      ]
+  HH.div_
+    [ renderProgramInput programInput
+    , maybe
+        (HH.text "")
+        (HH.fromPlainHTML <<< renderProgramOutput)
+        programOutput
+    ]
 
-renderProgramOutput ∷ Validate.ProgramOutput → HH.PlainHTML
+renderProgramInput ∷ ∀ w. ProgramInput → HH.HTML w Action
+renderProgramInput { jsonText, schemaText } = HH.form_
+  [ HH.div_
+      [ HH.label_
+          [ HH.text "JSON schema:"
+          ]
+      , HH.input
+          [ HE.onValueInput UpdateSchema
+          , HP.value schemaText
+          ]
+      ]
+  , HH.div_
+      [ HH.label_ [ HH.text "JSON value:" ]
+      , HH.input
+          [ HE.onValueInput UpdateJson
+          , HP.value jsonText
+          ]
+      ]
+  , HH.button
+      [ HE.onClick \_ → RunProgram
+      , HP.type_ ButtonButton
+      ]
+      [ HH.text "execute program" ]
+  ]
+
+renderProgramOutput ∷ ProgramOutput → HH.PlainHTML
 renderProgramOutput { exitCode, stderr, stdout } = HH.div_
   [ HH.div_
       [ HH.label_ [ HH.text "Exit code:" ]
@@ -101,11 +102,11 @@ renderProgramOutput { exitCode, stderr, stdout } = HH.div_
       ]
   , HH.div_
       [ HH.label_ [ HH.text "Standard output:" ]
-      , HH.text stdout
+      , HH.pre_ [ HH.samp_ [ HH.text stdout ] ]
       ]
   , HH.div_
       [ HH.label_ [ HH.text "Standard error:" ]
-      , HH.text stderr
+      , HH.pre_ [ HH.samp_ [ HH.text stderr ] ]
       ]
   ]
 
@@ -113,7 +114,11 @@ handleAction ∷ ∀ o m. Action → H.HalogenM State Action () o m Unit
 handleAction = case _ of
   RunProgram →
     H.modify_ \st → st
-      { programOutput = Just $ Validate.compute st.programInput }
+      { programOutput = Just $ CLI.runProgram
+          st.outputFormat
+          Validate.compute
+          st.programInput
+      }
   UpdateJson newJsonText →
     H.modify_ \st → st
       { programInput = st.programInput { jsonText = newJsonText } }
