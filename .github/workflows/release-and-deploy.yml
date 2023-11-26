@@ -42,18 +42,18 @@ jobs:
         run: >
           nix develop -c
           npm run docs
-      - name: Publish NPM package
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: >
-          nix develop -c
-          npm publish --access public
       - name: Create a GitHub release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: >
           nix develop -c
           npm run release -- --ci
+      - name: Publish NPM package
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: >
+          nix develop -c
+          npm publish --access public
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
