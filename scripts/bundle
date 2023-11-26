@@ -2,10 +2,10 @@
 
 set -e
 
+mkdir -p dist
+
 spago bundle-app \
 	--main Main.CLI \
+	--minify \
 	--platform node \
-	--to dist/cli.mjs \
-	1>dist/last-build.log 2>&1
-
-node dist/cli.mjs "$@"
+	--to dist/cli.mjs

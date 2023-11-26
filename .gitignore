@@ -1,5 +1,6 @@
 .psc-ide-port
 .spago
 dist
+node_modules
 output*
 result
