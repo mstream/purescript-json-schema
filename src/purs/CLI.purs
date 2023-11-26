@@ -1,4 +1,10 @@
-module CLI (runProgram, OutputFormat(..), Program, ProgramOutput) where
+module CLI
+  ( runProgram
+  , OutputFormat(..)
+  , Program
+  , ProgramOutput
+  , PureProgram
+  ) where
 
 import Prelude
 
@@ -16,6 +22,9 @@ type ProgramOutput =
 
 type Program i = i → ProgramOutput
 
+type PureProgram i o =
+  i → String \/ { expectedError ∷ Boolean, output ∷ o }
+
 data OutputFormat = Json | Markdown
 
 runProgram
@@ -23,14 +32,17 @@ runProgram
   . Document o
   ⇒ EncodeJson o
   ⇒ OutputFormat
-  → (i → String \/ o)
+  → PureProgram i o
   → i
   → ProgramOutput
 runProgram outputFormat compute = compute >>> case _ of
   Left errorMessage →
-    { exitCode: 1, stderr: errorMessage <> "\n", stdout: "" }
-  Right output →
-    { exitCode: 0, stderr: "", stdout: renderOutput output <> "\n" }
+    { exitCode: 2, stderr: errorMessage <> "\n", stdout: "" }
+  Right { expectedError, output } →
+    { exitCode: if expectedError then 1 else 0
+    , stderr: ""
+    , stdout: renderOutput output <> "\n"
+    }
   where
   renderOutput ∷ o → String
   renderOutput = case outputFormat of

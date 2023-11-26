@@ -109,11 +109,6 @@ run { command } = Aff.catchError executeProgram fallbackProgram
   executeProgram ∷ Aff ProgramOutput
   executeProgram = case command of
     Compat { leftSchemaPath, outputFormat, rightSchemaPath } → do
-      Console.error $ "calculating compatibility between schemata at "
-        <> leftSchemaPath
-        <> " and "
-        <> rightSchemaPath
-
       leftSchemaText ← FS.readTextFile UTF8 leftSchemaPath
       rightSchemaText ← FS.readTextFile UTF8 rightSchemaPath
 
@@ -123,11 +118,6 @@ run { command } = Aff.catchError executeProgram fallbackProgram
         { leftSchemaText, rightSchemaText }
 
     Diff { leftSchemaPath, outputFormat, rightSchemaPath } → do
-      Console.error $ "calculating difference between schemata at "
-        <> leftSchemaPath
-        <> " and "
-        <> rightSchemaPath
-
       leftSchemaText ← FS.readTextFile UTF8 leftSchemaPath
       rightSchemaText ← FS.readTextFile UTF8 rightSchemaPath
 
@@ -137,11 +127,6 @@ run { command } = Aff.catchError executeProgram fallbackProgram
         { leftSchemaText, rightSchemaText }
 
     Validate { jsonPath, outputFormat, schemaPath } → do
-      Console.error $ "validating JSON at "
-        <> jsonPath
-        <> " against schema at "
-        <> schemaPath
-
       schemaText ← FS.readTextFile UTF8 schemaPath
       jsonText ← FS.readTextFile UTF8 jsonPath
 

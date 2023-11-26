@@ -2,9 +2,10 @@
 
 set -e
 
-EXEC_ARGS=()
-for ARG in "$@"; do
-	EXEC_ARGS+=("--exec-args" "$ARG")
-done
+spago bundle-app \
+	--main Main.CLI \
+	--platform node \
+	--to dist/cli.mjs \
+	1>dist/last-build.log 2>&1
 
-spago run --main Main.CLI "${EXEC_ARGS[@]}"
+node dist/cli.mjs "$@"
