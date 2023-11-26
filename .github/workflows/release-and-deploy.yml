@@ -41,6 +41,9 @@ jobs:
         run: >
           nix develop -c
           npm run docs
+      - run: Publish NPM package
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Create a GitHub release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
