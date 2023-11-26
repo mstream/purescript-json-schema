@@ -4,6 +4,7 @@ import Prelude
 
 import Control.Monad.Error.Class (throwError)
 import Data.Foldable (foldMap)
+import Data.Maybe (Maybe(..))
 import Data.String as String
 import Data.String.NonEmpty (NonEmptyString)
 import Data.String.NonEmpty as StringNE
@@ -18,6 +19,7 @@ import Type.Proxy (Proxy(..))
 type Input =
   { command ∷ NonEmptyString
   , parameters ∷ Array Parameter
+  , shouldFail ∷ Boolean
   }
 
 type Parameter = NonEmptyString /\ NonEmptyString
@@ -42,6 +44,7 @@ fixtures =
           )
       , leftSchemaFile: StringNE.nes (Proxy ∷ Proxy "any-number.json")
       , rightSchemaFile: StringNE.nes (Proxy ∷ Proxy "any-string.json")
+      , shouldFail: true
       }
     ]
 
@@ -49,10 +52,19 @@ fixtures =
   diffFixtures = diffFixture <$>
     [ { differencesFile: StringNE.nes
           ( Proxy
+              ∷ Proxy "no-differences.json"
+          )
+      , leftSchemaFile: StringNE.nes (Proxy ∷ Proxy "any-number.json")
+      , rightSchemaFile: StringNE.nes (Proxy ∷ Proxy "any-number.json")
+      , shouldFail: false
+      }
+    , { differencesFile: StringNE.nes
+          ( Proxy
               ∷ Proxy "allowed-types-change-from-number-to-string.json"
           )
       , leftSchemaFile: StringNE.nes (Proxy ∷ Proxy "any-number.json")
       , rightSchemaFile: StringNE.nes (Proxy ∷ Proxy "any-string.json")
+      , shouldFail: true
       }
     ]
 
@@ -60,6 +72,7 @@ fixtures =
   validateFixtures = validateFixture <$>
     [ { jsonFile: StringNE.nes (Proxy ∷ Proxy "string.json")
       , schemaFile: StringNE.nes (Proxy ∷ Proxy "any-number.json")
+      , shouldFail: true
       , violationsFile: StringNE.nes
           (Proxy ∷ Proxy "string-is-not-a-number.json")
       }
@@ -69,15 +82,18 @@ compatFixture
   ∷ { compatibilitiesFile ∷ NonEmptyString
     , leftSchemaFile ∷ NonEmptyString
     , rightSchemaFile ∷ NonEmptyString
+    , shouldFail ∷ Boolean
     }
   → Fixture Input
-compatFixture { compatibilitiesFile, leftSchemaFile, rightSchemaFile } =
+compatFixture
+  { compatibilitiesFile, leftSchemaFile, rightSchemaFile, shouldFail } =
   { input:
       { command: StringNE.nes (Proxy ∷ Proxy "compat")
       , parameters:
           [ StringNE.nes (Proxy ∷ Proxy "left") /\ leftSchemaPath
           , StringNE.nes (Proxy ∷ Proxy "right") /\ rightSchemaPath
           ]
+      , shouldFail
       }
   , outputPath
   }
@@ -100,15 +116,18 @@ diffFixture
   ∷ { differencesFile ∷ NonEmptyString
     , leftSchemaFile ∷ NonEmptyString
     , rightSchemaFile ∷ NonEmptyString
+    , shouldFail ∷ Boolean
     }
   → Fixture Input
-diffFixture { differencesFile, leftSchemaFile, rightSchemaFile } =
+diffFixture
+  { differencesFile, leftSchemaFile, rightSchemaFile, shouldFail } =
   { input:
       { command: StringNE.nes (Proxy ∷ Proxy "diff")
       , parameters:
           [ StringNE.nes (Proxy ∷ Proxy "left") /\ leftSchemaPath
           , StringNE.nes (Proxy ∷ Proxy "right") /\ rightSchemaPath
           ]
+      , shouldFail
       }
   , outputPath
   }
@@ -130,16 +149,18 @@ diffFixture { differencesFile, leftSchemaFile, rightSchemaFile } =
 validateFixture
   ∷ { jsonFile ∷ NonEmptyString
     , schemaFile ∷ NonEmptyString
+    , shouldFail ∷ Boolean
     , violationsFile ∷ NonEmptyString
     }
   → Fixture Input
-validateFixture { jsonFile, schemaFile, violationsFile } =
+validateFixture { jsonFile, schemaFile, shouldFail, violationsFile } =
   { input:
       { command: StringNE.nes (Proxy ∷ Proxy "validate")
       , parameters:
           [ StringNE.nes (Proxy ∷ Proxy "json") /\ jsonPath
           , StringNE.nes (Proxy ∷ Proxy "schema") /\ schemaPath
           ]
+      , shouldFail
       }
   , outputPath
   }
@@ -167,15 +188,31 @@ describeInput { command, parameters } = "a CLI invocation of '"
     StringNE.toString k <> "=" <> StringNE.toString v
 
 executeCommand ∷ Input → Aff String
-executeCommand { command, parameters } = do
+executeCommand { command, parameters, shouldFail } = do
   result ← runCliProcess `pipe` runPrettierProcess
-  case result.exit of
+  let
+    { escapedCommand, exit, stderr, stdout } = result
+  case exit of
     BySignal _ →
-      throwError $ error $ "process killed: " <> result.escapedCommand
-    Normally 0 → do
-      pure $ result.stdout <> "\n"
-    Normally _ →
-      pure $ result.stderr <> "\n"
+      throwError $ error $ "process killed: " <> escapedCommand
+    Normally 0 →
+      if shouldFail then throwError
+        $ error
+        $ "command should fail but it did not: "
+            <> show { stderr, stdout }
+      else pure $ stdout <> "\n"
+    Normally 1 →
+      if shouldFail then pure $ stdout <> "\n"
+      else throwError
+        $ error
+        $ "command should not fail but it did: "
+            <> show { exitCode: 1, stderr, stdout }
+    Normally exitCode →
+      if shouldFail then pure $ stderr <> "\n"
+      else throwError
+        $ error
+        $ "command should not fail but it did: "
+            <> show { exitCode, stderr, stdout }
   where
   runCliProcess ∷ Aff ExecaProcess
   runCliProcess = E.execa
@@ -203,9 +240,11 @@ pipe runProcess1 runProcess2 = do
   process1 ← runProcess1
   result1 ← process1.getResult
   case result1.exit of
-    Normally 0 → do
+    Normally exitCode → do
       process2 ← runProcess2
       process2.stdin.writeUtf8End result1.stdout
-      process2.getResult
+      result2 ← process2.getResult
+      pure $ result1
+        { exitCode = Just exitCode, stdout = result2.stdout }
     _ →
       pure result1

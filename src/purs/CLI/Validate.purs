@@ -6,12 +6,13 @@ module CLI.Validate
 
 import Prelude
 
-import CLI (OutputFormat)
+import CLI (OutputFormat, PureProgram)
 import Data.Argonaut.Parser as AP
 import Data.Either (Either(..))
 import Data.Either.Nested (type (\/))
 import Data.Newtype (wrap)
 import Data.Set (Set)
+import Data.Set as Set
 import JsonSchema (JsonSchema)
 import JsonSchema.Codec.Parsing as Parsing
 import JsonSchema.Validation (Violation)
@@ -29,7 +30,9 @@ type ProgramInput =
   , schemaText ∷ String
   }
 
-compute ∷ ProgramInput → String \/ Set Violation
+type ProgramOutput = Set Violation
+
+compute ∷ PureProgram ProgramInput ProgramOutput
 compute { jsonText, schemaText } = do
   schema ← case parseSchema schemaText of
     Left errorMessage →
@@ -45,7 +48,11 @@ compute { jsonText, schemaText } = do
     Right json →
       Right json
 
-  Right $ jsonValue `Validation.validateAgainst` schema
+  let
+    violations = jsonValue `Validation.validateAgainst` schema
+
+  Right
+    { expectedError: not $ Set.isEmpty violations, output: violations }
   where
   parseJson ∷ String → String \/ JsonValue
   parseJson = map wrap <<< AP.jsonParser

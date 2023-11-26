@@ -6,12 +6,13 @@ module CLI.Diff
 
 import Prelude
 
-import CLI (OutputFormat)
+import CLI (OutputFormat, PureProgram)
 import Data.Argonaut.Parser as AP
 import Data.Either (Either(..))
 import Data.Either.Nested (type (\/))
 import Data.Newtype (wrap)
 import Data.Set (Set)
+import Data.Set as Set
 import JsonSchema (JsonSchema)
 import JsonSchema.Codec.Parsing as Parsing
 import JsonSchema.Difference (Difference)
@@ -28,7 +29,9 @@ type ProgramInput =
   , rightSchemaText ∷ String
   }
 
-compute ∷ ProgramInput → String \/ Set Difference
+type ProgramOutput = Set Difference
+
+compute ∷ PureProgram ProgramInput ProgramOutput
 compute { leftSchemaText, rightSchemaText } = do
   leftSchema ← case parseSchema leftSchemaText of
     Left errorMessage →
@@ -44,7 +47,13 @@ compute { leftSchemaText, rightSchemaText } = do
     Right schema →
       Right schema
 
-  Right $ Difference.calculate leftSchema rightSchema
+  let
+    differences = Difference.calculate leftSchema rightSchema
+
+  Right
+    { expectedError: not $ Set.isEmpty differences
+    , output: differences
+    }
   where
   parseSchema ∷ String → String \/ JsonSchema
   parseSchema s = do

@@ -6,14 +6,14 @@ module CLI.Compat
 
 import Prelude
 
-import CLI (OutputFormat)
+import CLI (OutputFormat, PureProgram)
 import Data.Argonaut.Parser as AP
 import Data.Either (Either(..))
 import Data.Either.Nested (type (\/))
 import Data.Newtype (wrap)
 import JsonSchema (JsonSchema)
 import JsonSchema.Codec.Parsing as Parsing
-import JsonSchema.Compatibility (Compatibility)
+import JsonSchema.Compatibility (Compatibility(..))
 import JsonSchema.Compatibility as Compatibility
 import JsonSchema.Difference as Difference
 
@@ -28,7 +28,9 @@ type ProgramInput =
   , rightSchemaText ∷ String
   }
 
-compute ∷ ProgramInput → String \/ Compatibility
+type ProgramOutput = Compatibility
+
+compute ∷ PureProgram ProgramInput ProgramOutput
 compute { leftSchemaText, rightSchemaText } = do
   leftSchema ← case parseSchema leftSchemaText of
     Left errorMessage →
@@ -44,9 +46,18 @@ compute { leftSchemaText, rightSchemaText } = do
     Right schema →
       Right schema
 
-  Right
-    $ Compatibility.calculate
-    $ Difference.calculate leftSchema rightSchema
+  let
+    differences = Difference.calculate leftSchema rightSchema
+
+  Right case Compatibility.calculate differences of
+    Backward details →
+      { expectedError: true, output: Backward details }
+    Forward details →
+      { expectedError: true, output: Forward details }
+    Full →
+      { expectedError: false, output: Full }
+    None details →
+      { expectedError: true, output: None details }
   where
   parseSchema ∷ String → String \/ JsonSchema
   parseSchema s = do
