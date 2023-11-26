@@ -216,7 +216,7 @@ executeCommand { command, parameters, shouldFail } = do
   where
   runCliProcess ∷ Aff ExecaProcess
   runCliProcess = E.execa
-    "./cli.sh"
+    "./bin/cli.js"
     ( [ StringNE.toString command ] <> formatCliParameters parameters
         <>
           [ "--output-format"

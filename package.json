@@ -1,0 +1,70 @@
+{
+  "name": "@json-schema/cli",
+  "version": "1.0.0",
+  "description": "CLI for purescript-json-schema",
+  "type": "module",
+  "files": [
+    "dist/cli.mjs"
+  ],
+  "bin": {
+    "json-schema": "bin/cli.js"
+  },
+  "scripts": {
+    "build": "scripty",
+    "bundle": "scripty",
+    "serve": "scripty",
+    "test": "scripty"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mstream/purescript-json-schema.git"
+  },
+  "author": "Maciej Laciak <maciej.laciak@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mstream/purescript-json-schema/issues"
+  },
+  "homepage": "https://github.com/mstream/purescript-json-schema#readme",
+  "devDependencies": {
+    "@release-it/conventional-changelog": "^8",
+    "release-it": "^17",
+    "scripty": "^2"
+  },
+  "release-it": {
+    "git": {
+      "commitMessage": "chore: release v${version}",
+      "requireCleanWorkingDir": true
+    },
+    "github": {
+      "release": true,
+      "releaseName": "Release ${version}",
+      "tokenRef": "GITHUB_TOKEN"
+    },
+    "npm": {
+      "publish": false,
+      "skipChecks": true
+    },
+    "plugins": {
+      "@release-it/conventional-changelog": {
+        "infile": "CHANGELOG.md",
+        "preset": {
+          "name": "conventionalcommits",
+          "types": [
+            {
+              "type": "feat",
+              "section": "Features"
+            },
+            {
+              "type": "fix",
+              "section": "Bug Fixes"
+            },
+            {
+              "type": "refactor",
+              "hidden": true
+            }
+          ]
+        }
+      }
+    }
+  }
+}
