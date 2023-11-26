@@ -36,11 +36,11 @@ jobs:
       - name: Test the library
         run: >
           nix develop -c
-          ./test.sh
+          npm run test
       - name: Build web application
         run: >
           nix develop -c
-          ./docs.sh
+          npm run docs
       - name: Create a GitHub release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

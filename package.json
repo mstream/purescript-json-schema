@@ -12,6 +12,7 @@
   "scripts": {
     "build": "scripty",
     "bundle": "scripty",
+    "docs": "scripty",
     "serve": "scripty",
     "test": "scripty"
   },
