@@ -3,4 +3,4 @@
 set -e
 
 npm run build
-npm run bundle
+npm run package
