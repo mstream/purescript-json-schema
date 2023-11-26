@@ -5462,28 +5462,28 @@
         return function(compute2) {
           var renderOutput = function() {
             if (outputFormat instanceof Json2) {
-              var $14 = stringifyWithIndent(2);
-              return function($15) {
-                return $14(encodeJson3($15));
+              var $17 = stringifyWithIndent(2);
+              return function($18) {
+                return $17(encodeJson3($18));
               };
             }
             ;
             if (outputFormat instanceof Markdown) {
-              var $16 = render2({
+              var $19 = render2({
                 maxLineLength: 72
               });
-              return function($17) {
-                return $16(document3(document1($17)));
+              return function($20) {
+                return $19(document3(document1($20)));
               };
             }
             ;
-            throw new Error("Failed pattern match at CLI (line 36, column 18 - line 42, column 30): " + [outputFormat.constructor.name]);
+            throw new Error("Failed pattern match at CLI (line 48, column 18 - line 54, column 30): " + [outputFormat.constructor.name]);
           }();
-          return function($18) {
+          return function($21) {
             return function(v) {
               if (v instanceof Left) {
                 return {
-                  exitCode: 1,
+                  exitCode: 2,
                   stderr: v.value0 + "\n",
                   stdout: ""
                 };
@@ -5491,14 +5491,20 @@
               ;
               if (v instanceof Right) {
                 return {
-                  exitCode: 0,
+                  exitCode: function() {
+                    if (v.value0.expectedError) {
+                      return 1;
+                    }
+                    ;
+                    return 0;
+                  }(),
                   stderr: "",
-                  stdout: renderOutput(v.value0) + "\n"
+                  stdout: renderOutput(v.value0.output) + "\n"
                 };
               }
               ;
-              throw new Error("Failed pattern match at CLI (line 29, column 47 - line 33, column 69): " + [v.constructor.name]);
-            }(compute2($18));
+              throw new Error("Failed pattern match at CLI (line 38, column 47 - line 45, column 6): " + [v.constructor.name]);
+            }(compute2($21));
           };
         };
       };
@@ -7615,9 +7621,9 @@
       });
     };
     var parseJson = function() {
-      var $17 = map20(wrap5);
-      return function($18) {
-        return $17(jsonParser($18));
+      var $18 = map20(wrap5);
+      return function($19) {
+        return $18(jsonParser($19));
       };
     }();
     return bind3(function() {
@@ -7630,7 +7636,7 @@
         return new Right(v1.value0);
       }
       ;
-      throw new Error("Failed pattern match at CLI.Validate (line 34, column 12 - line 39, column 19): " + [v1.constructor.name]);
+      throw new Error("Failed pattern match at CLI.Validate (line 37, column 12 - line 42, column 19): " + [v1.constructor.name]);
     }())(function(schema) {
       return bind3(function() {
         var v1 = parseJson(v.jsonText);
@@ -7642,9 +7648,13 @@
           return new Right(v1.value0);
         }
         ;
-        throw new Error("Failed pattern match at CLI.Validate (line 41, column 15 - line 46, column 17): " + [v1.constructor.name]);
+        throw new Error("Failed pattern match at CLI.Validate (line 44, column 15 - line 49, column 17): " + [v1.constructor.name]);
       }())(function(jsonValue) {
-        return new Right(validateAgainst(jsonValue)(schema));
+        var violations = validateAgainst(jsonValue)(schema);
+        return new Right({
+          expectedError: !isEmpty2(violations),
+          output: violations
+        });
       });
     });
   };
