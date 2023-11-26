@@ -13,7 +13,6 @@
     "build": "scripty",
     "bundle": "scripty",
     "docs": "scripty",
-    "prepare": "scripty",
     "release": "scripty",
     "serve": "scripty",
     "test": "scripty"
