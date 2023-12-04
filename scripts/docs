@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 
 set -e
+set -x
+
+npm run test
 
 spago run --main Docs.Main
-spago bundle-app --main Sandbox.Main --to docs/src/sandbox.js
+
+esbuild --bundle docs/sandbox.js --outfile=docs/src/sandbox.js
+cp docs/sandbox.css docs/src/
 cp docs/sandbox.html docs/src/
 nix build .#docs
