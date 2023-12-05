@@ -1,6 +1,7 @@
-.psc-ide-port
-.spago
-dist
-node_modules
-output*
-result
+/.psc-ide-port
+/.spago
+/build
+/dist
+/node_modules
+/output*
+/result
