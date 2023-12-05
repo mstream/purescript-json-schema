@@ -41,7 +41,6 @@ in pkgs.stdenv.mkDerivation {
   installPhase = ''
     mkdir "$out"
     mdbook build --dest-dir "$out" docs
-    cp docs/sandbox.css "$out/html/css/"
   '';
   unpackPhase = ''
     cp -r $src/docs .

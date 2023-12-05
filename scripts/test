@@ -2,7 +2,6 @@
 
 set -e
 
-npm run build
 spago test -m Test.Unit.Main
 npm run bundle
 spago test -m Test.Snapshot.Main
