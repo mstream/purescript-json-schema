@@ -256,9 +256,12 @@ pipe runProcess1 runProcess2 = do
           _ →
             throwError
               $ Exception.error
-              $ "pipeline failed: " <> show result2
-      else throwError $ Exception.error $ show
-        { errorCode, stderr: result1.stderr }
+              $ "right side of pipeline failed: " <> show result2
+      else throwError
+        $ Exception.error
+        $ "left side of pipeline failed: " <> show result1
 
     _ →
-      pure result1
+      throwError
+        $ Exception.error
+        $ "left side of pipeline failed: " <> show result1
