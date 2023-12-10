@@ -2,8 +2,18 @@
 
 let
   unpack-self = ''
+    set -e
     mkdir -p {.spago,src,test}
     cp $src/{packages.dhall,spago.dhall} .
+    if [ -d $src/bin ]; then
+      cp --recursive $src/bin .
+    fi
+    if [ -d $src/scripts ]; then
+      cp --recursive $src/scripts .
+    fi
+    if [ -d $src/snapshots ]; then
+      cp --recursive $src/snapshots .
+    fi
     cp --recursive $src/src/* src/
     cp --recursive $src/test/* test/
     install-spago-style
@@ -18,33 +28,48 @@ let
           cp --force --recursive ${dep-src}/src/* src/
         ''
       )
-      ""
+      "set -e"
       (builtins.attrValues deps)
   ;
   unpack-phase = deps: ''
     ${unpack-self}
     ${unpack-deps deps}
   '';
-  install-phase = ''
-    mkdir $out
-    cp --recursive {.spago,output,src,test} $out/
-  '';
   build-phase = ''
+    set -e
     shopt -s globstar
-    build-spago-style .spago/*/*/src/**/*.purs src/**/*.purs
+    build-spago-style .spago/*/*/src/**/*.purs src/**/*.purs test/**/*.purs
+    if [ -d output/Main ]; then
+      build-spago-style --codegen corefn .spago/*/*/src/**/*.purs src/**/*.purs
+      purs-backend-es bundle-app --platform node --to dist/index.mjs
+    fi
   '';
-
+  check-phase = ''
+    set -e
+    node --eval "import {main} from './output/Test.Main/index.js'; main()" --input-type module;
+  '';
+  install-phase = ''
+    set -e
+    mkdir $out
+    cp --recursive {.spago,output,src} $out/
+  '';
   mkPursLibDerivation = name: lib-path: deps:
     let
       spagoPkgs = import "${lib-path}/spago-packages.nix" { inherit pkgs; };
     in
     pkgs.stdenv.mkDerivation {
       buildPhase = build-phase;
+      checkPhase = check-phase;
+      doCheck = true;
       installPhase = install-phase;
       name = "purescript-${name}";
       nativeBuildInputs = with pkgs; [
         easy-ps.purs
+        easy-ps.purs-backend-es
         easy-ps.spago
+        pkgs.esbuild
+        pkgs.nodePackages.prettier
+        pkgs.nodejs
         spagoPkgs.installSpagoStyle
         spagoPkgs.buildSpagoStyle
       ];

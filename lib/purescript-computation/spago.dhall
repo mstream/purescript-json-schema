@@ -2,7 +2,6 @@
 , dependencies =
   [ "aff"
   , "arrays"
-  , "datetime"
   , "docs"
   , "effect"
   , "foldable-traversable"

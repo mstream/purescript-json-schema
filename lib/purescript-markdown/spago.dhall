@@ -3,7 +3,6 @@
   [ "aff"
   , "arrays"
   , "control"
-  , "datetime"
   , "effect"
   , "foldable-traversable"
   , "lists"

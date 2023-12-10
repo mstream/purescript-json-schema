@@ -31,17 +31,7 @@ spec =
   , description: StringNE.nes (Proxy ∷ Proxy "abc")
   , executeCommand
   , fixtures
-  , initHook: Just $ void do
-      process ← E.execa "./scripts/bundle" [] identity
-      { exit, stderr, stdout } ← process.getResult
-      case exit of
-        Normally 0 →
-          pure unit
-        _ →
-          throwError
-            $ Exception.error
-            $ "bundling has failed" <> show { stderr, stdout }
-
+  , initHook: Nothing
   }
 
 fixtures ∷ Array (Fixture Input)
@@ -230,7 +220,7 @@ executeCommand { command, parameters, shouldFail } = do
   where
   runCliProcess ∷ Aff ExecaProcess
   runCliProcess = E.execa
-    "./bin/cli.js"
+    "./bin/cli.mjs"
     ( [ StringNE.toString command ] <> formatCliParameters parameters
         <>
           [ "--output-format"
@@ -259,8 +249,14 @@ pipe runProcess1 runProcess2 = do
         process2 ← runProcess2
         process2.stdin.writeUtf8End result1.stdout
         result2 ← process2.getResult
-        pure $ result1
-          { exitCode = Just errorCode, stdout = result2.stdout }
+        case result2.exit of
+          Normally 0 →
+            pure $ result1
+              { exitCode = Just errorCode, stdout = result2.stdout }
+          _ →
+            throwError
+              $ Exception.error
+              $ "pipeline failed: " <> show result2
       else throwError $ Exception.error $ show
         { errorCode, stderr: result1.stderr }
 

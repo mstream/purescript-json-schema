@@ -2,7 +2,6 @@ module CLI.Halogen (commandFormComponent) where
 
 import Prelude
 
-import CLI (Command(..))
 import CLI.Command.Compat as Compat
 import CLI.Command.Diff as Diff
 import CLI.Command.Validate as Validate

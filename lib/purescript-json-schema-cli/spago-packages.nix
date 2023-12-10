@@ -113,6 +113,8 @@ let
         installPhase = "ln -s $src $out";
       };
 
+  # computation is a Local package in (Local "./../../lib/purescript-computation")
+
     "console" = pkgs.stdenv.mkDerivation {
         name = "console";
         version = "v6.1.0";
