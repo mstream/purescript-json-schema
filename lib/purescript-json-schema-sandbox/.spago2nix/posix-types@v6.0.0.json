@@ -1,0 +1,1 @@
+{"type":"Fetched","value":{"result":{"url":"https://github.com/purescript-node/purescript-posix-types.git","sha256":"1zcm2hikfigh5fbwg12c61gvvjhmwgy6fplfcm6bc5aqb7w3czll","rev":"b79ff37f87846ca5caab2123cf84148e700d40d1"},"package":{"version":"v6.0.0","repo":{"tag":"Remote","contents":"https://github.com/purescript-node/purescript-posix-types.git"},"packageName":"posix-types"}}}

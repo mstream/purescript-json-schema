@@ -1,0 +1,1 @@
+{"type":"Fetched","value":{"result":{"url":"https://github.com/purescript-contrib/purescript-unicode.git","sha256":"0w2gsmqcy7pj5vd22qzpig20bdgzmbagyqxrg9mm1njjfsmcm8cv","rev":"6454d59d9e1fd1bc5a72e80e985d8282022a567a"},"package":{"version":"v6.0.0","repo":{"tag":"Remote","contents":"https://github.com/purescript-contrib/purescript-unicode.git"},"packageName":"unicode"}}}

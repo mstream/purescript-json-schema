@@ -1,0 +1,1 @@
+{"type":"Fetched","value":{"result":{"url":"https://github.com/garyb/purescript-debug.git","sha256":"0q3r21zh0kjy9aq8q2siaf8841q63cmxjl2fbk0z3r0z4cfihccg","rev":"a37b82f62c89734934c0962ece3412913020460a"},"package":{"version":"v6.0.2","repo":{"tag":"Remote","contents":"https://github.com/garyb/purescript-debug.git"},"packageName":"debug"}}}

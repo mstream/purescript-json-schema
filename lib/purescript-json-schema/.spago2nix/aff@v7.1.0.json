@@ -1,0 +1,1 @@
+{"type":"Fetched","value":{"result":{"url":"https://github.com/purescript-contrib/purescript-aff.git","sha256":"1viplap030ym9ya033xl6x41hvdc12v9ngwp1v64ayl40a5m1d47","rev":"6adec6ff048a7876f74c294c440374cd21342d39"},"package":{"version":"v7.1.0","repo":{"tag":"Remote","contents":"https://github.com/purescript-contrib/purescript-aff.git"},"packageName":"aff"}}}

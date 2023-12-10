@@ -1,0 +1,1 @@
+{"type":"Fetched","value":{"result":{"url":"https://github.com/hdgarrood/purescript-ansi.git","sha256":"1aml84m5p1s14kj29m39182byg44nf275p4cinx3kgwhv1gj0qcp","rev":"7d898732d643a977a78004851112a4417909e126"},"package":{"version":"v7.0.0","repo":{"tag":"Remote","contents":"https://github.com/hdgarrood/purescript-ansi.git"},"packageName":"ansi"}}}

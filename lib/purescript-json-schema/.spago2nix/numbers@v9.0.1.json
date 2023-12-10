@@ -1,0 +1,1 @@
+{"type":"Fetched","value":{"result":{"url":"https://github.com/purescript/purescript-numbers.git","sha256":"0qx52ajzz8i1ry0mcwkdxzm7lybd05zia8asl0n87hamdz80ilxd","rev":"27d54effdd2c0e7a86fe356b1cd813dca5981c2d"},"package":{"version":"v9.0.1","repo":{"tag":"Remote","contents":"https://github.com/purescript/purescript-numbers.git"},"packageName":"numbers"}}}

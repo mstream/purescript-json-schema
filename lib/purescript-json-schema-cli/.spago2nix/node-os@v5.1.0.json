@@ -1,0 +1,1 @@
+{"type":"Fetched","value":{"result":{"url":"https://github.com/purescript-node/purescript-node-os.git","sha256":"1zr04ahqz3h6sggm0h0qymhnxnxg952ab6p19hw5lm6smchn4k0y","rev":"c1b8e378c395b84f6973e688d9f38bc60a1f6f2b"},"package":{"version":"v5.1.0","repo":{"tag":"Remote","contents":"https://github.com/purescript-node/purescript-node-os.git"},"packageName":"node-os"}}}
