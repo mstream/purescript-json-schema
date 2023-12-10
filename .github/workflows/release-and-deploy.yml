@@ -40,14 +40,13 @@ jobs:
           npm run test
       - name: Build web application
         run: >
-          nix develop -c
-          npm run docs
+          nix build .#docs
       - name: Create a GitHub release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: >
           nix develop -c
-          npm run release
+          npm run release -- --ci
       - name: Publish NPM package
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

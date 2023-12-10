@@ -1,0 +1,1 @@
+{"type":"Fetched","value":{"result":{"url":"https://github.com/purescript/purescript-random.git","sha256":"0qz14qviz5053j9h1jwpk0gnn692hcdx6fp90wckzrnw31d53174","rev":"9540bc965a9596da02fefd9949418bb19c92533a"},"package":{"version":"v6.0.0","repo":{"tag":"Remote","contents":"https://github.com/purescript/purescript-random.git"},"packageName":"random"}}}

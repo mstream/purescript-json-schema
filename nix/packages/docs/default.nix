@@ -1,13 +1,35 @@
-{ pkgs, ... }:
-let aspellEn = pkgs.aspellWithDicts (d: [ d.en d.en-computers d.en-science ]);
-in pkgs.stdenv.mkDerivation {
-  buildInputs = with pkgs; [
+{ pkgs, purescript-json-schema-sandbox, ... }:
+let
+  aspellEn = pkgs.aspellWithDicts (d: [ d.en d.en-computers d.en-science ]);
+  generateDocsMain = pkgs.writeTextFile {
+    name = "generate-docs.js";
+    text = ''
+      import { main } from "${purescript-json-schema-sandbox}/output/GenerateDocs.Main";
+      main();
+    '';
+  };
+  sandboxMain = pkgs.writeTextFile {
+    name = "sandbox.js";
+    text = ''
+      import { main } from "${purescript-json-schema-sandbox}/output/Sandbox.Main";
+      main();
+    '';
+  };
+in
+pkgs.stdenv.mkDerivation {
+  nativeBuildInputs = with pkgs; [
     esbuild
     mdbook
     mdbook-linkcheck
     mdbook-mermaid
     nodePackages.markdownlint-cli
+    nodejs
   ] ++ [ aspellEn ];
+  buildPhase = ''
+    esbuild --bundle ${sandboxMain} --outfile=docs/src/sandbox.js --platform=browser
+    esbuild --bundle ${generateDocsMain} --outfile=generate-docs.js --platform=node
+    node generate-docs.js
+  '';
   checkPhase = ''
     function validate_spelling() {
       file=$1
@@ -44,9 +66,12 @@ in pkgs.stdenv.mkDerivation {
   '';
   unpackPhase = ''
     cp -r $src/docs .
-    chmod u+w docs/extra-dictionary.txt
-    cp -r $src/.markdownlint.json .
+    chmod --recursive u+w docs
+    mkdir docs/src
+    cp docs/sandbox.css docs/src/
+    cp docs/sandbox.html docs/src/
+    cp $src/.markdownlint.json .
   '';
-  name = "purescript-json-schema-docs";
+  name = "docs";
   src = ../../..;
 }

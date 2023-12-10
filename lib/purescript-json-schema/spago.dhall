@@ -1,0 +1,32 @@
+{ name = "json-schema"
+, dependencies =
+  [ "aff"
+  , "argonaut-codecs"
+  , "argonaut-core"
+  , "arrays"
+  , "computation"
+  , "control"
+  , "docs"
+  , "effect"
+  , "either"
+  , "foldable-traversable"
+  , "foreign-object"
+  , "gen"
+  , "integers"
+  , "lists"
+  , "markdown"
+  , "maybe"
+  , "newtype"
+  , "nonempty"
+  , "ordered-collections"
+  , "prelude"
+  , "quickcheck"
+  , "spec"
+  , "strings"
+  , "tailrec"
+  , "tuples"
+  , "utils"
+  ]
+, packages = ./packages.dhall
+, sources = [ "src/**/*.purs", "test/**/*.purs" ]
+}

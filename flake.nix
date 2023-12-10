@@ -1,5 +1,5 @@
 {
-  description = "Logo language interpreter";
+  description = "Purescript JSON schema library";
 
   inputs = {
     easy-purescript-nix.url = "github:justinwoo/easy-purescript-nix/master";
@@ -14,7 +14,7 @@
     , ...
     }:
     let
-      name = "purescript-json-schema";
+      name = "purescript-json-schema-monorepo";
 
       supportedSystems = [
         "aarch64-darwin"
@@ -44,7 +44,48 @@
         src = ./.;
       };
 
-      docs = import ./nix/packages/docs { inherit pkgs; };
+      lib = import ./nix/lib { inherit easy-ps pkgs; };
+
+      purescript-computation = lib.mkPursLibDerivation
+        "computation"
+        ./lib/purescript-computation
+        { inherit purescript-docs purescript-markdown purescript-utils; };
+      purescript-docs = lib.mkPursLibDerivation
+        "docs"
+        ./lib/purescript-docs
+        { inherit purescript-markdown purescript-utils; };
+      purescript-docs-sandbox = lib.mkPursLibDerivation
+        "docs-sandbox"
+        ./lib/purescript-docs-sandbox
+        { inherit purescript-json-schema; };
+      purescript-json-schema = lib.mkPursLibDerivation
+        "json-schema"
+        ./lib/purescript-json-schema
+        { inherit purescript-computation purescript-docs purescript-markdown purescript-utils; };
+      purescript-json-schema-cli = lib.mkPursLibDerivation
+        "json-schema-cli"
+        ./lib/purescript-json-schema-cli
+        { inherit purescript-docs-sandbox purescript-optparse purescript-utils; };
+      purescript-json-schema-sandbox = lib.mkPursLibDerivation
+        "json-schema-sandbox"
+        ./lib/purescript-json-schema-sandbox
+        { inherit purescript-docs-sandbox purescript-json-schema purescript-json-schema-cli; };
+      purescript-markdown = lib.mkPursLibDerivation
+        "markdown"
+        ./lib/purescript-markdown
+        { inherit purescript-utils; };
+      purescript-optparse = lib.mkPursLibDerivation
+        "optparse"
+        ./lib/purescript-optparse
+        { };
+      purescript-utils = lib.mkPursLibDerivation
+        "utils"
+        ./lib/purescript-utils
+        { };
+
+      docs = import ./nix/packages/docs {
+        inherit pkgs purescript-json-schema-sandbox;
+      };
 
       devShellInputs = {
         easy-ps = with easy-ps; [
@@ -53,6 +94,7 @@
           purs-backend-es
           purs-tidy
           spago
+          spago2nix
         ];
 
         node-packages = with pkgs.nodePackages; [ prettier ];
@@ -70,8 +112,21 @@
           nodejs
         ];
       };
+
+      serve = flake-utils.lib.mkApp {
+        drv =
+          pkgs.runCommandCC
+            "serve"
+            { }
+            ''
+              mkdir $out
+              ${pkgs.httplz}/bin/httplz ${docs}/html/
+            '';
+      };
+
     in
     {
+      apps = { inherit serve; };
       checks = { inherit docs format-check; };
       devShells.default = pkgs.mkShell {
         inherit name;
@@ -85,7 +140,19 @@
           PS1="\[\e[33m\][\[\e[m\]\[\e[34;40m\]${name}:\[\e[m\]\[\e[36m\]\w\[\e[m\]\[\e[33m\]]\[\e[m\]\[\e[32m\]\\$\[\e[m\] "
         '';
       };
-      packages = { inherit docs; };
+      packages = {
+        inherit
+          docs
+          purescript-computation
+          purescript-docs
+          purescript-docs-sandbox
+          purescript-json-schema
+          purescript-json-schema-cli
+          purescript-json-schema-sandbox
+          purescript-markdown
+          purescript-optparse
+          purescript-utils;
+      };
     }
     );
 }

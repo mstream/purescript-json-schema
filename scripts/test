@@ -2,6 +2,6 @@
 
 set -e
 
-spago test -m Test.Unit.Main
-npm run bundle
-spago test -m Test.Snapshot.Main
+for lib_dir in lib/*; do
+	(cd "$lib_dir" && spago test)
+done

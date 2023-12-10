@@ -1,0 +1,1 @@
+{"type":"Fetched","value":{"result":{"url":"https://github.com/natefaubion/purescript-heterogeneous.git","sha256":"0ff1wjq2ayhy67ydggbb2qlzbhvmv1m1z8dcp48p9zhxiq9fpfsz","rev":"5b7542bdd9547c5aef95b8878f103f0ce4ee1383"},"package":{"version":"v0.6.0","repo":{"tag":"Remote","contents":"https://github.com/natefaubion/purescript-heterogeneous.git"},"packageName":"heterogeneous"}}}

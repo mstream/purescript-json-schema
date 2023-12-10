@@ -1,0 +1,1 @@
+{"type":"Fetched","value":{"result":{"url":"https://github.com/purescript/purescript-console.git","sha256":"0br5i4kzya2gwvlakbqzy4ivav9fpp61ipfpch45jnhqqfgfdhmd","rev":"dc9854023e3392399f5eea9f5db965dbfe2cfe11"},"package":{"version":"v6.1.0","repo":{"tag":"Remote","contents":"https://github.com/purescript/purescript-console.git"},"packageName":"console"}}}
