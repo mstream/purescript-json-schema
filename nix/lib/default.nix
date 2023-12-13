@@ -47,7 +47,7 @@ let
   check-phase = ''
     set -e
     TEST_SRC="import {main} from './output/Test.Main/index.js'; main()"
-    node --eval ${TEST_SRC} --input-type module;
+    node --eval $TEST_SRC --input-type module;
   '';
   fixup-phase = ''
     set -e
