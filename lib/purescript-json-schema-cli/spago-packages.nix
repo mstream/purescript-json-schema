@@ -67,11 +67,11 @@ let
 
     "arrays" = pkgs.stdenv.mkDerivation {
         name = "arrays";
-        version = "v7.2.1";
+        version = "v7.3.0";
         src = pkgs.fetchgit {
           url = "https://github.com/purescript/purescript-arrays.git";
-          rev = "ad760640451bd6b4bdd5d44969940217767accba";
-          sha256 = "1b9h016ckwaljdqlny2x2pipz3282qv4v4hpa2cjsk3yzw4j12v1";
+          rev = "6554b3d9c1ebb871477ffa88c2f3850d714b42b0";
+          sha256 = "0hli942mp7wwxyx2h5ijdk2cz6g1njhrsm0bl6xwc8l2s68flj82";
         };
         phases = "installPhase";
         installPhase = "ln -s $src $out";
@@ -617,11 +617,11 @@ let
 
     "node-child-process" = pkgs.stdenv.mkDerivation {
         name = "node-child-process";
-        version = "v11.0.0";
+        version = "v11.1.0";
         src = pkgs.fetchgit {
           url = "https://github.com/purescript-node/purescript-node-child-process.git";
-          rev = "12932f4280d66a5a49d07d43838ded51dec63a02";
-          sha256 = "15qb8j10nmsx4m0ybvl9imk6hs1scvavr983yxy5259rwy1iclb8";
+          rev = "99fd379bcbcd4dff122f5e68838e7967a9366f79";
+          sha256 = "1y6i7vvxr18fv9lkkymcjmbc76wfs1hf743rqg1bvqq9h5hg4ik5";
         };
         phases = "installPhase";
         installPhase = "ln -s $src $out";
@@ -641,11 +641,11 @@ let
 
     "node-execa" = pkgs.stdenv.mkDerivation {
         name = "node-execa";
-        version = "v4.0.1";
+        version = "v5.0.0";
         src = pkgs.fetchgit {
           url = "https://github.com/jordanmartinez/purescript-node-execa.git";
-          rev = "fda206466d694fd3bb042b0f6cb758a0aea9adae";
-          sha256 = "1gvx83gahw5w0ylyqwirnqczf2yskv39dfzvfc186wyyxq7bl885";
+          rev = "9d8b11cc3694e19d82c40f316f0b2dcd4fd3794f";
+          sha256 = "026jvg6h2a7abwpry1nw736hg6kalkjkw3fqjxidydhbh7l7ip42";
         };
         phases = "installPhase";
         installPhase = "ln -s $src $out";
@@ -1185,11 +1185,11 @@ let
 
     "web-pointerevents" = pkgs.stdenv.mkDerivation {
         name = "web-pointerevents";
-        version = "v1.0.0";
+        version = "v2.0.0";
         src = pkgs.fetchgit {
           url = "https://github.com/purescript-web/purescript-web-pointerevents.git";
-          rev = "cf1f48dda73ea34f81a769809489806fce0cac40";
-          sha256 = "1yswmb81vpj2nhb5ibiddih3zk8kwg1rpymq6jydqawrhdzwz8z7";
+          rev = "2959db8ce02db1049096214c8a89537c0431b8ec";
+          sha256 = "0c953am86dn8h8pqi0iwh1r0m64v1sr19a9n19623r50l5f7cvzp";
         };
         phases = "installPhase";
         installPhase = "ln -s $src $out";

@@ -1,1 +1,0 @@
-{"type":"Fetched","value":{"result":{"url":"https://github.com/purescript-web/purescript-web-file.git","sha256":"1wjf1m5y2qsba83is297icv9zyl7jilxdga0192mm1rp0j16jjln","rev":"023786ae62bbb8bf58156dd7f02011fa38221ef1"},"package":{"version":"v4.0.0","repo":{"tag":"Remote","contents":"https://github.com/purescript-web/purescript-web-file.git"},"packageName":"web-file"}}}

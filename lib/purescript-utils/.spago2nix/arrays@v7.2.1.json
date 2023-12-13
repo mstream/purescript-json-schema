@@ -1,1 +1,0 @@
-{"type":"Fetched","value":{"result":{"url":"https://github.com/purescript/purescript-arrays.git","sha256":"1b9h016ckwaljdqlny2x2pipz3282qv4v4hpa2cjsk3yzw4j12v1","rev":"ad760640451bd6b4bdd5d44969940217767accba"},"package":{"version":"v7.2.1","repo":{"tag":"Remote","contents":"https://github.com/purescript/purescript-arrays.git"},"packageName":"arrays"}}}

@@ -67,11 +67,11 @@ let
 
     "arrays" = pkgs.stdenv.mkDerivation {
         name = "arrays";
-        version = "v7.2.1";
+        version = "v7.3.0";
         src = pkgs.fetchgit {
           url = "https://github.com/purescript/purescript-arrays.git";
-          rev = "ad760640451bd6b4bdd5d44969940217767accba";
-          sha256 = "1b9h016ckwaljdqlny2x2pipz3282qv4v4hpa2cjsk3yzw4j12v1";
+          rev = "6554b3d9c1ebb871477ffa88c2f3850d714b42b0";
+          sha256 = "0hli942mp7wwxyx2h5ijdk2cz6g1njhrsm0bl6xwc8l2s68flj82";
         };
         phases = "installPhase";
         installPhase = "ln -s $src $out";

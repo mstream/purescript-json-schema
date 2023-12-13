@@ -72,12 +72,12 @@ let
       installPhase = install-phase;
       name = "purescript-${name}";
       nativeBuildInputs = with pkgs; [
-        easy-ps.purs
         easy-ps.purs-backend-es
         easy-ps.spago
         pkgs.esbuild
         pkgs.nodePackages.prettier
         pkgs.nodejs
+        pkgs.purescript
         spagoPkgs.installSpagoStyle
         spagoPkgs.buildSpagoStyle
       ];
