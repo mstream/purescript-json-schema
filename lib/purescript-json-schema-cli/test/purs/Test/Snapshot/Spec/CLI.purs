@@ -12,6 +12,8 @@ import Data.Tuple.Nested (type (/\), (/\))
 import Effect.Aff (Aff)
 import Effect.Exception as Exception
 import Node.ChildProcess.Types (Exit(..))
+import Node.FS.Aff as FS
+import Node.FS.Constants (x_OK)
 import Node.Library.Execa (ExecaProcess, ExecaResult)
 import Node.Library.Execa as E
 import Test.Snapshot.Utils (Fixture, SnapshotTestSpec)
@@ -31,7 +33,12 @@ spec =
   , description: StringNE.nes (Proxy ∷ Proxy "abc")
   , executeCommand
   , fixtures
-  , initHook: Nothing
+  , initHook: Just $ FS.access' "./bin/cli.mjs" x_OK >>= case _ of
+      Just error →
+        throwError error
+      Nothing →
+        pure unit
+
   }
 
 fixtures ∷ Array (Fixture Input)
