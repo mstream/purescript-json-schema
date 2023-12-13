@@ -3,7 +3,7 @@
 let
   unpack-self = ''
     set -e
-    mkdir -p {.spago,src,test}
+    mkdir --parents {.spago,src,test}
     cp $src/{packages.dhall,spago.dhall} .
     if [ -d $src/bin ]; then
       cp --recursive $src/bin .
@@ -46,17 +46,19 @@ let
   '';
   check-phase = ''
     set -e
-    node --eval "import {main} from './output/Test.Main/index.js'; main()" --input-type module;
+    TEST_SRC="import {main} from './output/Test.Main/index.js'; main()"
+    node --eval ${TEST_SRC} --input-type module;
   '';
   fixup-phase = ''
     set -e
-    rm $out/output/cache-db.json
+    if [ -f $out/output/cache-db.json ]; then
+      rm $out/output/cache-db.json
+    fi
   '';
   install-phase = ''
     set -e
     mkdir $out
     cp --recursive {.spago,output,src} $out/
-    rm $out/output/cache-db.json
   '';
   mkPursLibDerivation = name: lib-path: deps:
     let
