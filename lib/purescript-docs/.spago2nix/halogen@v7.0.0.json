@@ -1,1 +1,0 @@
-{"type":"Fetched","value":{"result":{"url":"https://github.com/purescript-halogen/purescript-halogen.git","sha256":"1y0jxnyav8wv49zwmimfbcp6niyz25mxh2spn6kfh9bfhrpfd36d","rev":"222e1febc889c64a71013748b6bf04db969888f9"},"package":{"version":"v7.0.0","repo":{"tag":"Remote","contents":"https://github.com/purescript-halogen/purescript-halogen.git"},"packageName":"halogen"}}}

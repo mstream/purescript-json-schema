@@ -1,1 +1,0 @@
-{"type":"Fetched","value":{"result":{"url":"https://github.com/purescript/purescript-quickcheck.git","sha256":"142dvh57fl8b6i7mm37a38v7vkc1znbqz6l6wqa704m53hkikvyd","rev":"bf5029f97e6c0d7552d3a08d2ab793a19e2c5e3d"},"package":{"version":"v8.0.1","repo":{"tag":"Remote","contents":"https://github.com/purescript/purescript-quickcheck.git"},"packageName":"quickcheck"}}}

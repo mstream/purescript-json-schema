@@ -254,16 +254,22 @@ pipe runProcess1 runProcess2 = do
     Normally errorCode →
       if errorCode < 2 then do
         process2 ← runProcess2
-        process2.stdin.writeUtf8End result1.stdout
-        result2 ← process2.getResult
-        case result2.exit of
-          Normally 0 →
-            pure $ result1
-              { exitCode = Just errorCode, stdout = result2.stdout }
-          _ →
+        case process2.stdin of
+          Nothing →
             throwError
               $ Exception.error
-              $ "right side of pipeline failed: " <> show result2
+                  "right side of pipeline failed: no  stdin"
+          Just stdin → do
+            stdin.writeUtf8End result1.stdout
+            result2 ← process2.getResult
+            case result2.exit of
+              Normally 0 →
+                pure $ result1
+                  { exitCode = Just errorCode, stdout = result2.stdout }
+              _ →
+                throwError
+                  $ Exception.error
+                  $ "right side of pipeline failed: " <> show result2
       else throwError
         $ Exception.error
         $ "left side of pipeline failed: " <> show result1

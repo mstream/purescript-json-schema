@@ -1,1 +1,0 @@
-{"type":"Fetched","value":{"result":{"url":"https://github.com/purescript/purescript-lcg.git","sha256":"1shzn6zvc1cxd7v0bvfsk7x3xf59vxby8c5lfjvd746r6396zn65","rev":"67c6c6483a563a59ae036d9dca0f1be2835326a5"},"package":{"version":"v4.0.0","repo":{"tag":"Remote","contents":"https://github.com/purescript/purescript-lcg.git"},"packageName":"lcg"}}}

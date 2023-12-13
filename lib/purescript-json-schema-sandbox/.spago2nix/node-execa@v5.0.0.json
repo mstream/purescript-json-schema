@@ -1,0 +1,1 @@
+{"type":"Fetched","value":{"result":{"url":"https://github.com/jordanmartinez/purescript-node-execa.git","sha256":"026jvg6h2a7abwpry1nw736hg6kalkjkw3fqjxidydhbh7l7ip42","rev":"9d8b11cc3694e19d82c40f316f0b2dcd4fd3794f"},"package":{"version":"v5.0.0","repo":{"tag":"Remote","contents":"https://github.com/jordanmartinez/purescript-node-execa.git"},"packageName":"node-execa"}}}

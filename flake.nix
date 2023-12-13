@@ -90,7 +90,6 @@
       devShellInputs = {
         easy-ps = with easy-ps; [
           psa
-          purs
           purs-backend-es
           purs-tidy
           spago
@@ -110,6 +109,7 @@
           imagemagick
           mdbook
           nodejs
+          purescript
         ];
       };
 
