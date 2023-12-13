@@ -27,13 +27,16 @@ type Input =
 
 type Parameter = NonEmptyString /\ NonEmptyString
 
+cliBinPath ∷ String
+cliBinPath = "./bin/cli.mjs"
+
 spec ∷ SnapshotTestSpec Input
 spec =
   { describeInput
   , description: StringNE.nes (Proxy ∷ Proxy "abc")
   , executeCommand
   , fixtures
-  , initHook: Just $ FS.access' "./bin/cli.mjs" x_OK >>= case _ of
+  , initHook: Just $ FS.access' cliBinPath x_OK >>= case _ of
       Just error →
         throwError error
       Nothing →
@@ -227,14 +230,14 @@ executeCommand { command, parameters, shouldFail } = do
   where
   runCliProcess ∷ Aff ExecaProcess
   runCliProcess = E.execa
-    "./bin/cli.mjs"
+    cliBinPath
     ( [ StringNE.toString command ] <> formatCliParameters parameters
         <>
           [ "--output-format"
           , "json"
           ]
     )
-    identity
+    (_ { shell = Just "bash" })
 
   runPrettierProcess ∷ Aff ExecaProcess
   runPrettierProcess = E.execa
