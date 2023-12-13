@@ -4,7 +4,7 @@
   inputs = {
     easy-purescript-nix.url = "github:justinwoo/easy-purescript-nix/master";
     flake-utils.url = "github:numtide/flake-utils/main";
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-23.11";
+    nixpkgs.url = "github:nixos/nixpkgs/23.11";
   };
 
   outputs =
@@ -124,9 +124,13 @@
             '';
       };
 
+      workflow = flake-utils.lib.mkApp {
+        drv = pkgs.act;
+      };
+
     in
     {
-      apps = { inherit serve; };
+      apps = { inherit serve workflow; };
       checks = { inherit docs format-check; };
       devShells.default = pkgs.mkShell {
         inherit name;
