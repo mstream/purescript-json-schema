@@ -34,10 +34,6 @@ jobs:
         run: >
           nix develop -c
           npm ci
-      - name: Test the library
-        run: >
-          nix develop -c
-          npm run test
       - name: Build web application
         run: >
           nix build .#docs

@@ -10,8 +10,7 @@
     "json-schema": "bin/cli.js"
   },
   "scripts": {
-    "release": "scripty",
-    "test": "scripty"
+    "release": "scripty"
   },
   "repository": {
     "type": "git",

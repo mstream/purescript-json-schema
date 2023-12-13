@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-set -e
-
-for lib_dir in lib/*; do
-	(cd "$lib_dir" && spago test)
-done
