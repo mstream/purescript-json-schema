@@ -74,6 +74,7 @@ let
       nativeBuildInputs = with pkgs; [
         easy-ps.purs-backend-es
         easy-ps.spago
+        pkgs.bash
         pkgs.esbuild
         pkgs.nodePackages.prettier
         pkgs.nodejs
