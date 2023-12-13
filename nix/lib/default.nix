@@ -48,10 +48,15 @@ let
     set -e
     node --eval "import {main} from './output/Test.Main/index.js'; main()" --input-type module;
   '';
+  fixup-phase = ''
+    set -e
+    rm $out/output/cache-db.json
+  '';
   install-phase = ''
     set -e
     mkdir $out
     cp --recursive {.spago,output,src} $out/
+    rm $out/output/cache-db.json
   '';
   mkPursLibDerivation = name: lib-path: deps:
     let
@@ -61,6 +66,7 @@ let
       buildPhase = build-phase;
       checkPhase = check-phase;
       doCheck = true;
+      fixupPhase = fixup-phase;
       installPhase = install-phase;
       name = "purescript-${name}";
       nativeBuildInputs = with pkgs; [
