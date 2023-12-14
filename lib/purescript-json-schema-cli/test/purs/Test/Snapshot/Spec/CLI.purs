@@ -201,22 +201,6 @@ describeInput { command, parameters } = "a CLI invocation of '"
 
 executeCommand ∷ Input → Aff String
 executeCommand { command, parameters, shouldFail } = do
-  pwdProcess ← E.execa
-    "pwd"
-    []
-    (_ { shell = Just "bash" })
-  pwdResult ← pwdProcess.getResult
-  lsProcess ← E.execa
-    "ls"
-    [ "bin/" ]
-    (_ { shell = Just "bash" })
-  lsResult ← lsProcess.getResult
-
-  when true
-    ( throwError $ Exception.error $ show
-        { pwd: pwdResult.stdout, ls: lsResult.stdout }
-    )
-
   result ← runCliProcess `pipe` runPrettierProcess
   let
     { escapedCommand, exit, stderr, stdout } = result
