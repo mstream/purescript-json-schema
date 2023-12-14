@@ -201,22 +201,6 @@ describeInput { command, parameters } = "a CLI invocation of '"
 
 executeCommand ∷ Input → Aff String
 executeCommand { command, parameters, shouldFail } = do
-  pwdProcess ← E.execa
-    "pwd"
-    []
-    (_ { shell = Just "bash" })
-  pwdResult ← pwdProcess.getResult
-  lsProcess ← E.execa
-    "ls"
-    [ "bin/" ]
-    (_ { shell = Just "bash" })
-  lsResult ← lsProcess.getResult
-
-  when true
-    ( throwError $ Exception.error $ show
-        { pwd: pwdResult.stdout, ls: lsResult.stdout }
-    )
-
   result ← runCliProcess `pipe` runPrettierProcess
   let
     { escapedCommand, exit, stderr, stdout } = result
@@ -259,7 +243,7 @@ executeCommand { command, parameters, shouldFail } = do
   runPrettierProcess = E.execa
     "prettier"
     [ "--no-color", "--parser", "json" ]
-    identity
+    (_ { shell = Just "bash" })
 
 formatCliParameters ∷ Array Parameter → Array String
 formatCliParameters = foldMap \(k /\ v) →
@@ -277,7 +261,7 @@ pipe runProcess1 runProcess2 = do
           Nothing →
             throwError
               $ Exception.error
-                  "right side of pipeline failed: no  stdin"
+                  "right side of pipeline failed: no stdin"
           Just stdin → do
             stdin.writeUtf8End result1.stdout
             result2 ← process2.getResult
