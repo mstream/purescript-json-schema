@@ -208,7 +208,7 @@ executeCommand { command, parameters, shouldFail } = do
   pwdResult ← pwdProcess.getResult
   lsProcess ← E.execa
     "ls"
-    []
+    [ "bin/" ]
     (_ { shell = Just "bash" })
   lsResult ← lsProcess.getResult
 
