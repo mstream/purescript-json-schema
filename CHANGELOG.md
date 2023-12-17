@@ -1,5 +1,7 @@
 
 
+## [1.1.7](https://github.com/mstream/purescript-json-schema/compare/1.1.6...1.1.7) (2023-12-17)
+
 ## [1.1.6](https://github.com/mstream/purescript-json-schema/compare/1.1.5...1.1.6) (2023-12-17)
 
 ## [1.1.5](https://github.com/mstream/purescript-json-schema/compare/1.1.4...1.1.5) (2023-12-17)
