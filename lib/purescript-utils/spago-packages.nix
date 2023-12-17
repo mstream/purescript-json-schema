@@ -593,6 +593,18 @@ let
         installPhase = "ln -s $src $out";
       };
 
+    "pmock" = pkgs.stdenv.mkDerivation {
+        name = "pmock";
+        version = "v0.7.0";
+        src = pkgs.fetchgit {
+          url = "https://github.com/pujoheadsoft/purescript-pmock.git";
+          rev = "6a22fe3fa7fd46e082ab468428ab24b7b154d1ef";
+          sha256 = "00vfp8hk9x0gzaqm6xl4mwbxfvj0kw03jqp3vzdfjnmamqh5p5mr";
+        };
+        phases = "installPhase";
+        installPhase = "ln -s $src $out";
+      };
+
     "prelude" = pkgs.stdenv.mkDerivation {
         name = "prelude";
         version = "v6.0.1";

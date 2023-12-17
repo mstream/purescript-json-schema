@@ -13,7 +13,7 @@ import Effect.Aff (Aff)
 import Effect.Exception as Exception
 import Node.ChildProcess.Types (Exit(..))
 import Node.FS.Aff as FS
-import Node.FS.Constants (x_OK)
+import Node.FS.Constants (r_OK, x_OK)
 import Node.Library.Execa (ExecaProcess, ExecaResult)
 import Node.Library.Execa as E
 import Test.Snapshot.Utils (Fixture, SnapshotTestSpec)
@@ -28,7 +28,7 @@ type Input =
 type Parameter = NonEmptyString /\ NonEmptyString
 
 cliBinPath ∷ String
-cliBinPath = "./bin/cli.mjs"
+cliBinPath = "./dist/index.mjs"
 
 spec ∷ SnapshotTestSpec Input
 spec =
@@ -36,7 +36,7 @@ spec =
   , description: StringNE.nes (Proxy ∷ Proxy "abc")
   , executeCommand
   , fixtures
-  , initHook: Just $ FS.access' cliBinPath x_OK >>= case _ of
+  , initHook: Just $ FS.access' cliBinPath r_OK >>= case _ of
       Just error →
         throwError error
       Nothing →
@@ -230,8 +230,9 @@ executeCommand { command, parameters, shouldFail } = do
   where
   runCliProcess ∷ Aff ExecaProcess
   runCliProcess = E.execa
-    cliBinPath
-    ( [ StringNE.toString command ] <> formatCliParameters parameters
+    "node"
+    ( [ cliBinPath, StringNE.toString command ]
+        <> formatCliParameters parameters
         <>
           [ "--output-format"
           , "json"

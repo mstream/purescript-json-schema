@@ -30,4 +30,4 @@ runAll specs = do
   void resultsAff
   where
   timeoutInMillis ∷ Number
-  timeoutInMillis = 10000.0
+  timeoutInMillis = 5000.0
