@@ -21,13 +21,13 @@ import Type.Proxy (Proxy(..))
 type JsonPath = List JsonPathSegment
 
 render ∷ JsonPath → NonEmptyString
-render = foldl f (StringNE.nes (Proxy ∷ Proxy "$")) <<< List.reverse
+render = foldl f (StringNE.nes (Proxy @"$")) <<< List.reverse
   where
   f ∷ NonEmptyString → JsonPathSegment → NonEmptyString
   f acc = (acc <> _) <<< case _ of
     ItemIndex idx →
-      StringNE.nes (Proxy ∷ Proxy "[") `StringNE.appendString` show idx
-        <> StringNE.nes (Proxy ∷ Proxy "]")
+      StringNE.nes (Proxy @"[") `StringNE.appendString` show idx
+        <> StringNE.nes (Proxy @"]")
     Property name →
       "/" `StringNE.prependString` name
 

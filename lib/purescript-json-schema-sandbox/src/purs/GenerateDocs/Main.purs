@@ -44,7 +44,7 @@ buildTableOfContents titles =
     [ M.heading1
         $ ArrayNE.singleton
         $ M.text
-        $ StringNE.nes (Proxy ∷ Proxy "Summary")
+        $ StringNE.nes (Proxy @"Summary")
     , M.orderedList $
         ( ArrayNE.singleton
             <<< M.paragraph
@@ -61,7 +61,7 @@ titleToLink title = M.link title
 documentFilePath ∷ NonEmptyString → NonEmptyString
 documentFilePath title =
   (M.headingIdToString $ M.formatAnchor title)
-    `StringNE.prependString` (StringNE.nes (Proxy ∷ Proxy ".md"))
+    `StringNE.prependString` (StringNE.nes (Proxy @".md"))
 
 saveDocumentation ∷ NonEmptySet (NonEmptyString /\ Document) → Aff Unit
 saveDocumentation docsByTitle = do

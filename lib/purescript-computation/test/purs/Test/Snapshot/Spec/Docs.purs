@@ -31,7 +31,7 @@ type OutputSample = ValueSample Output
 spec ∷ SnapshotTestSpec Spec
 spec =
   { describeInput
-  , description: StringNE.nes (Proxy ∷ Proxy "abc")
+  , description: StringNE.nes (Proxy @"rendering computation spec")
   , executeCommand: pure <<< renderComputationSpec
   , fixtures
   , initHook: Nothing
@@ -41,7 +41,7 @@ fixtures ∷ Array (Fixture Spec)
 fixtures =
   renderFixture <$>
     [ { computationSpec: computation1
-      , outputFile: StringNE.nes (Proxy ∷ Proxy "computation1.md")
+      , outputFile: StringNE.nes (Proxy @"computation1.md")
       }
     ]
 
@@ -52,7 +52,7 @@ renderFixture { computationSpec, outputFile } =
   { input: computationSpec, outputPath }
   where
   outputPath ∷ NonEmptyString
-  outputPath = StringNE.nes (Proxy ∷ Proxy "markdown/") <> outputFile
+  outputPath = StringNE.nes (Proxy @"markdown/") <> outputFile
 
 describeInput ∷ Spec → String
 describeInput { input, output } = "a computation with input of '"
@@ -72,58 +72,57 @@ computation1 =
       [ M.paragraph
           $ ArrayNE.singleton
           $ M.text
-          $ StringNE.nes
-              (Proxy ∷ Proxy "computation context")
+          $ StringNE.nes (Proxy @"computation context")
       ]
   , description: \oSpec { i: iSpec, s: sSpec } →
-      StringNE.nes (Proxy ∷ Proxy "computation of ")
+      StringNE.nes (Proxy @"computation of ")
         <> show1 oSpec
-        <> StringNE.nes (Proxy ∷ Proxy " based on ")
+        <> StringNE.nes (Proxy @" based on ")
         <> show1 iSpec
-        <> StringNE.nes (Proxy ∷ Proxy " and ")
+        <> StringNE.nes (Proxy @" and ")
         <> show1 sSpec
   , input:
       { i: ValueSpec
           $
-            StringNE.nes (Proxy ∷ Proxy "integers")
+            StringNE.nes (Proxy @"integers")
       , s: ValueSpec
-          $ StringNE.nes (Proxy ∷ Proxy "a string")
+          $ StringNE.nes (Proxy @"a string")
       }
   , examples:
       [ { description: StringNE.nes
-            (Proxy ∷ Proxy "example1 description")
+            (Proxy @"example1 description")
         , expectedOutput: ValueSample
-            { description: StringNE.nes (Proxy ∷ Proxy "false value")
+            { description: StringNE.nes (Proxy @"false value")
             , sample: false
             }
         , input:
             { i: ValueSample
                 { description: StringNE.nes
-                    (Proxy ∷ Proxy "number one and two")
+                    (Proxy @"number one and two")
                 , sample: [ 1, 2 ]
                 }
             , s: ValueSample
                 { description: StringNE.nes
-                    (Proxy ∷ Proxy "a three letter word")
+                    (Proxy @"a three letter word")
                 , sample: "fox"
                 }
             }
         }
       , { description: StringNE.nes
-            (Proxy ∷ Proxy "example2 description")
+            (Proxy @"example2 description")
         , expectedOutput: ValueSample
-            { description: StringNE.nes (Proxy ∷ Proxy "true value")
+            { description: StringNE.nes (Proxy @"true value")
             , sample: true
             }
         , input:
             { i: ValueSample
                 { description: StringNE.nes
-                    (Proxy ∷ Proxy "number two, three and four")
+                    (Proxy @"number two, three and four")
                 , sample: [ 2, 3, 4 ]
                 }
             , s: ValueSample
                 { description: StringNE.nes
-                    (Proxy ∷ Proxy "a three letter word")
+                    (Proxy @"a three letter word")
                 , sample: "fox"
                 }
             }
@@ -135,14 +134,14 @@ computation1 =
        } →
         String.length s == Array.length i
   , output: ValueSpec $ StringNE.nes
-      (Proxy ∷ Proxy "some result")
+      (Proxy @"some result")
   , properties:
       [ { description: StringNE.nes
-            (Proxy ∷ Proxy "property1 description")
+            (Proxy @"property1 description")
         , property: const $ pure Success
         }
       , { description: StringNE.nes
-            (Proxy ∷ Proxy "property2 description")
+            (Proxy @"property2 description")
         , property: const $ pure Success
         }
       ]

@@ -28,7 +28,7 @@ instance (Document a, Document e) ⇒ Document (e \/ a) where
   document = case _ of
     Left error →
       ( M.paragraph $ ArrayNE.singleton $ M.text $ StringNE.nes
-          (Proxy ∷ Proxy "an error:")
+          (Proxy @"an error:")
       )
         :| (Array.fromFoldable $ document error)
     Right value →
@@ -52,7 +52,7 @@ documentFoldable isOrdered = NE.singleton
     ( M.paragraph
         $ ArrayNE.singleton
         $ M.text
-        $ StringNE.nes (Proxy ∷ Proxy "∅")
+        $ StringNE.nes (Proxy @"∅")
     )
     ( (if isOrdered then M.orderedList else M.unorderedList)
         <<< map (ArrayNE.fromNonEmpty <<< document)

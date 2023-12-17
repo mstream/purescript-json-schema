@@ -16,21 +16,21 @@ type Range = { from ∷ Boundary, to ∷ Boundary }
 
 renderRange ∷ Range → PhrasingContentNode
 renderRange range = M.inlineCode
-  $ renderFrom <> StringNE.nes (Proxy ∷ Proxy ",") <> renderTo
+  $ renderFrom <> StringNE.nes (Proxy @",") <> renderTo
   where
   renderFrom ∷ NonEmptyString
   renderFrom = case range.from of
     Closed x →
-      StringNE.nes (Proxy ∷ Proxy "[") `StringNE.appendString` show x
+      StringNE.nes (Proxy @"[") `StringNE.appendString` show x
     Open x →
-      StringNE.nes (Proxy ∷ Proxy "(") `StringNE.appendString` show x
+      StringNE.nes (Proxy @"(") `StringNE.appendString` show x
 
   renderTo ∷ NonEmptyString
   renderTo = case range.to of
     Closed x →
-      show x `StringNE.prependString` StringNE.nes (Proxy ∷ Proxy "]")
+      show x `StringNE.prependString` StringNE.nes (Proxy @"]")
     Open x →
-      show x `StringNE.prependString` StringNE.nes (Proxy ∷ Proxy ")")
+      show x `StringNE.prependString` StringNE.nes (Proxy @")")
 
 data Boundary = Closed Number | Open Number
 

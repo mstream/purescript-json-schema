@@ -99,7 +99,7 @@ render formComponent { programOutput } =
         [ HH.div_
             [ HH.text "Options Form:" ]
         , HH.slot
-            (Proxy ∷ Proxy "optionsForm")
+            (Proxy @"optionsForm")
             unit
             formComponent
             unit
@@ -148,7 +148,7 @@ handleAction = case _ of
 
   RunProgram → do
     programOutput ← H.request
-      (Proxy ∷ Proxy "optionsForm")
+      (Proxy @"optionsForm")
       unit
       RequestProgramExecution
     put { programOutput }

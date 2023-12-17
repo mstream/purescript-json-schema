@@ -60,21 +60,21 @@ spec =
   { context
   , description:
       \outputSpec { json: jsonSpec, schema: schemaSpec } →
-        StringNE.nes (Proxy ∷ Proxy "finding ")
+        StringNE.nes (Proxy @"finding ")
           <> show1 outputSpec
-          <> StringNE.nes (Proxy ∷ Proxy " as a result of validating ")
+          <> StringNE.nes (Proxy @" as a result of validating ")
           <> show1 jsonSpec
-          <> StringNE.nes (Proxy ∷ Proxy " against ")
+          <> StringNE.nes (Proxy @" against ")
           <> show1 schemaSpec
   , examples
   , execute: \{ json: ValueSample json, schema: ValueSample schema } →
       json.sample `Validation.validateAgainst` schema.sample
   , input:
-      { json: ValueSpec $ StringNE.nes (Proxy ∷ Proxy "JSON value")
-      , schema: ValueSpec $ StringNE.nes (Proxy ∷ Proxy "JSON schema")
+      { json: ValueSpec $ StringNE.nes (Proxy @"JSON value")
+      , schema: ValueSpec $ StringNE.nes (Proxy @"JSON schema")
       }
   , output: ValueSpec
-      $ StringNE.nes (Proxy ∷ Proxy "JSON schema violations")
+      $ StringNE.nes (Proxy @"JSON schema violations")
   , properties
   }
 
@@ -86,8 +86,7 @@ context =
             $
               StringNE.nes
                 ( Proxy
-                    ∷ Proxy
-                        "JSON validation is a specification for validating the structure and data types of JSON values."
+                    @"JSON validation is a specification for validating the structure and data types of JSON values."
                 )
         )
           `ArrayNE.cons'`
@@ -95,22 +94,19 @@ context =
             , M.text
                 $ StringNE.nes
                     ( Proxy
-                        ∷ Proxy
-                            "It allows you to specify the required properties, the types of values, the format of the data, and other constraints for a JSON object."
+                        @"It allows you to specify the required properties, the types of values, the format of the data, and other constraints for a JSON object."
                     )
             , M.lineBreak
             , M.text
                 $ StringNE.nes
                     ( Proxy
-                        ∷ Proxy
-                            "This is useful for ensuring that the data received or sent in a JSON format is as expected and can be processed correctly."
+                        @"This is useful for ensuring that the data received or sent in a JSON format is as expected and can be processed correctly."
                     )
             , M.lineBreak
             , M.text
                 $ StringNE.nes
                     ( Proxy
-                        ∷ Proxy
-                            "It helps to catch errors early, improve data quality, and reduce the amount of code needed for data validation."
+                        @"It helps to catch errors early, improve data quality, and reduce the amount of code needed for data validation."
                     )
             ]
   ]
@@ -119,17 +115,14 @@ properties ∷ Array Property
 properties =
   [ { description:
         StringNE.nes
-          ( Proxy
-              ∷ Proxy
-                  "'true' JSON schema does not impose any constraints"
-          )
+          (Proxy @"'true' JSON schema does not impose any constraints")
     , property: \execute → do
         json ← genAnyJsonValueSample
 
         let
           schema = ValueSample
             { description: StringNE.nes
-                (Proxy ∷ Proxy "'true' JSON schema")
+                (Proxy @"'true' JSON schema")
             , sample: BooleanSchema true
             }
           violations = execute { json, schema }
@@ -142,14 +135,14 @@ properties =
     }
   , { description:
         StringNE.nes
-          (Proxy ∷ Proxy "'false' JSON schema rejects anything")
+          (Proxy @"'false' JSON schema rejects anything")
     , property: \execute → do
         json ← genAnyJsonValueSample
 
         let
           schema = ValueSample
             { description: StringNE.nes
-                (Proxy ∷ Proxy "'false' JSON schema")
+                (Proxy @"'false' JSON schema")
             , sample: BooleanSchema false
             }
           violations = execute { json, schema }
@@ -161,8 +154,7 @@ properties =
     }
   , { description: StringNE.nes
         ( Proxy
-            ∷ Proxy
-                "any JSON value passes validation against 'empty object' JSON schema"
+            @"any JSON value passes validation against 'empty object' JSON schema"
         )
     , property: \execute → do
         json ← genAnyJsonValueSample
@@ -170,7 +162,7 @@ properties =
         let
           schema = ValueSample
             { description: StringNE.nes
-                (Proxy ∷ Proxy "'empty object' JSON schema")
+                (Proxy @"'empty object' JSON schema")
             , sample: ObjectSchema $ Schema.defaultKeywords
             }
           violations = execute { json, schema }
@@ -185,7 +177,7 @@ properties =
 
 genAnyJsonValueSample ∷ Gen (ValueSample JsonValue)
 genAnyJsonValueSample = genValueSample
-  (StringNE.nes (Proxy ∷ Proxy "any JSON value"))
+  (StringNE.nes (Proxy @"any JSON value"))
   (wrap <$> AGen.genJson)
 
 examples ∷ Array Example
@@ -194,12 +186,12 @@ examples =
       "a JSON value directly matches schema's only 'type' keyword item"
       { json: ValueSample
           { description: StringNE.nes
-              (Proxy ∷ Proxy "JSON number value")
+              (Proxy @"JSON number value")
           , sample: wrap $ A.fromNumber 2.5
           }
       , schema: ValueSample
           { description: StringNE.nes
-              (Proxy ∷ Proxy "JSON schema accepting only numbers")
+              (Proxy @"JSON schema accepting only numbers")
           , sample: ObjectSchema $ Schema.defaultKeywords
               { typeKeyword = Just $ Set.fromFoldable [ JsonNumber ] }
           }
@@ -209,14 +201,13 @@ examples =
       { json: ValueSample
           { description: StringNE.nes
               ( Proxy
-                  ∷ Proxy
-                      "JSON number value which happens to be an integer"
+                  @"JSON number value which happens to be an integer"
               )
           , sample: wrap $ A.fromNumber 1.0
           }
       , schema: ValueSample
           { description: StringNE.nes
-              (Proxy ∷ Proxy "JSON schema accepting any numbers")
+              (Proxy @"JSON schema accepting any numbers")
           , sample: ObjectSchema $ Schema.defaultKeywords
               { typeKeyword = Just $ Set.fromFoldable [ JsonNumber ] }
           }
@@ -224,14 +215,13 @@ examples =
   , noViolationsExample
       "a JSON value directly matches one of schema's 'type' keyword items"
       { json: ValueSample
-          { description: StringNE.nes (Proxy ∷ Proxy "JSON null value")
+          { description: StringNE.nes (Proxy @"JSON null value")
           , sample: wrap A.jsonNull
           }
       , schema: ValueSample
           { description: StringNE.nes
               ( Proxy
-                  ∷ Proxy
-                      "JSON schema accepting booleans, nulls and strings"
+                  @"JSON schema accepting booleans, nulls and strings"
               )
           , sample: ObjectSchema $ Schema.defaultKeywords
               { typeKeyword = Just $ Set.fromFoldable
@@ -242,14 +232,13 @@ examples =
   , noViolationsExample
       "a JSON number value is a multiple of the factor desired by the schema"
       { json: ValueSample
-          { description: StringNE.nes (Proxy ∷ Proxy "a multiple of x")
+          { description: StringNE.nes (Proxy @"a multiple of x")
           , sample: wrap $ A.fromNumber 7.5
           }
       , schema: ValueSample
           { description: StringNE.nes
               ( Proxy
-                  ∷ Proxy
-                      "schema accepting only numbers which are multiples of x"
+                  @"schema accepting only numbers which are multiples of x"
               )
           , sample: ObjectSchema $ Schema.defaultKeywords
               { multipleOf = Just 2.5
@@ -260,12 +249,12 @@ examples =
   , violationsExample
       "the value is neither null or string"
       { json: ValueSample
-          { description: StringNE.nes (Proxy ∷ Proxy "a boolean value")
+          { description: StringNE.nes (Proxy @"a boolean value")
           , sample: wrap $ A.jsonTrue
           }
       , schema: ValueSample
           { description: StringNE.nes
-              (Proxy ∷ Proxy "schema accepting only nulls or strings")
+              (Proxy @"schema accepting only nulls or strings")
           , sample: ObjectSchema $ Schema.defaultKeywords
               { typeKeyword = Just
                   $ Set.fromFoldable [ JsonNull, JsonString ]
@@ -274,7 +263,7 @@ examples =
       }
       ( ValueSample
           { description: StringNE.nes
-              (Proxy ∷ Proxy "a type mismatch violation")
+              (Proxy @"a type mismatch violation")
           , sample: Set.singleton $ Violation
               { jsonPath: Nil
               , reason: TypeMismatch
@@ -290,19 +279,19 @@ examples =
       "the schema accepts only whole numbers"
       { json: ValueSample
           { description: StringNE.nes
-              (Proxy ∷ Proxy "a fractional number")
+              (Proxy @"a fractional number")
           , sample: wrap $ A.fromNumber 1.5
           }
       , schema: ValueSample
           { description: StringNE.nes
-              (Proxy ∷ Proxy "schema accepting only whole numbers")
+              (Proxy @"schema accepting only whole numbers")
           , sample: ObjectSchema $ Schema.defaultKeywords
               { typeKeyword = Just $ Set.singleton JsonInteger }
           }
       }
       ( ValueSample
           { description: StringNE.nes
-              (Proxy ∷ Proxy "a type mismatch violation")
+              (Proxy @"a type mismatch violation")
           , sample: Set.singleton $ Violation
               { jsonPath: Nil
               , reason: TypeMismatch
@@ -318,8 +307,7 @@ examples =
       { json: ValueSample
           { description: StringNE.nes
               ( Proxy
-                  ∷ Proxy
-                      "an array containing a mixture of null and boolean values to a schema accepting only arrays of nulls"
+                  @"an array containing a mixture of null and boolean values to a schema accepting only arrays of nulls"
               )
           , sample: wrap $ A.fromArray
               [ A.jsonNull
@@ -332,7 +320,7 @@ examples =
           }
       , schema: ValueSample
           { description: StringNE.nes
-              (Proxy ∷ Proxy "schema accepting only arrays of nulls")
+              (Proxy @"schema accepting only arrays of nulls")
           , sample: ObjectSchema $ Schema.defaultKeywords
               { items = Just $ ObjectSchema $ Schema.defaultKeywords
                   { typeKeyword = Just $ Set.singleton JsonNull }
@@ -342,7 +330,7 @@ examples =
       }
       ( ValueSample
           { description: StringNE.nes
-              (Proxy ∷ Proxy "an invalid array violation")
+              (Proxy @"an invalid array violation")
           , sample: Set.singleton $ Violation
               { jsonPath: Nil
               , reason: InvalidArray $
@@ -372,22 +360,20 @@ examples =
       "the schema requires items to be unique, and the value contains duplicate occurrence"
       { json: ValueSample
           { description: StringNE.nes
-              ( Proxy
-                  ∷ Proxy "an array containing some duplicated strings"
-              )
+              (Proxy @"an array containing some duplicated strings")
           , sample: wrap $ A.fromArray $ A.fromString <$>
               [ "a", "b", "b", "c", "d", "d", "e" ]
           }
       , schema: ValueSample
           { description: StringNE.nes
-              (Proxy ∷ Proxy "schema not accepting duplicates")
+              (Proxy @"schema not accepting duplicates")
           , sample: ObjectSchema $ Schema.defaultKeywords
               { uniqueItems = true }
           }
       }
       ( ValueSample
           { description: StringNE.nes
-              (Proxy ∷ Proxy "an invalid array violation")
+              (Proxy @"an invalid array violation")
           , sample: Set.singleton $ Violation
               { jsonPath: Nil
               , reason: InvalidArray $
@@ -421,12 +407,12 @@ examples =
       "the schema accepts any multiples of 2.5"
       { json: ValueSample
           { description: StringNE.nes
-              (Proxy ∷ Proxy "a multiple of 2.5")
+              (Proxy @"a multiple of 2.5")
           , sample: wrap $ A.fromNumber 7.5
           }
       , schema: ValueSample
           { description: StringNE.nes
-              (Proxy ∷ Proxy "a schema accepting only multiples of 2.5")
+              (Proxy @"a schema accepting only multiples of 2.5")
           , sample: ObjectSchema $ Schema.defaultKeywords
               { multipleOf = Just 2.5
               , typeKeyword = Just $ Set.fromFoldable [ JsonNumber ]
@@ -437,12 +423,12 @@ examples =
       "the schema accepts only multiples of 2.5"
       { json: ValueSample
           { description: StringNE.nes
-              (Proxy ∷ Proxy "not a multiple of 2.5")
+              (Proxy @"not a multiple of 2.5")
           , sample: wrap $ A.fromNumber 7.0
           }
       , schema: ValueSample
           { description: StringNE.nes
-              (Proxy ∷ Proxy "a schema accepting only multiples of 2.5")
+              (Proxy @"a schema accepting only multiples of 2.5")
           , sample: ObjectSchema $ Schema.defaultKeywords
               { multipleOf = Just 2.5
               , typeKeyword = Just $ Set.fromFoldable [ JsonNumber ]
@@ -451,7 +437,7 @@ examples =
       }
       ( ValueSample
           { description: StringNE.nes
-              (Proxy ∷ Proxy "an invalid multiple violation")
+              (Proxy @"an invalid multiple violation")
           , sample: Set.singleton $ Violation
               { jsonPath: Nil
               , reason: InvalidMultiple
@@ -466,16 +452,14 @@ examples =
           { description:
               StringNE.nes
                 ( Proxy
-                    ∷ Proxy
-                        "number at the schema's maximum allowed values boundary"
+                    @"number at the schema's maximum allowed values boundary"
                 )
           , sample: wrap $ A.fromNumber 4.0
           }
       , schema: ValueSample
           { description: StringNE.nes
               ( Proxy
-                  ∷ Proxy
-                      "a schema with a maximum inclusive allowed value set"
+                  @"a schema with a maximum inclusive allowed value set"
               )
           , sample:
               ObjectSchema $ Schema.defaultKeywords
@@ -488,16 +472,14 @@ examples =
           { description:
               StringNE.nes
                 ( Proxy
-                    ∷ Proxy
-                        "number at the schema's maximum allowed values boundary"
+                    @"number at the schema's maximum allowed values boundary"
                 )
           , sample: wrap $ A.fromNumber 4.0
           }
       , schema: ValueSample
           { description: StringNE.nes
               ( Proxy
-                  ∷ Proxy
-                      "a schema with a maximum exclusive allowed value set"
+                  @"a schema with a maximum exclusive allowed value set"
               )
           , sample:
               ObjectSchema $ Schema.defaultKeywords
@@ -506,7 +488,7 @@ examples =
       }
       ( ValueSample
           { description: StringNE.nes
-              (Proxy ∷ Proxy "an invalid range violation")
+              (Proxy @"an invalid range violation")
           , sample: Set.singleton $ Violation
               { jsonPath: Nil
               , reason: InvalidRange
@@ -523,16 +505,14 @@ examples =
           { description:
               StringNE.nes
                 ( Proxy
-                    ∷ Proxy
-                        "number exceeding the schema's maximum allowed values boundary"
+                    @"number exceeding the schema's maximum allowed values boundary"
                 )
           , sample: wrap $ A.fromNumber 5.0
           }
       , schema: ValueSample
           { description: StringNE.nes
               ( Proxy
-                  ∷ Proxy
-                      "a schema with a maximum inclusive allowed value set"
+                  @"a schema with a maximum inclusive allowed value set"
               )
           , sample:
               ObjectSchema $ Schema.defaultKeywords
@@ -541,7 +521,7 @@ examples =
       }
       ( ValueSample
           { description: StringNE.nes
-              (Proxy ∷ Proxy "an invalid range violation")
+              (Proxy @"an invalid range violation")
           , sample: Set.singleton $ Violation
               { jsonPath: Nil
               , reason: InvalidRange
@@ -558,16 +538,14 @@ examples =
           { description:
               StringNE.nes
                 ( Proxy
-                    ∷ Proxy
-                        "number below the schema's maximum allowed values boundary"
+                    @"number below the schema's maximum allowed values boundary"
                 )
           , sample: wrap $ A.fromNumber 3.0
           }
       , schema: ValueSample
           { description: StringNE.nes
               ( Proxy
-                  ∷ Proxy
-                      "a schema with a maximum exclusive allowed value set"
+                  @"a schema with a maximum exclusive allowed value set"
               )
           , sample:
               ObjectSchema $ Schema.defaultKeywords
@@ -580,16 +558,14 @@ examples =
           { description:
               StringNE.nes
                 ( Proxy
-                    ∷ Proxy
-                        "number at the schema's minimum allowed values boundary"
+                    @"number at the schema's minimum allowed values boundary"
                 )
           , sample: wrap $ A.fromNumber 4.0
           }
       , schema: ValueSample
           { description: StringNE.nes
               ( Proxy
-                  ∷ Proxy
-                      "a schema with a minimum inclusive allowed value set"
+                  @"a schema with a minimum inclusive allowed value set"
               )
           , sample:
               ObjectSchema $ Schema.defaultKeywords
@@ -602,16 +578,14 @@ examples =
           { description:
               StringNE.nes
                 ( Proxy
-                    ∷ Proxy
-                        "number at the schema's minimum allowed values boundary"
+                    @"number at the schema's minimum allowed values boundary"
                 )
           , sample: wrap $ A.fromNumber 4.0
           }
       , schema: ValueSample
           { description: StringNE.nes
               ( Proxy
-                  ∷ Proxy
-                      "a schema with a minimum exclusive allowed value set"
+                  @"a schema with a minimum exclusive allowed value set"
               )
           , sample:
               ObjectSchema $ Schema.defaultKeywords
@@ -620,7 +594,7 @@ examples =
       }
       ( ValueSample
           { description: StringNE.nes
-              (Proxy ∷ Proxy "an invalid range violation")
+              (Proxy @"an invalid range violation")
           , sample: Set.singleton $ Violation
               { jsonPath: Nil
               , reason: InvalidRange
@@ -637,16 +611,14 @@ examples =
           { description:
               StringNE.nes
                 ( Proxy
-                    ∷ Proxy
-                        "number exceeding the schema's minimum allowed values boundary"
+                    @"number exceeding the schema's minimum allowed values boundary"
                 )
           , sample: wrap $ A.fromNumber 3.0
           }
       , schema: ValueSample
           { description: StringNE.nes
               ( Proxy
-                  ∷ Proxy
-                      "a schema with a minimum inclusive allowed value set"
+                  @"a schema with a minimum inclusive allowed value set"
               )
           , sample:
               ObjectSchema $ Schema.defaultKeywords
@@ -655,7 +627,7 @@ examples =
       }
       ( ValueSample
           { description: StringNE.nes
-              (Proxy ∷ Proxy "an invalid range violation")
+              (Proxy @"an invalid range violation")
           , sample: Set.singleton $ Violation
               { jsonPath: Nil
               , reason: InvalidRange
@@ -672,16 +644,14 @@ examples =
           { description:
               StringNE.nes
                 ( Proxy
-                    ∷ Proxy
-                        "number below the schema's minimum allowed values boundary"
+                    @"number below the schema's minimum allowed values boundary"
                 )
           , sample: wrap $ A.fromNumber 5.0
           }
       , schema: ValueSample
           { description: StringNE.nes
               ( Proxy
-                  ∷ Proxy
-                      "a schema with a minimum exclusive allowed value set"
+                  @"a schema with a minimum exclusive allowed value set"
               )
           , sample:
               ObjectSchema $ Schema.defaultKeywords
@@ -693,12 +663,12 @@ examples =
 noViolationsExample ∷ String → { | InputSample } → Example
 noViolationsExample justification input =
   { description:
-      StringNE.nes (Proxy ∷ Proxy "Because ")
+      StringNE.nes (Proxy @"Because ")
         `StringNE.appendString` justification
         <>
-          StringNE.nes (Proxy ∷ Proxy ", such a value is valid.")
+          StringNE.nes (Proxy @", such a value is valid.")
   , expectedOutput: ValueSample
-      { description: StringNE.nes (Proxy ∷ Proxy "no violations")
+      { description: StringNE.nes (Proxy @"no violations")
       , sample: Set.empty
       }
   , input
@@ -708,10 +678,10 @@ violationsExample
   ∷ String → { | InputSample } → ValueSample Output → Example
 violationsExample justification input expectedOutput =
   { description:
-      StringNE.nes (Proxy ∷ Proxy "Because ")
+      StringNE.nes (Proxy @"Because ")
         `StringNE.appendString` justification
         <>
-          StringNE.nes (Proxy ∷ Proxy ", such a value is invalid.")
+          StringNE.nes (Proxy @", such a value is invalid.")
   , expectedOutput
   , input
   }

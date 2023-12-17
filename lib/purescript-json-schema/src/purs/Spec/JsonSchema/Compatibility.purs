@@ -57,19 +57,19 @@ spec ∷ Spec
 spec =
   { context
   , description: \outputSpec { differences: differencesSpec } →
-      StringNE.nes (Proxy ∷ Proxy "assessing ")
+      StringNE.nes (Proxy @"assessing ")
         <> show1 outputSpec
-        <> StringNE.nes (Proxy ∷ Proxy " based on ")
+        <> StringNE.nes (Proxy @" based on ")
         <> show1 differencesSpec
   , examples
   , execute: \{ differences: ValueSample differences } →
       Compatibility.calculate differences.sample
   , input:
       { differences: ValueSpec $ StringNE.nes
-          (Proxy ∷ Proxy "schemata differences")
+          (Proxy @"schemata differences")
       }
   , output: ValueSpec $ StringNE.nes
-      (Proxy ∷ Proxy "the type of compatibility")
+      (Proxy @"the type of compatibility")
   , properties
   }
 
@@ -77,44 +77,41 @@ context ∷ ComputationContext
 context =
   [ compatibilityTypeParagraph
       ( StringNE.nes
-          (Proxy ∷ Proxy "Backward")
+          (Proxy @"Backward")
       )
       ( StringNE.nes
           ( Proxy
-              ∷ Proxy
-                  "an ability of a system to understand input intended for previous versions of itself"
+              @"an ability of a system to understand input intended for previous versions of itself"
           )
       )
   , compatibilityTypeParagraph
       ( StringNE.nes
-          (Proxy ∷ Proxy "Forward")
+          (Proxy @"Forward")
       )
       ( StringNE.nes
           ( Proxy
-              ∷ Proxy
-                  "an ability of a system to understand input intended for future versions of itself"
+              @"an ability of a system to understand input intended for future versions of itself"
           )
       )
   , compatibilityTypeParagraph
       ( StringNE.nes
-          (Proxy ∷ Proxy "Full")
+          (Proxy @"Full")
       )
       ( StringNE.nes
-          (Proxy ∷ Proxy "backward and forward compatibility combined")
+          (Proxy @"backward and forward compatibility combined")
       )
   , compatibilityTypeParagraph
       ( StringNE.nes
-          (Proxy ∷ Proxy "No")
+          (Proxy @"No")
       )
       ( StringNE.nes
-          (Proxy ∷ Proxy "neither level of compatibility")
+          (Proxy @"neither level of compatibility")
       )
   , M.paragraph $
       ( M.text $
           StringNE.nes
             ( Proxy
-                ∷ Proxy
-                    "Maintaining backward and forward compatibility is important for minimizing disruption"
+                @"Maintaining backward and forward compatibility is important for minimizing disruption"
             )
       )
         `ArrayNE.cons'`
@@ -122,8 +119,7 @@ context =
           , M.text
               $ StringNE.nes
                   ( Proxy
-                      ∷ Proxy
-                          "and ensuring smooth transitions when updating JSON schemata."
+                      @"and ensuring smooth transitions when updating JSON schemata."
                   )
           ]
   , M.renderMermaid $ FlowChartDef LeftToRight
@@ -181,10 +177,10 @@ context =
       M.emphasis
         ( ArrayNE.singleton $ M.text
             $ compatibilityType <> StringNE.nes
-                (Proxy ∷ Proxy " compatibility")
+                (Proxy @" compatibility")
         )
         `ArrayNE.cons'`
-          [ M.text $ StringNE.nes (Proxy ∷ Proxy " - ")
+          [ M.text $ StringNE.nes (Proxy @" - ")
           , M.text description
           ]
 
@@ -196,7 +192,7 @@ examples =
   [ fullCompatibilityExample
       "identical schemata cannot be incompatible with each other"
       { differences: ValueSample
-          { description: StringNE.nes (Proxy ∷ Proxy "no differences")
+          { description: StringNE.nes (Proxy @"no differences")
           , sample: Set.empty
           }
       }
@@ -205,8 +201,7 @@ examples =
       { differences: ValueSample
           { description: StringNE.nes
               ( Proxy
-                  ∷ Proxy
-                      "extending set of accepted value types from numbers to numbers and integers"
+                  @"extending set of accepted value types from numbers to numbers and integers"
               )
           , sample: Set.singleton $ Difference
               { differenceType: TypeChange
@@ -220,7 +215,7 @@ examples =
       "Because not every integer is a number, such a change is backward compatible."
       { differences: ValueSample
           { description: StringNE.nes
-              (Proxy ∷ Proxy "extension of accepted types by a number")
+              (Proxy @"extension of accepted types by a number")
           , sample: Set.singleton $ Difference
               { differenceType: TypeChange
                   (Just $ Set.singleton JsonInteger)
@@ -239,7 +234,7 @@ examples =
       "Because not every integer is a number, such a change is forward compatible."
       { differences: ValueSample
           { description: StringNE.nes
-              (Proxy ∷ Proxy "reduction of accepted types by a number")
+              (Proxy @"reduction of accepted types by a number")
           , sample: Set.singleton $ Difference
               { differenceType: TypeChange
                   (Just $ Set.fromFoldable [ JsonInteger, JsonNumber ])
@@ -258,8 +253,7 @@ examples =
       "Because no boolean value can satisfy null JSON type constraint, and vice versa, such a change is incompatible."
       { differences: ValueSample
           { description: StringNE.nes
-              ( Proxy
-                  ∷ Proxy "an accepted type change from null to boolean"
+              ( Proxy @"an accepted type change from null to boolean"
               )
           , sample: Set.singleton $ Difference
               { differenceType: TypeChange
@@ -285,9 +279,7 @@ examples =
       "Because every integer is a number, but not vice versa, such a change is backward compatible."
       { differences: ValueSample
           { description: StringNE.nes
-              ( Proxy
-                  ∷ Proxy
-                      "change of accepted type from integer to number"
+              ( Proxy @"change of accepted type from integer to number"
               )
           , sample: Set.singleton $ Difference
               { differenceType: TypeChange
@@ -307,9 +299,7 @@ examples =
       "Because every integer is a number, but not vice versa, such a change is forward compatible."
       { differences: ValueSample
           { description: StringNE.nes
-              ( Proxy
-                  ∷ Proxy
-                      "change of accepted type from number to integer"
+              ( Proxy @"change of accepted type from number to integer"
               )
           , sample: Set.singleton $ Difference
               { differenceType: TypeChange
@@ -330,8 +320,7 @@ examples =
       { differences: ValueSample
           { description: StringNE.nes
               ( Proxy
-                  ∷ Proxy
-                      "extension of accepted types by an additional type"
+                  @"extension of accepted types by an additional type"
               )
           , sample: Set.singleton $ Difference
               { differenceType: TypeChange
@@ -351,7 +340,7 @@ examples =
       "Because less value types than before are accepted, this change is backward compatible."
       { differences: ValueSample
           { description: StringNE.nes
-              (Proxy ∷ Proxy "reduction of accepted types")
+              (Proxy @"reduction of accepted types")
           , sample: Set.singleton $ Difference
               { differenceType: TypeChange
                   (Just $ Set.fromFoldable [ JsonNull, JsonBoolean ])
@@ -371,8 +360,7 @@ examples =
       { differences: ValueSample
           { description: StringNE.nes
               ( Proxy
-                  ∷ Proxy
-                      "the new value of multipleOf being divisible by the old one"
+                  @"the new value of multipleOf being divisible by the old one"
               )
           , sample: Set.singleton $ Difference
               { differenceType: MultipleOfChange (Just 2.0) (Just 4.0)
@@ -391,8 +379,7 @@ examples =
       { differences: ValueSample
           { description: StringNE.nes
               ( Proxy
-                  ∷ Proxy
-                      "the old value of multipleOf being divisible by the new one"
+                  @"the old value of multipleOf being divisible by the new one"
               )
           , sample: Set.singleton $ Difference
               { differenceType: MultipleOfChange (Just 4.0) (Just 2.0)
@@ -411,8 +398,7 @@ examples =
       { differences: ValueSample
           { description: StringNE.nes
               ( Proxy
-                  ∷ Proxy
-                      "old and new value of multipleOf being not each other's factors"
+                  @"old and new value of multipleOf being not each other's factors"
               )
           , sample: Set.singleton $ Difference
               { differenceType: MultipleOfChange (Just 2.0) (Just 5.0)
@@ -437,8 +423,7 @@ examples =
       { differences: ValueSample
           { description: StringNE.nes
               ( Proxy
-                  ∷ Proxy
-                      "the old value of multipleOf being divisible by the new one"
+                  @"the old value of multipleOf being divisible by the new one"
               )
           , sample:
               Set.fromFoldable
@@ -465,9 +450,7 @@ examples =
       "all numbers from the old range fall into the new, unconstrained one"
       { differences: ValueSample
           { description: StringNE.nes
-              ( Proxy
-                  ∷ Proxy
-                      "the range gets unconstrained"
+              ( Proxy @"the range gets unconstrained"
               )
           , sample:
               Set.fromFoldable
@@ -495,8 +478,7 @@ examples =
       { differences: ValueSample
           { description: StringNE.nes
               ( Proxy
-                  ∷ Proxy
-                      "the range of allowed number values being extended"
+                  @"the range of allowed number values being extended"
               )
           , sample:
               Set.fromFoldable
@@ -528,9 +510,7 @@ examples =
       "all numbers from the new, longer range fall into the old, shorter range"
       { differences: ValueSample
           { description: StringNE.nes
-              ( Proxy
-                  ∷ Proxy
-                      "the range of allowed values being shifted"
+              ( Proxy @"the range of allowed values being shifted"
               )
           , sample:
               Set.fromFoldable
@@ -562,9 +542,7 @@ examples =
       "all numbers from the new, shorted range fall into the old, longer range"
       { differences: ValueSample
           { description: StringNE.nes
-              ( Proxy
-                  ∷ Proxy
-                      "the range of allowed values being reduced"
+              ( Proxy @"the range of allowed values being reduced"
               )
           , sample:
               Set.fromFoldable
@@ -597,8 +575,7 @@ examples =
       { differences: ValueSample
           { description: StringNE.nes
               ( Proxy
-                  ∷ Proxy
-                      "the range of allowed values being reduced using the exclusive version of constraints"
+                  @"the range of allowed values being reduced using the exclusive version of constraints"
               )
           , sample:
               Set.fromFoldable
@@ -631,8 +608,7 @@ examples =
       { differences: ValueSample
           { description: StringNE.nes
               ( Proxy
-                  ∷ Proxy
-                      "the range of allowed number values being extended and reduced at the same time"
+                  @"the range of allowed number values being extended and reduced at the same time"
               )
           , sample:
               Set.fromFoldable
@@ -670,8 +646,7 @@ examples =
       { differences: ValueSample
           { description: StringNE.nes
               ( Proxy
-                  ∷ Proxy
-                      "the range of allowed number values being extended and reduced at the same time using exclusive versions of constraints"
+                  @"the range of allowed number values being extended and reduced at the same time using exclusive versions of constraints"
               )
           , sample:
               Set.fromFoldable
@@ -709,17 +684,15 @@ examples =
 fullCompatibilityExample ∷ String → { | InputSample } → Example
 fullCompatibilityExample description input =
   { description:
-      StringNE.nes (Proxy ∷ Proxy "In this situation, ")
+      StringNE.nes (Proxy @"In this situation, ")
         `StringNE.appendString` description
         <> StringNE.nes
-          ( Proxy
-              ∷ Proxy
-                  ". Therefore, such a change is fully compatible."
+          ( Proxy @". Therefore, such a change is fully compatible."
           )
 
   , expectedOutput: ValueSample
       { description:
-          StringNE.nes (Proxy ∷ Proxy "full compatibility")
+          StringNE.nes (Proxy @"full compatibility")
       , sample: Full
       }
   , input
@@ -732,16 +705,14 @@ backwardCompatibilityExample
   → Example
 backwardCompatibilityExample description input forwardIncompatibilities =
   { description:
-      StringNE.nes (Proxy ∷ Proxy "In this situation, ")
+      StringNE.nes (Proxy @"In this situation, ")
         `StringNE.appendString` description
         <> StringNE.nes
-          ( Proxy
-              ∷ Proxy
-                  ". Therefore, such a change is backward compatible."
+          ( Proxy @". Therefore, such a change is backward compatible."
           )
   , expectedOutput: ValueSample
       { description: StringNE.nes
-          (Proxy ∷ Proxy "backward compatibility")
+          (Proxy @"backward compatibility")
       , sample: Backward { forwardIncompatibilities }
       }
   , input
@@ -754,16 +725,14 @@ forwardCompatibilityExample
   → Example
 forwardCompatibilityExample description input backwardIncompatibilities =
   { description:
-      StringNE.nes (Proxy ∷ Proxy "In this situation, ")
+      StringNE.nes (Proxy @"In this situation, ")
         `StringNE.appendString` description
         <> StringNE.nes
-          ( Proxy
-              ∷ Proxy
-                  ". Therefore, such a change is forward compatible."
+          ( Proxy @". Therefore, such a change is forward compatible."
           )
   , expectedOutput: ValueSample
       { description: StringNE.nes
-          (Proxy ∷ Proxy "forward compatibility")
+          (Proxy @"forward compatibility")
       , sample: Forward { backwardIncompatibilities }
       }
   , input
@@ -781,16 +750,13 @@ noCompatibilityExample
   backwardIncompatibilities
   forwardIncompatibilities =
   { description:
-      StringNE.nes (Proxy ∷ Proxy "In this situation, ")
+      StringNE.nes (Proxy @"In this situation, ")
         `StringNE.appendString` description
         <> StringNE.nes
-          ( Proxy
-              ∷ Proxy
-                  ". Therefore, such a change is not compatible."
-          )
+          (Proxy @". Therefore, such a change is not compatible.")
   , expectedOutput: ValueSample
       { description: StringNE.nes
-          (Proxy ∷ Proxy "no compatibility")
+          (Proxy @"no compatibility")
       , sample: None
           { backwardIncompatibilities, forwardIncompatibilities }
       }

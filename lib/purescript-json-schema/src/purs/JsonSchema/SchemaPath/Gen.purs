@@ -30,5 +30,5 @@ genSchemaPath = Gen.unfoldable genSegment
   genPropertyName ∷ m NonEmptyString
   genPropertyName = do
     suffix ← StringGen.genAlphaString
-    pure $ StringNE.nes (Proxy ∷ Proxy "prop-")
+    pure $ StringNE.nes (Proxy @"prop-")
       `StringNE.appendString` suffix

@@ -20,7 +20,7 @@ type DocumentExample = { description ∷ String, document ∷ Document }
 spec ∷ SnapshotTestSpec DocumentExample
 spec =
   { describeInput
-  , description: StringNE.nes (Proxy ∷ Proxy "abc")
+  , description: StringNE.nes (Proxy @"abc")
   , executeCommand: pure <<< renderMarkdownDocument
   , fixtures
   , initHook: Nothing
@@ -30,13 +30,13 @@ fixtures ∷ Array (Fixture DocumentExample)
 fixtures =
   renderFixture <$>
     [ { document: longLinesExample
-      , outputFile: StringNE.nes (Proxy ∷ Proxy "long-lines.md")
+      , outputFile: StringNE.nes (Proxy @"long-lines.md")
       }
     , { document: codeBlockExample
-      , outputFile: StringNE.nes (Proxy ∷ Proxy "code-block.md")
+      , outputFile: StringNE.nes (Proxy @"code-block.md")
       }
     , { document: mermaidFlowChartExample
-      , outputFile: StringNE.nes (Proxy ∷ Proxy "mermaid-flow-chart.md")
+      , outputFile: StringNE.nes (Proxy @"mermaid-flow-chart.md")
       }
     ]
 
@@ -46,7 +46,7 @@ renderFixture
 renderFixture { document, outputFile } = { input: document, outputPath }
   where
   outputPath ∷ NonEmptyString
-  outputPath = StringNE.nes (Proxy ∷ Proxy "markdown/") <> outputFile
+  outputPath = StringNE.nes (Proxy @"markdown/") <> outputFile
 
 describeInput ∷ DocumentExample → String
 describeInput { description } = "a markdown document featuring "
@@ -119,14 +119,14 @@ paragraphWithLineOfLengthTenTimes n = M.paragraph
   $ M.text description `ArrayNE.cons'` [ M.lineBreak, M.text line ]
   where
   description ∷ NonEmptyString
-  description = StringNE.nes (Proxy ∷ Proxy "The following line is ")
+  description = StringNE.nes (Proxy @"The following line is ")
     `StringNE.appendString` (show (10 * n) <> " characters long.")
 
   line ∷ NonEmptyString
   line = linePrefix `StringNE.appendString` lineSuffix
 
   linePrefix ∷ NonEmptyString
-  linePrefix = StringNE.nes (Proxy ∷ Proxy "aaaaaaaaa ")
+  linePrefix = StringNE.nes (Proxy @"aaaaaaaaa ")
 
   lineSuffix ∷ String
   lineSuffix =
