@@ -68,7 +68,11 @@ renderFilesystemFieldset = HH.fieldset_
     ( \filePath acc fileContents → acc <>
         [ HH.label [ HP.for filePath ] [ HH.text filePath ]
         , HH.textarea
-            [ HP.id filePath, HP.rows 10, HP.value fileContents ]
+            [ HE.onValueInput $ UpdateFileSystem filePath
+            , HP.id filePath
+            , HP.rows 10
+            , HP.value fileContents
+            ]
         ]
     )
     [ HH.legend_ [ HH.text "Filesystem" ] ]
