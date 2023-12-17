@@ -1,0 +1,1 @@
+{"type":"Fetched","value":{"result":{"url":"https://github.com/pujoheadsoft/purescript-pmock.git","sha256":"00vfp8hk9x0gzaqm6xl4mwbxfvj0kw03jqp3vzdfjnmamqh5p5mr","rev":"6a22fe3fa7fd46e082ab468428ab24b7b154d1ef"},"package":{"version":"v0.7.0","repo":{"tag":"Remote","contents":"https://github.com/pujoheadsoft/purescript-pmock.git"},"packageName":"pmock"}}}

@@ -5,12 +5,6 @@ let
     set -e
     mkdir --parents {.spago,src,test}
     cp $src/{packages.dhall,spago.dhall} .
-    if [ -d $src/bin ]; then
-      cp --recursive $src/bin .
-    fi
-    if [ -d $src/scripts ]; then
-      cp --recursive $src/scripts .
-    fi
     if [ -d $src/snapshots ]; then
       cp --recursive $src/snapshots .
     fi
@@ -23,8 +17,8 @@ let
       (acc: dep-src:
         ''
           ${acc}
+          chmod --recursive u+w {.spago,src}
           cp --force --recursive ${dep-src}/.spago/* .spago/
-          chmod --recursive u+w src
           cp --force --recursive ${dep-src}/src/* src/
         ''
       )
@@ -35,15 +29,23 @@ let
     ${unpack-self}
     ${unpack-deps deps}
   '';
-  build-phase = ''
-    set -e
-    shopt -s globstar
-    build-spago-style .spago/*/*/src/**/*.purs src/**/*.purs test/**/*.purs
-    if [ -d output/Main ]; then
-      build-spago-style --codegen corefn .spago/*/*/src/**/*.purs src/**/*.purs
-      purs-backend-es bundle-app --platform node --to dist/index.mjs
-    fi
-  '';
+  build-phase = is-executable:
+    let
+      option-lines = ''
+        set -e
+        shopt -s globstar
+      '';
+      build-lines =
+        if is-executable then ''
+          build-spago-style --codegen corefn .spago/*/*/src/**/*.purs src/**/*.purs
+          purs-backend-es bundle-app --platform node --to dist/index.mjs
+        '' else "";
+    in
+    ''
+      ${option-lines}
+      build-spago-style .spago/*/*/src/**/*.purs src/**/*.purs test/**/*.purs
+      ${build-lines}
+    '';
   check-phase = ''
     set -e
     TEST_SRC="import {main} from './output/Test.Main/index.js'; main()"
@@ -60,12 +62,12 @@ let
     mkdir $out
     cp --recursive {.spago,output,src} $out/
   '';
-  mkPursLibDerivation = name: lib-path: deps:
+  mkPursLibDerivation = name: lib-path: is-executable: deps:
     let
       spagoPkgs = import "${lib-path}/spago-packages.nix" { inherit pkgs; };
     in
     pkgs.stdenv.mkDerivation {
-      buildPhase = build-phase;
+      buildPhase = build-phase is-executable;
       checkPhase = check-phase;
       doCheck = true;
       fixupPhase = fixup-phase;
