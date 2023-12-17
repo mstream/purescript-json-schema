@@ -49,17 +49,17 @@ spec ∷ Spec
 spec =
   { context
   , description: \outputSpec { json: jsonSpec } →
-      StringNE.nes (Proxy ∷ Proxy "producing ")
+      StringNE.nes (Proxy @"producing ")
         <> show1 outputSpec
-        <> StringNE.nes (Proxy ∷ Proxy " as a result of parsing ")
+        <> StringNE.nes (Proxy @" as a result of parsing ")
         <> show1 jsonSpec
   , examples
   , execute: \{ json: ValueSample json } →
       Parsing.parseSchema json.sample
   , input:
-      { json: ValueSpec $ StringNE.nes (Proxy ∷ Proxy "JSON value") }
+      { json: ValueSpec $ StringNE.nes (Proxy @"JSON value") }
   , output: ValueSpec $ StringNE.nes
-      (Proxy ∷ Proxy "a JSON schema or an error")
+      (Proxy @"a JSON schema or an error")
   , properties
   }
 
@@ -70,9 +70,7 @@ context =
   desc ∷ NonEmptyArray NonEmptyString
   desc =
     StringNE.nes
-      ( Proxy
-          ∷ Proxy "JSON schema is commonly expressed in a JSON format."
-      )
+      (Proxy @"JSON schema is commonly expressed in a JSON format.")
       `ArrayNE.cons'`
         [ StringNE.nes
             ( Proxy
@@ -102,7 +100,7 @@ examples =
       "a boolean value of true is a valid schema which passes validation of any JSON value"
       { json: ValueSample
           { description: StringNE.nes
-              (Proxy ∷ Proxy "a boolean JSON value")
+              (Proxy @"a boolean JSON value")
           , sample: wrap A.jsonTrue
           }
       }
@@ -111,7 +109,7 @@ examples =
       "a boolean value of false is a valid schema which passes validation of any JSON value"
       { json: ValueSample
           { description: StringNE.nes
-              (Proxy ∷ Proxy "a boolean JSON value")
+              (Proxy @"a boolean JSON value")
           , sample: wrap A.jsonFalse
           }
       }
@@ -120,7 +118,7 @@ examples =
       "an empty JSON object is a valid schema which passes validation of any JSON value"
       { json: ValueSample
           { description: StringNE.nes
-              ( Proxy ∷ Proxy "an empty JSON object"
+              ( Proxy @"an empty JSON object"
               )
           , sample: wrap A.jsonEmptyObject
           }
@@ -254,10 +252,7 @@ examples =
       { json: ValueSample
           { description:
               StringNE.nes
-                ( Proxy
-                    ∷ Proxy
-                        "A JSON object with 'uniqueItems' property set"
-                )
+                (Proxy @"A JSON object with 'uniqueItems' property set")
           , sample: wrap $ A.fromObject $ Object.fromFoldable
               [ "uniqueItems" /\ A.jsonTrue ]
           }
@@ -271,16 +266,13 @@ examples =
 successExample ∷ String → { | InputSample } → JsonSchema → Example
 successExample description input expectedJsonSchema =
   { description:
-      StringNE.nes (Proxy ∷ Proxy "Because ")
+      StringNE.nes (Proxy @"Because ")
         `StringNE.appendString` description
         <> StringNE.nes
-          ( Proxy
-              ∷ Proxy
-                  ", such a value represents a JSON schema."
-          )
+          (Proxy @", such a value represents a JSON schema.")
   , expectedOutput: ValueSample
       { description: StringNE.nes
-          (Proxy ∷ Proxy "a successfully parsed JSON schema")
+          (Proxy @"a successfully parsed JSON schema")
 
       , sample: Right expectedJsonSchema
       }
@@ -290,16 +282,13 @@ successExample description input expectedJsonSchema =
 failureExample ∷ String → { | InputSample } → String → Example
 failureExample description input expectedErrorMessage =
   { description:
-      StringNE.nes (Proxy ∷ Proxy "Because ")
+      StringNE.nes (Proxy @"Because ")
         `StringNE.appendString` description
         <> StringNE.nes
-          ( Proxy
-              ∷ Proxy
-                  ", such a value does not represent a JSON schema."
+          ( Proxy @", such a value does not represent a JSON schema."
           )
   , expectedOutput: ValueSample
-      { description: StringNE.nes
-          (Proxy ∷ Proxy "a parsing error")
+      { description: StringNE.nes (Proxy @"a parsing error")
       , sample: Left expectedErrorMessage
       }
   , input

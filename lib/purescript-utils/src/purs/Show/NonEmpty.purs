@@ -12,16 +12,16 @@ class Show1 a where
 
 instance Show1 Boolean where
   show1 b =
-    if b then StringNE.nes (Proxy ∷ Proxy "true")
-    else StringNE.nes (Proxy ∷ Proxy "false")
+    if b then StringNE.nes (Proxy @"true")
+    else StringNE.nes (Proxy @"false")
 
 instance Show1 Int where
-  show1 = fromMaybe (StringNE.nes (Proxy ∷ Proxy "impossible"))
+  show1 = fromMaybe (StringNE.nes (Proxy @"impossible"))
     <<< StringNE.fromString
     <<< show
 
 instance Show1 Number where
-  show1 = fromMaybe (StringNE.nes (Proxy ∷ Proxy "impossible"))
+  show1 = fromMaybe (StringNE.nes (Proxy @"impossible"))
     <<< StringNE.fromString
     <<< show
 
@@ -29,5 +29,5 @@ instance Show1 NonEmptyString where
   show1 = show1 <<< StringNE.toString
 
 instance Show1 String where
-  show1 = StringNE.appendString (StringNE.nes (Proxy ∷ Proxy "\""))
+  show1 = StringNE.appendString (StringNE.nes (Proxy @"\""))
     <<< (_ <> "\"")

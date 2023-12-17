@@ -20,28 +20,28 @@ import Type.Proxy (Proxy(..))
 type SchemaPath = List SchemaPathSegment
 
 render ∷ SchemaPath → NonEmptyString
-render = foldl f (StringNE.nes (Proxy ∷ Proxy "#")) <<< List.reverse
+render = foldl f (StringNE.nes (Proxy @"#")) <<< List.reverse
   where
   f ∷ NonEmptyString → SchemaPathSegment → NonEmptyString
   f acc = (acc `StringNE.appendString` "/" <> _) <<< case _ of
     ExclusiveMinimum →
-      StringNE.nes (Proxy ∷ Proxy "exclusiveMinimum")
+      StringNE.nes (Proxy @"exclusiveMinimum")
     ExclusiveMaximum →
-      StringNE.nes (Proxy ∷ Proxy "exclusiveMaximum")
+      StringNE.nes (Proxy @"exclusiveMaximum")
     Items →
-      StringNE.nes (Proxy ∷ Proxy "items")
+      StringNE.nes (Proxy @"items")
     Maximum →
-      StringNE.nes (Proxy ∷ Proxy "maximum")
+      StringNE.nes (Proxy @"maximum")
     Minimum →
-      StringNE.nes (Proxy ∷ Proxy "minimum")
+      StringNE.nes (Proxy @"minimum")
     MultipleOf →
-      StringNE.nes (Proxy ∷ Proxy "multipleOf")
+      StringNE.nes (Proxy @"multipleOf")
     Properties name →
       "properties/" `StringNE.prependString` name
     TypeKeyword →
-      StringNE.nes (Proxy ∷ Proxy "type")
+      StringNE.nes (Proxy @"type")
     UniqueItems →
-      StringNE.nes (Proxy ∷ Proxy "uniqueItems")
+      StringNE.nes (Proxy @"uniqueItems")
 
 data SchemaPathSegment
   = ExclusiveMaximum

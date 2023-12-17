@@ -42,17 +42,17 @@ spec ∷ Spec
 spec =
   { context
   , description: \outputSpec { schema: schemaSpec } →
-      StringNE.nes (Proxy ∷ Proxy "printing ")
+      StringNE.nes (Proxy @"printing ")
         <> show1 outputSpec
-        <> StringNE.nes (Proxy ∷ Proxy " representing a ")
+        <> StringNE.nes (Proxy @" representing a ")
         <> show1 schemaSpec
   , examples
   , execute: \{ schema: ValueSample schema } →
       Schema.print schema.sample
   , input:
-      { schema: ValueSpec $ StringNE.nes (Proxy ∷ Proxy "JSON schema") }
+      { schema: ValueSpec $ StringNE.nes (Proxy @"JSON schema") }
   , output: ValueSpec $ StringNE.nes
-      (Proxy ∷ Proxy "a JSON value")
+      (Proxy @"a JSON value")
   , properties
   }
 
@@ -62,9 +62,7 @@ context = []
 properties ∷ Array Property
 properties =
   [ { description: StringNE.nes
-        ( Proxy
-            ∷ Proxy "always prints a well-formatted schema JSON"
-        )
+        (Proxy @"always prints a well-formatted schema JSON")
     , property: \execute → do
         schema ← genAnyJsonSchemaSample
 
@@ -83,7 +81,7 @@ properties =
 
 genAnyJsonSchemaSample ∷ Gen (ValueSample JsonSchema)
 genAnyJsonSchemaSample = genValueSample
-  (StringNE.nes (Proxy ∷ Proxy "any JSON schema"))
+  (StringNE.nes (Proxy @"any JSON schema"))
   SchemaGen.genSchema
 
 examples ∷ Array Example

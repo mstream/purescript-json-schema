@@ -60,7 +60,7 @@ instance (Document a) ⇒ Document (ValueSample a) where
     ( M.paragraph
         $ ArrayNE.singleton
         $ M.text
-        $ description <> StringNE.nes (Proxy ∷ Proxy ":")
+        $ description <> StringNE.nes (Proxy @":")
     )
       :| [ M.blockquote $ document sample ]
 

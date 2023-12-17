@@ -61,11 +61,11 @@ instance Show Violation where
 instance Document Violation where
   document (Violation { jsonPath, reason, schemaPath }) =
     ( M.paragraph $
-        (M.text $ StringNE.nes (Proxy ∷ Proxy "JSON value path: "))
+        (M.text $ StringNE.nes (Proxy @"JSON value path: "))
           `ArrayNE.cons'`
             [ M.inlineCode $ JsonPath.render jsonPath
             , M.lineBreak
-            , M.text $ StringNE.nes (Proxy ∷ Proxy "JSON schema path: ")
+            , M.text $ StringNE.nes (Proxy @"JSON schema path: ")
             , M.inlineCode $ SchemaPath.render schemaPath
             ]
     ) :| (Array.fromFoldable $ document reason)
@@ -118,10 +118,10 @@ instance Document ViolationReason where
     AlwaysFailingSchema →
       NE.singleton $ M.paragraph $ ArrayNE.singleton $ M.text $
         StringNE.nes
-          (Proxy ∷ Proxy "Schema always fails validation.")
+          (Proxy @"Schema always fails validation.")
     InvalidArray itemViolations →
       ( M.paragraph $ ArrayNE.singleton $ M.text $ StringNE.nes
-          (Proxy ∷ Proxy "Invalid array:")
+          (Proxy @"Invalid array:")
       )
         :|
           [ M.unorderedList
@@ -147,7 +147,7 @@ instance Document ViolationReason where
           M.text
             ( show value
                 `StringNE.prependString` StringNE.nes
-                  (Proxy ∷ Proxy " is outside of the valid range of ")
+                  (Proxy @" is outside of the valid range of ")
             )
             `ArrayNE.cons'` [ Range.renderRange validRange ]
     NonUniqueArrayItem →
@@ -155,28 +155,28 @@ instance Document ViolationReason where
         $ M.paragraph
         $ ArrayNE.singleton
         $ M.text
-        $ StringNE.nes (Proxy ∷ Proxy "Non-unique array item.")
+        $ StringNE.nes (Proxy @"Non-unique array item.")
     TypeMismatch { actualJsonValueType, allowedJsonValueTypes } →
       NE.singleton $ M.paragraph $ ArrayNE.singleton $ M.text $
-        StringNE.nes (Proxy ∷ Proxy "Invalid type. Expected ")
+        StringNE.nes (Proxy @"Invalid type. Expected ")
           <>
             ( case ArrayNE.fromFoldable allowedJsonValueTypes of
                 Nothing →
-                  StringNE.nes (Proxy ∷ Proxy "none")
+                  StringNE.nes (Proxy @"none")
                 Just allowedTypes →
                   StringNE.join1With " or "
                     $ Schema.renderJsonValueType <$> allowedTypes
             )
-          <> StringNE.nes (Proxy ∷ Proxy " but got ")
+          <> StringNE.nes (Proxy @" but got ")
           <> Schema.renderJsonValueType actualJsonValueType
-          <> StringNE.nes (Proxy ∷ Proxy ".")
+          <> StringNE.nes (Proxy @".")
     ValidAgainstNotSchema →
       NE.singleton
         $ M.paragraph
         $ ArrayNE.singleton
         $ M.text
         $ StringNE.nes
-            (Proxy ∷ Proxy "JSON is valid against schema from 'not'.")
+            (Proxy @"JSON is valid against schema from 'not'.")
 
 validateAgainst ∷ JsonValue → JsonSchema → Set Violation
 validateAgainst = go Nil Nil

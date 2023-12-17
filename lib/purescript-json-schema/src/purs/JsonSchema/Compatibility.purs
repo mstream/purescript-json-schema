@@ -110,9 +110,7 @@ instance Document Compatibility where
   document = case _ of
     Backward { forwardIncompatibilities } →
       ( M.paragraph $ ArrayNE.singleton $ M.text $ StringNE.nes
-          ( Proxy
-              ∷ Proxy
-                  "Reasons for breaking the forward compatibility:"
+          ( Proxy @"Reasons for breaking the forward compatibility:"
           )
       ) :|
         [ M.unorderedList $ ArrayNE.singleton
@@ -124,9 +122,7 @@ instance Document Compatibility where
     Forward { backwardIncompatibilities } →
       ( M.paragraph $ ArrayNE.singleton $ M.text $
           StringNE.nes
-            ( Proxy
-                ∷ Proxy
-                    "Reasons for breaking the backward compatibility:"
+            ( Proxy @"Reasons for breaking the backward compatibility:"
             )
       ) :|
         [ M.unorderedList $ ArrayNE.singleton
@@ -140,7 +136,7 @@ instance Document Compatibility where
         $ M.paragraph
         $ ArrayNE.singleton
         $ M.text
-        $ StringNE.nes (Proxy ∷ Proxy "✓")
+        $ StringNE.nes (Proxy @"✓")
     None
       { backwardIncompatibilities
       , forwardIncompatibilities
@@ -163,7 +159,7 @@ instance Document BackwardIncompatibility where
     ( M.paragraph
         $ ArrayNE.singleton
         $ M.text
-        $ StringNE.nes (Proxy ∷ Proxy "schema path: ")
+        $ StringNE.nes (Proxy @"schema path: ")
             <> SchemaPath.render path
     )
       :| (Array.fromFoldable $ document incompatibilityType)
@@ -183,7 +179,7 @@ instance Document ForwardIncompatibility where
     ( M.paragraph
         $ ArrayNE.singleton
         $ M.text
-        $ StringNE.nes (Proxy ∷ Proxy "schema path: ")
+        $ StringNE.nes (Proxy @"schema path: ")
             <> SchemaPath.render path
     )
       :| Array.fromFoldable (document incompatibilityType)
@@ -225,16 +221,16 @@ instance Document BackwardIncompatibilityType where
       MultipleIntroduced multiple →
         ( M.text $
             StringNE.nes
-              (Proxy ∷ Proxy "numerical values must be multiples of ")
+              (Proxy @"numerical values must be multiples of ")
         )
           `ArrayNE.cons'`
             [ M.text $ show1 multiple
-            , M.text $ StringNE.nes (Proxy ∷ Proxy " now")
+            , M.text $ StringNE.nes (Proxy @" now")
             ]
       OldMultipleIsNotFactorOfNewMultiple { new, old } →
         ( M.text $
             StringNE.nes
-              (Proxy ∷ Proxy "the old multiple constraint of ")
+              (Proxy @"the old multiple constraint of ")
         )
           `ArrayNE.cons'`
             [ M.text $ show1 old
@@ -303,15 +299,15 @@ instance Document ForwardIncompatibilityType where
     case _ of
       MultipleWithdrawn multiple →
         ( M.text $ StringNE.nes
-            (Proxy ∷ Proxy "numerical values must not be multiples of ")
+            (Proxy @"numerical values must not be multiples of ")
         )
           `ArrayNE.cons'`
             [ M.text $ show1 multiple
-            , M.text $ StringNE.nes (Proxy ∷ Proxy "anymore")
+            , M.text $ StringNE.nes (Proxy @"anymore")
             ]
       NewMultipleIsNotFactorOfOldMultiple { new, old } →
         ( M.text $ StringNE.nes
-            (Proxy ∷ Proxy "the new multiple constraint of ")
+            (Proxy @"the new multiple constraint of ")
         )
           `ArrayNE.cons'`
             [ M.text $ show1 new
@@ -377,7 +373,7 @@ renderNumberRangeChange = case _ of
   LowerAndUpper lower upper →
     Range.renderRange lower
       `ArrayNE.cons'`
-        [ M.text $ StringNE.nes (Proxy ∷ Proxy " and ")
+        [ M.text $ StringNE.nes (Proxy @" and ")
         , Range.renderRange upper
         ]
   Upper upper →

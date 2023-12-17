@@ -132,7 +132,7 @@ documentInput = hfoldl
       $ M.emphasis
       $ ArrayNE.singleton
       $ M.text
-      $ StringNE.nes (Proxy ∷ Proxy "Input:")
+      $ StringNE.nes (Proxy @"Input:")
   )
 
 documentOutput
@@ -149,7 +149,7 @@ documentOutput outputSample =
       $ M.emphasis
       $ ArrayNE.singleton
       $ M.text
-      $ StringNE.nes (Proxy ∷ Proxy "Output:")
+      $ StringNE.nes (Proxy @"Output:")
   )
     <>
       ( ArrayNE.singleton
@@ -157,7 +157,7 @@ documentOutput outputSample =
           $ ArrayNE.singleton
           $ M.text
           $ mapping GetValueDescription outputSample
-              <> StringNE.nes (Proxy ∷ Proxy ":")
+              <> StringNE.nes (Proxy @":")
       )
     <>
       ( ArrayNE.singleton $ M.blockquote $ document
@@ -216,8 +216,10 @@ documentComputation
 
   renderSchema ∷ Array FlowContentNode
   renderSchema =
-    [ M.heading2 $ ArrayNE.singleton $ M.text $ StringNE.nes
-        (Proxy ∷ Proxy "Schema")
+    [ M.heading2
+        $ ArrayNE.singleton
+        $ M.text
+        $ StringNE.nes (Proxy @"Schema")
     ] <> (ArrayNE.toArray $ documentSchema input output)
 
   renderContext ∷ Array FlowContentNode
@@ -225,8 +227,7 @@ documentComputation
     [ M.heading2
         $ ArrayNE.singleton
         $ M.text
-        $ StringNE.nes
-            (Proxy ∷ Proxy "Context")
+        $ StringNE.nes (Proxy @"Context")
     ] <> context
 
   renderExamples
@@ -238,8 +239,7 @@ documentComputation
         [ M.heading2
             $ ArrayNE.singleton
             $ M.text
-            $ StringNE.nes
-                (Proxy ∷ Proxy "Examples")
+            $ StringNE.nes (Proxy @"Examples")
         ]
           <> (renderExamplesIndex $ Tuple.fst <$> docsByIdx)
           <>
@@ -256,8 +256,7 @@ documentComputation
       [ M.heading2
           $ ArrayNE.singleton
           $ M.text
-          $ StringNE.nes
-              (Proxy ∷ Proxy "Properties")
+          $ StringNE.nes (Proxy @"Properties")
       , M.unorderedList $ documentComputationProperty <$> props
       ]
     Nothing →

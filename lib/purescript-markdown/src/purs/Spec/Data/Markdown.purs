@@ -35,17 +35,17 @@ spec = do
       textFormattingTestCase
         "keeps single line if text is short enough"
         10
-        (StringNE.nes (Proxy ∷ Proxy "aaaa"))
-        (ListNE.singleton (StringNE.nes (Proxy ∷ Proxy "aaaa")))
+        (StringNE.nes (Proxy @"aaaa"))
+        (ListNE.singleton (StringNE.nes (Proxy @"aaaa")))
 
       textFormattingTestCase
         "splits text into multiple lines if text is to long"
         10
-        (StringNE.nes (Proxy ∷ Proxy "aaaa bbbb cccc dddd eeee"))
-        ( (StringNE.nes (Proxy ∷ Proxy "aaaa bbbb")) `ListNE.cons'`
+        (StringNE.nes (Proxy @"aaaa bbbb cccc dddd eeee"))
+        ( (StringNE.nes (Proxy @"aaaa bbbb")) `ListNE.cons'`
             List.fromFoldable
-              [ StringNE.nes (Proxy ∷ Proxy "cccc dddd")
-              , StringNE.nes (Proxy ∷ Proxy "eeee")
+              [ StringNE.nes (Proxy @"cccc dddd")
+              , StringNE.nes (Proxy @"eeee")
               ]
         )
 
@@ -84,9 +84,9 @@ spec = do
         "link"
         ( ArrayNE.singleton
             $ M.link
-                (StringNE.nes (Proxy ∷ Proxy "title"))
+                (StringNE.nes (Proxy @"title"))
                 ( M.urlOfLocalFile $ StringNE.nes
-                    (Proxy ∷ Proxy "dir1/file1")
+                    (Proxy @"dir1/file1")
                 )
         )
         [ "[title](dir1/file1)" ]
@@ -95,7 +95,7 @@ spec = do
         "inline code"
         ( ArrayNE.singleton
             $ M.inlineCode
-            $ StringNE.nes (Proxy ∷ Proxy "code1")
+            $ StringNE.nes (Proxy @"code1")
         )
         [ "`code1`" ]
 
@@ -296,7 +296,7 @@ spec = do
       "renders inline code"
       [ M.phrasingContent
           $ M.inlineCode
-          $ StringNE.nes (Proxy ∷ Proxy "word1")
+          $ StringNE.nes (Proxy @"word1")
       ]
       [ "`word1`" ]
 

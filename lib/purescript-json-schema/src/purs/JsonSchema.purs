@@ -96,19 +96,19 @@ instance Show JsonValueType where
 renderJsonValueType ∷ JsonValueType → NonEmptyString
 renderJsonValueType = case _ of
   JsonArray →
-    StringNE.nes (Proxy ∷ Proxy "array")
+    StringNE.nes (Proxy @"array")
   JsonBoolean →
-    StringNE.nes (Proxy ∷ Proxy "boolean")
+    StringNE.nes (Proxy @"boolean")
   JsonInteger →
-    StringNE.nes (Proxy ∷ Proxy "integer")
+    StringNE.nes (Proxy @"integer")
   JsonNull →
-    StringNE.nes (Proxy ∷ Proxy "null")
+    StringNE.nes (Proxy @"null")
   JsonNumber →
-    StringNE.nes (Proxy ∷ Proxy "number")
+    StringNE.nes (Proxy @"number")
   JsonObject →
-    StringNE.nes (Proxy ∷ Proxy "object")
+    StringNE.nes (Proxy @"object")
   JsonString →
-    StringNE.nes (Proxy ∷ Proxy "string")
+    StringNE.nes (Proxy @"string")
 
 print ∷ JsonSchema → JsonValue
 print = case _ of

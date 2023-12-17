@@ -69,7 +69,7 @@ handleQuery = case _ of
   Sandbox.RequestProgramExecution reply → do
     state ← get
     outputFormat ← H.request
-      (Proxy ∷ Proxy "outputFormat")
+      (Proxy @"outputFormat")
       unit
       OutputFormat.GetOutputFormat
     case outputFormat of
@@ -79,7 +79,7 @@ handleQuery = case _ of
         case state.selectedCommand of
           CompatCommand → do
             input ← H.request
-              (Proxy ∷ Proxy "compatOptions")
+              (Proxy @"compatOptions")
               unit
               Command.GetInput
 
@@ -94,7 +94,7 @@ handleQuery = case _ of
 
           DiffCommand → do
             input ← H.request
-              (Proxy ∷ Proxy "diffOptions")
+              (Proxy @"diffOptions")
               unit
               Command.GetInput
 
@@ -109,7 +109,7 @@ handleQuery = case _ of
 
           ValidateCommand → do
             input ← H.request
-              (Proxy ∷ Proxy "validateOptions")
+              (Proxy @"validateOptions")
               unit
               Command.GetInput
 
@@ -126,7 +126,7 @@ render ∷ ∀ m. State → ComponentHTML Action Slots m
 render { selectedCommand } = HH.form_
   [ renderCommandSelectionDropdown
   , HH.slot_
-      (Proxy ∷ Proxy "outputFormat")
+      (Proxy @"outputFormat")
       unit
       OutputFormat.component
       unit
@@ -139,19 +139,19 @@ render { selectedCommand } = HH.form_
     , case selectedCommand of
         CompatCommand →
           HH.slot_
-            (Proxy ∷ Proxy "compatOptions")
+            (Proxy @"compatOptions")
             unit
             CompatOptions.component
             unit
         DiffCommand →
           HH.slot_
-            (Proxy ∷ Proxy "diffOptions")
+            (Proxy @"diffOptions")
             unit
             DiffOptions.component
             unit
         ValidateCommand →
           HH.slot_
-            (Proxy ∷ Proxy "validateOptions")
+            (Proxy @"validateOptions")
             unit
             ValidateOptions.component
             unit

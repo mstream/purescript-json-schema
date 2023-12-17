@@ -30,14 +30,14 @@ spec = Spec.describe "Test.Snapshot.Utils" do
       initHookFixture = createSuccessfulInitHookFixture 1
       testSpec = testSnapshot
         { describeInput: const "input"
-        , description: StringNE.nes (Proxy ∷ Proxy "description")
+        , description: StringNE.nes (Proxy @"description")
         , executeCommand: const $ pure "expected output\n"
         , fixtures:
             [ { input: unit
-              , outputPath: StringNE.nes (Proxy ∷ Proxy "text/dummy")
+              , outputPath: StringNE.nes (Proxy @"text/dummy")
               }
             , { input: unit
-              , outputPath: StringNE.nes (Proxy ∷ Proxy "text/dummy")
+              , outputPath: StringNE.nes (Proxy @"text/dummy")
               }
             ]
         , initHook: initHookFixture.initHook
@@ -59,14 +59,14 @@ spec = Spec.describe "Test.Snapshot.Utils" do
       initHookFixture = createFailingInitHookFixture 2
       testSpec = testSnapshot
         { describeInput: const "input"
-        , description: StringNE.nes (Proxy ∷ Proxy "description")
+        , description: StringNE.nes (Proxy @"description")
         , executeCommand: const $ pure "expected output\n"
         , fixtures:
             [ { input: unit
-              , outputPath: StringNE.nes (Proxy ∷ Proxy "text/dummy")
+              , outputPath: StringNE.nes (Proxy @"text/dummy")
               }
             , { input: unit
-              , outputPath: StringNE.nes (Proxy ∷ Proxy "text/dummy")
+              , outputPath: StringNE.nes (Proxy @"text/dummy")
               }
             ]
         , initHook: initHookFixture.initHook
