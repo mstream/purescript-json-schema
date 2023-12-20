@@ -47,50 +47,79 @@
       lib = import ./nix/lib { inherit easy-ps pkgs; };
 
       purescript-computation = lib.mkPursLibDerivation
-        "computation"
-        ./lib/purescript-computation
-        false
-        { inherit purescript-docs purescript-markdown purescript-utils; };
-      purescript-docs = lib.mkPursLibDerivation
-        "docs"
-        ./lib/purescript-docs
-        false
-        { inherit purescript-markdown purescript-utils; };
-      purescript-docs-sandbox = lib.mkPursLibDerivation
-        "docs-sandbox"
-        ./lib/purescript-docs-sandbox
-        false
-        { inherit purescript-json-schema; };
-      purescript-json-schema = lib.mkPursLibDerivation
-        "json-schema"
-        ./lib/purescript-json-schema
-        false
-        { inherit purescript-computation purescript-docs purescript-markdown purescript-utils; };
-      purescript-json-schema-cli = lib.mkPursLibDerivation
-        "json-schema-cli"
-        ./lib/purescript-json-schema-cli
-        true
-        { inherit purescript-docs-sandbox purescript-optparse purescript-utils; };
-      purescript-json-schema-sandbox = lib.mkPursLibDerivation
-        "json-schema-sandbox"
-        ./lib/purescript-json-schema-sandbox
-        false
-        { inherit purescript-docs-sandbox purescript-json-schema purescript-json-schema-cli; };
-      purescript-markdown = lib.mkPursLibDerivation
-        "markdown"
-        ./lib/purescript-markdown
-        false
-        { inherit purescript-utils; };
-      purescript-optparse = lib.mkPursLibDerivation
-        "optparse"
-        ./lib/purescript-optparse
-        false
-        { };
-      purescript-utils = lib.mkPursLibDerivation
-        "utils"
-        ./lib/purescript-utils
-        false
-        { };
+        {
+          deps = {
+            inherit
+              purescript-docs
+              purescript-markdown
+              purescript-utils;
+          };
+          lib-path = ./lib/purescript-computation;
+          name = "computation";
+        };
+
+      purescript-docs = lib.mkPursLibDerivation {
+        deps = { inherit purescript-markdown purescript-utils; };
+        lib-path = ./lib/purescript-docs;
+        name = "docs";
+      };
+
+      purescript-docs-sandbox = lib.mkPursLibDerivation {
+        deps = { inherit purescript-json-schema; };
+        lib-path = ./lib/purescript-docs-sandbox;
+        name = "docs-sandbox";
+      };
+
+      purescript-json-schema = lib.mkPursLibDerivation {
+        deps = {
+          inherit
+            purescript-computation
+            purescript-docs
+            purescript-markdown
+            purescript-utils;
+        };
+        lib-path = ./lib/purescript-json-schema;
+        name = "json-schema";
+      };
+
+      purescript-json-schema-cli = lib.mkPursLibDerivation {
+        deps = {
+          inherit
+            purescript-docs-sandbox
+            purescript-optparse
+            purescript-utils;
+        };
+        is-executable = true;
+        lib-path = ./lib/purescript-json-schema-cli;
+        name = "json-schema-cli";
+      };
+
+      purescript-json-schema-sandbox = lib.mkPursLibDerivation {
+        deps = {
+          inherit
+            purescript-docs-sandbox
+            purescript-json-schema
+            purescript-json-schema-cli;
+        };
+        lib-path = ./lib/purescript-json-schema-sandbox;
+        name = "json-schema-sandbox";
+      };
+
+      purescript-markdown = lib.mkPursLibDerivation {
+        deps = { inherit purescript-utils; };
+        lib-path = ./lib/purescript-markdown;
+        name = "markdown";
+      };
+
+      purescript-optparse = lib.mkPursLibDerivation {
+        lib-path = ./lib/purescript-optparse;
+        name = "optparse";
+      };
+
+      purescript-utils = lib.mkPursLibDerivation {
+        lib-path = ./lib/purescript-utils;
+        name = "utils";
+      };
 
       docs = import ./nix/packages/docs {
         inherit pkgs purescript-json-schema-sandbox;

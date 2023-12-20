@@ -62,7 +62,12 @@ let
     mkdir $out
     cp --recursive {.spago,output,src} $out/
   '';
-  mkPursLibDerivation = name: lib-path: is-executable: deps:
+  mkPursLibDerivation =
+    { deps ? { }
+    , is-executable ? false
+    , lib-path
+    , name
+    }:
     let
       spagoPkgs = import "${lib-path}/spago-packages.nix" { inherit pkgs; };
     in
