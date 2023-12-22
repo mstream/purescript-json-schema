@@ -28,7 +28,20 @@ type Input =
 type Parameter = NonEmptyString /\ NonEmptyString
 
 cliBinPath ∷ String
-cliBinPath = "./dist/index.mjs"
+cliBinPath = "./dist/node/index.mjs"
+
+snapshotsPath ∷ NonEmptyString → NonEmptyString
+snapshotsPath = append $ StringNE.nes (Proxy @"test/snapshots/")
+
+jsonValuesPath ∷ NonEmptyString → NonEmptyString
+jsonValuesPath = append
+  $ snapshotsPath
+  $ StringNE.nes (Proxy @"json/values/")
+
+schemaPath ∷ NonEmptyString → NonEmptyString
+schemaPath = append
+  $ snapshotsPath
+  $ StringNE.nes (Proxy @"json/schemata/")
 
 spec ∷ SnapshotTestSpec Input
 spec =
@@ -96,27 +109,14 @@ compatFixture
   { input:
       { command: StringNE.nes (Proxy @"compat")
       , parameters:
-          [ StringNE.nes (Proxy @"left") /\ leftSchemaPath
-          , StringNE.nes (Proxy @"right") /\ rightSchemaPath
+          [ StringNE.nes (Proxy @"left") /\ schemaPath leftSchemaFile
+          , StringNE.nes (Proxy @"right") /\ schemaPath rightSchemaFile
           ]
       , shouldFail
       }
-  , outputPath
+  , outputPath: StringNE.nes (Proxy @"json/compatibilities/")
+      <> compatibilitiesFile
   }
-  where
-  leftSchemaPath ∷ NonEmptyString
-  leftSchemaPath =
-    StringNE.nes (Proxy @"snapshots/json/schemata/")
-      <> leftSchemaFile
-
-  rightSchemaPath ∷ NonEmptyString
-  rightSchemaPath =
-    StringNE.nes (Proxy @"snapshots/json/schemata/")
-      <> rightSchemaFile
-
-  outputPath ∷ NonEmptyString
-  outputPath = StringNE.nes (Proxy @"json/compatibilities/")
-    <> compatibilitiesFile
 
 diffFixture
   ∷ { differencesFile ∷ NonEmptyString
@@ -130,27 +130,14 @@ diffFixture
   { input:
       { command: StringNE.nes (Proxy @"diff")
       , parameters:
-          [ StringNE.nes (Proxy @"left") /\ leftSchemaPath
-          , StringNE.nes (Proxy @"right") /\ rightSchemaPath
+          [ StringNE.nes (Proxy @"left") /\ schemaPath leftSchemaFile
+          , StringNE.nes (Proxy @"right") /\ schemaPath rightSchemaFile
           ]
       , shouldFail
       }
-  , outputPath
+  , outputPath: StringNE.nes (Proxy @"json/differences/")
+      <> differencesFile
   }
-  where
-  leftSchemaPath ∷ NonEmptyString
-  leftSchemaPath =
-    StringNE.nes (Proxy @"snapshots/json/schemata/")
-      <> leftSchemaFile
-
-  rightSchemaPath ∷ NonEmptyString
-  rightSchemaPath =
-    StringNE.nes (Proxy @"snapshots/json/schemata/")
-      <> rightSchemaFile
-
-  outputPath ∷ NonEmptyString
-  outputPath = StringNE.nes (Proxy @"json/differences/")
-    <> differencesFile
 
 validateFixture
   ∷ { jsonFile ∷ NonEmptyString
@@ -163,25 +150,14 @@ validateFixture { jsonFile, schemaFile, shouldFail, violationsFile } =
   { input:
       { command: StringNE.nes (Proxy @"validate")
       , parameters:
-          [ StringNE.nes (Proxy @"json") /\ jsonPath
-          , StringNE.nes (Proxy @"schema") /\ schemaPath
+          [ StringNE.nes (Proxy @"json") /\ jsonValuesPath jsonFile
+          , StringNE.nes (Proxy @"schema") /\ schemaPath schemaFile
           ]
       , shouldFail
       }
-  , outputPath
+  , outputPath: StringNE.nes (Proxy @"json/violations/")
+      <> violationsFile
   }
-  where
-  jsonPath ∷ NonEmptyString
-  jsonPath = StringNE.nes (Proxy @"snapshots/json/values/")
-    <> jsonFile
-
-  schemaPath ∷ NonEmptyString
-  schemaPath = StringNE.nes (Proxy @"snapshots/json/schemata/")
-    <> schemaFile
-
-  outputPath ∷ NonEmptyString
-  outputPath = StringNE.nes (Proxy @"json/violations/")
-    <> violationsFile
 
 describeInput ∷ Input → String
 describeInput { command, parameters } = "a CLI invocation of '"

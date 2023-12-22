@@ -1,20 +1,6 @@
 { pkgs, purescript-json-schema-sandbox, ... }:
 let
   aspellEn = pkgs.aspellWithDicts (d: [ d.en d.en-computers d.en-science ]);
-  generateDocsMain = pkgs.writeTextFile {
-    name = "generate-docs.js";
-    text = ''
-      import { main } from "${purescript-json-schema-sandbox}/output/GenerateDocs.Main";
-      main();
-    '';
-  };
-  sandboxMain = pkgs.writeTextFile {
-    name = "sandbox.js";
-    text = ''
-      import { main } from "${purescript-json-schema-sandbox}/output/Sandbox.Main";
-      main();
-    '';
-  };
 in
 pkgs.stdenv.mkDerivation {
   nativeBuildInputs = with pkgs; [
@@ -26,9 +12,7 @@ pkgs.stdenv.mkDerivation {
     nodejs
   ] ++ [ aspellEn ];
   buildPhase = ''
-    esbuild --bundle ${sandboxMain} --outfile=docs/src/sandbox.js --platform=browser
-    esbuild --bundle ${generateDocsMain} --outfile=generate-docs.js --platform=node
-    node generate-docs.js
+    node ${purescript-json-schema-sandbox}/dist/node/generate-docs.mjs
   '';
   checkPhase = ''
     function validate_spelling() {
@@ -68,8 +52,8 @@ pkgs.stdenv.mkDerivation {
     cp -r $src/docs .
     chmod --recursive u+w docs
     mkdir docs/src
-    cp docs/sandbox.css docs/src/
-    cp docs/sandbox.html docs/src/
+    cp docs/{sandbox.html,sandbox.css} docs/src/
+    cp ${purescript-json-schema-sandbox}/dist/browser/sandbox.js docs/src
     cp $src/.markdownlint.json .
   '';
   name = "docs";

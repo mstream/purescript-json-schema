@@ -1,7 +1,6 @@
 { name = "purescript-utils"
 , dependencies =
   [ "aff"
-  , "arrays"
   , "console"
   , "datetime"
   , "effect"

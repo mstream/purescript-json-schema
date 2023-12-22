@@ -1,97 +1,114 @@
 { easy-ps, pkgs }:
-
 let
-  unpack-self = ''
-    set -e
-    mkdir --parents {.spago,src,test}
-    cp $src/{packages.dhall,spago.dhall} .
-    if [ -d $src/snapshots ]; then
-      cp --recursive $src/snapshots .
-    fi
-    cp --recursive $src/src/* src/
-    cp --recursive $src/test/* test/
-    install-spago-style
-  '';
-  unpack-deps = deps:
-    builtins.foldl'
-      (acc: dep-src:
-        ''
-          ${acc}
-          chmod --recursive u+w {.spago,src}
-          cp --force --recursive ${dep-src}/.spago/* .spago/
-          cp --force --recursive ${dep-src}/src/* src/
-        ''
-      )
-      "set -e"
-      (builtins.attrValues deps)
-  ;
-  unpack-phase = deps: ''
-    ${unpack-self}
-    ${unpack-deps deps}
-  '';
-  build-phase = is-executable:
-    let
-      option-lines = ''
-        set -e
-        shopt -s globstar
-      '';
-      build-lines =
-        if is-executable then ''
-          build-spago-style --codegen corefn .spago/*/*/src/**/*.purs src/**/*.purs
-          purs-backend-es bundle-app --platform node --to dist/index.mjs
-        '' else "";
-    in
-    ''
-      ${option-lines}
-      build-spago-style .spago/*/*/src/**/*.purs src/**/*.purs test/**/*.purs
-      ${build-lines}
-    '';
-  check-phase = ''
-    set -e
-    TEST_SRC="import {main} from './output/Test.Main/index.js'; main()"
-    node --eval "$TEST_SRC" --input-type module;
-  '';
-  fixup-phase = ''
-    set -e
-    if [ -f $out/output/cache-db.json ]; then
-      rm $out/output/cache-db.json
-    fi
-  '';
-  install-phase = ''
-    set -e
-    mkdir $out
-    cp --recursive {.spago,output,src} $out/
-  '';
-  mkPursLibDerivation =
-    { deps ? { }
-    , is-executable ? false
+  mkLib =
+    { browser-executables ? { }
+    , deps ? { }
     , lib-path
     , name
+    , node-executables ? { }
     }:
     let
       spagoPkgs = import "${lib-path}/spago-packages.nix" { inherit pkgs; };
     in
-    pkgs.stdenv.mkDerivation {
-      buildPhase = build-phase is-executable;
-      checkPhase = check-phase;
+    pkgs.stdenvNoCC.mkDerivation {
+      buildPhase =
+        let
+          browser-exec-bundle-cmds = pkgs.lib.attrsets.foldlAttrs
+            (acc: bundle-name: module-name:
+              ''
+                ${acc}
+                purs-backend-es bundle-app \
+                  --main ${module-name} \
+                  --platform browser \
+                  --to dist/browser/${bundle-name}.js
+              ''
+            )
+            ""
+            browser-executables;
+          node-exec-bundle-cmds = pkgs.lib.attrsets.foldlAttrs
+            (acc: bundle-name: module-name:
+              ''
+                ${acc}
+                purs-backend-es bundle-app \
+                  --main ${module-name} \
+                  --platform node \
+                  --to dist/node/${bundle-name}.mjs
+              ''
+            )
+            ""
+            node-executables;
+          exec-bundle-commands = browser-exec-bundle-cmds + node-exec-bundle-cmds;
+        in
+        ''
+          set -e
+          shopt -s globstar
+          build-spago-style \
+            deps-src/**/*.purs \
+            src/**/*.purs \
+            test/**/*.purs
+
+        '' + (
+          if builtins.stringLength exec-bundle-commands > 0
+          then "build-spago-style --codegen corefn deps-src/**/*.purs src/**/*.purs" + exec-bundle-commands
+          else ""
+        );
+      checkPhase = ''
+        set -e
+        purs-tidy check $src/{src,test}
+        TEST_SRC="import {main} from './output/Test.Main/index.js'; main()"
+        node --eval "$TEST_SRC" --input-type module;
+      '';
       doCheck = true;
-      fixupPhase = fixup-phase;
-      installPhase = install-phase;
+      installPhase = ''
+        set -e
+        mkdir $out
+        cp --recursive $src/src $out/
+        chmod --recursive u+w $out/src
+        rsync --recursive deps-src/purs/ $out/src/purs
+        ${
+            if builtins.length (builtins.attrNames browser-executables) + builtins.length (builtins.attrNames node-executables) > 0
+            then "cp --recursive dist $out/"
+            else ""
+        }
+      '';
       name = "purescript-${name}";
       nativeBuildInputs = with pkgs; [
         easy-ps.purs-backend-es
+        easy-ps.purs-tidy
         easy-ps.spago
         pkgs.bash
         pkgs.esbuild
-        pkgs.nodePackages.prettier
         pkgs.nodejs
+        pkgs.nodePackages.prettier
         pkgs.purescript
-        spagoPkgs.installSpagoStyle
+        pkgs.rsync
         spagoPkgs.buildSpagoStyle
+        spagoPkgs.installSpagoStyle
       ];
-      src = lib-path;
-      unpackPhase = unpack-phase deps;
+      src = pkgs.lib.fileset.toSource {
+        fileset = pkgs.lib.fileset.unions [
+          ../../lib/purescript-${name}/spago-packages.nix
+          ../../lib/purescript-${name}/src
+          ../../lib/purescript-${name}/test
+        ];
+        root = ../../lib/purescript-${name};
+      };
+      unpackPhase = builtins.foldl'
+        (acc: dep-src:
+          ''
+            ${acc}
+            rsync --recursive ${dep-src}/src/purs/ deps-src/purs
+          ''
+        )
+        ''
+          set -e
+          install-spago-style
+          mkdir -p deps-src/purs
+          rsync --recursive .spago/*/*/src/ deps-src/purs
+          rm -r .spago
+          cp --recursive $src/{src,test} .
+        ''
+        (builtins.attrValues deps);
     };
-
 in
-{ inherit mkPursLibDerivation; }
+{ inherit mkLib; }
