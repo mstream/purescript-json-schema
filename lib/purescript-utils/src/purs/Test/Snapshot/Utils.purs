@@ -12,7 +12,7 @@ import Effect.Exception (Error)
 import Node.Encoding (Encoding(..))
 import Node.FS.Aff as FS
 import Test.Spec as Spec
-import Test.Spec.Assertions (fail)
+import Test.Spec.Assertions as SpecA
 import Test.TestSpec (TestSpec)
 
 type SnapshotTestSpec i =
@@ -44,14 +44,14 @@ testSnapshot
     in
       Spec.it title do
         expected ← FS.readTextFile UTF8
-          ("snapshots/" <> StringNE.toString outputPath)
+          ("test/snapshots/" <> StringNE.toString outputPath)
         actual ← executeCommand input
         actual `shouldEqualTo` expected
 
 shouldEqualTo ∷ ∀ m. MonadThrow Error m ⇒ String → String → m Unit
 shouldEqualTo actual expected = when
   (actual /= expected)
-  (fail errorMessage)
+  (SpecA.fail errorMessage)
   where
   errorMessage ∷ String
   errorMessage = show actual <> "  \n≠\n" <> "  " <> show expected

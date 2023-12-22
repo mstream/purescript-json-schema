@@ -8,15 +8,18 @@ import Data.String.NonEmpty as StringNE
 import Effect (Effect)
 import Effect.Aff (Aff)
 import Effect.Aff as Aff
+import Effect.Class.Console (info)
 import Effect.Class.Console as Console
 import Effect.Exception as Exception
 import Test.PMock (Mock, Param, (:>))
 import Test.PMock as Mock
 import Test.Snapshot.Utils (testSnapshot)
-import Test.Spec (Spec)
+import Test.Spec (Spec, Tree)
 import Test.Spec (describe, it) as Spec
+import Test.Spec.Assertions as SpecA
 import Test.Spec.Reporter as SpecReporter
 import Test.Spec.Runner as SpecRunner
+import Test.Spec.Summary as SpecSummary
 import Type.Proxy (Proxy(..))
 
 main ∷ Effect Unit
@@ -50,9 +53,13 @@ spec = Spec.describe "Test.Snapshot.Utils" do
       []
       testSpec
 
-    void resultsAff
+    results ← resultsAff
 
     initHookFixture.verifyInitHookCalledTimes 1
+
+    when
+      (not $ SpecSummary.successful results)
+      (SpecA.fail "not all tests have finished successfully")
 
   Spec.it "does not run tests when the init hook fails" do
     let
@@ -78,9 +85,16 @@ spec = Spec.describe "Test.Snapshot.Utils" do
       SpecRunner.defaultConfig { exit = false }
       []
       testSpec
-    void resultsAff
+
+    results ← resultsAff
 
     initHookFixture.verifyInitHookCalledTimes 1
+
+    when
+      (SpecSummary.successful results)
+      ( SpecA.fail
+          "tests have finished successfully despite init hook failing"
+      )
 
 type InitHookFixture =
   { initHook ∷ Maybe (Aff Unit)

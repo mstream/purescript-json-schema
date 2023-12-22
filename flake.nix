@@ -30,67 +30,100 @@
 
       easy-ps = import easy-purescript-nix { inherit pkgs; };
 
-      format-check = pkgs.stdenvNoCC.mkDerivation {
+      lint-nix = pkgs.stdenvNoCC.mkDerivation {
         checkPhase = ''
-          purs-tidy check {src,test}
+          deadnix --exclude ./node_modules/lodash/flake.nix $src
+          statix check --ignore 'spago-packages.nix' $src
         '';
         doCheck = true;
         dontBuild = true;
         installPhase = ''
           mkdir "$out"
         '';
-        name = "format-check";
-        nativeBuildInputs = with easy-ps; [ purs-tidy ];
-        src = ./.;
+        name = "lint-nix";
+        nativeBuildInputs = with pkgs; [ deadnix statix ];
+        src = ./nix;
       };
 
       lib = import ./nix/lib { inherit easy-ps pkgs; };
 
-      purescript-computation = lib.mkPursLibDerivation
-        "computation"
-        ./lib/purescript-computation
-        false
-        { inherit purescript-docs purescript-markdown purescript-utils; };
-      purescript-docs = lib.mkPursLibDerivation
-        "docs"
-        ./lib/purescript-docs
-        false
-        { inherit purescript-markdown purescript-utils; };
-      purescript-docs-sandbox = lib.mkPursLibDerivation
-        "docs-sandbox"
-        ./lib/purescript-docs-sandbox
-        false
-        { inherit purescript-json-schema; };
-      purescript-json-schema = lib.mkPursLibDerivation
-        "json-schema"
-        ./lib/purescript-json-schema
-        false
-        { inherit purescript-computation purescript-docs purescript-markdown purescript-utils; };
-      purescript-json-schema-cli = lib.mkPursLibDerivation
-        "json-schema-cli"
-        ./lib/purescript-json-schema-cli
-        true
-        { inherit purescript-docs-sandbox purescript-optparse purescript-utils; };
-      purescript-json-schema-sandbox = lib.mkPursLibDerivation
-        "json-schema-sandbox"
-        ./lib/purescript-json-schema-sandbox
-        false
-        { inherit purescript-docs-sandbox purescript-json-schema purescript-json-schema-cli; };
-      purescript-markdown = lib.mkPursLibDerivation
-        "markdown"
-        ./lib/purescript-markdown
-        false
-        { inherit purescript-utils; };
-      purescript-optparse = lib.mkPursLibDerivation
-        "optparse"
-        ./lib/purescript-optparse
-        false
-        { };
-      purescript-utils = lib.mkPursLibDerivation
-        "utils"
-        ./lib/purescript-utils
-        false
-        { };
+      purescript-computation = lib.mkLib {
+        deps = {
+          inherit
+            purescript-docs
+            purescript-markdown
+            purescript-utils;
+        };
+        lib-path = ./lib/purescript-computation;
+        name = "computation";
+      };
+
+      purescript-docs = lib.mkLib {
+        deps = { inherit purescript-markdown purescript-utils; };
+        lib-path = ./lib/purescript-docs;
+        name = "docs";
+      };
+
+      purescript-docs-sandbox = lib.mkLib {
+        deps = { inherit purescript-json-schema; };
+        lib-path = ./lib/purescript-docs-sandbox;
+        name = "docs-sandbox";
+      };
+
+      purescript-json-schema = lib.mkLib {
+        deps = {
+          inherit
+            purescript-computation
+            purescript-docs
+            purescript-markdown
+            purescript-utils;
+        };
+        lib-path = ./lib/purescript-json-schema;
+        name = "json-schema";
+      };
+
+      purescript-json-schema-cli = lib.mkLib {
+        deps = {
+          inherit
+            purescript-docs-sandbox
+            purescript-optparse
+            purescript-utils;
+        };
+        lib-path = ./lib/purescript-json-schema-cli;
+        name = "json-schema-cli";
+        node-executables = { index = "Main"; };
+      };
+
+      purescript-json-schema-sandbox = lib.mkLib {
+        browser-executables = {
+          sandbox = "Sandbox.Main";
+        };
+        deps = {
+          inherit
+            purescript-docs-sandbox
+            purescript-json-schema
+            purescript-json-schema-cli;
+        };
+        lib-path = ./lib/purescript-json-schema-sandbox;
+        name = "json-schema-sandbox";
+        node-executables = { generate-docs = "GenerateDocs.Main"; };
+      };
+
+      purescript-markdown = lib.mkLib {
+        deps = { inherit purescript-utils; };
+        lib-path = ./lib/purescript-markdown;
+        name = "markdown";
+      };
+
+      purescript-optparse = lib.mkLib {
+        lib-path = ./lib/purescript-optparse;
+        name = "optparse";
+      };
+
+      purescript-utils = lib.mkLib {
+        lib-path = ./lib/purescript-utils;
+        name = "utils";
+      };
 
       docs = import ./nix/packages/docs {
         inherit pkgs purescript-json-schema-sandbox;
@@ -140,14 +173,14 @@
     in
     {
       apps = { inherit serve workflow; };
-      checks = { inherit docs format-check; };
+      checks = { inherit docs lint-nix; };
       devShells.default = pkgs.mkShell {
         inherit name;
         buildInputs =
           devShellInputs.easy-ps ++
           devShellInputs.node-packages ++
           devShellInputs.pkgs;
-        inputsFrom = [ docs ];
+        inputsFrom = [ docs lint-nix ];
         shellHook = ''
           PS1="\[\e[33m\][\[\e[m\]\[\e[34;40m\]${name}:\[\e[m\]\[\e[36m\]\w\[\e[m\]\[\e[33m\]]\[\e[m\]\[\e[32m\]\\$\[\e[m\] "
         '';
