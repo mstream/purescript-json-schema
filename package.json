@@ -9,9 +9,6 @@
   "bin": {
     "json-schema": "bin/cli.js"
   },
-  "scripts": {
-    "release": "scripty"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/mstream/purescript-json-schema.git"
@@ -22,11 +19,6 @@
     "url": "https://github.com/mstream/purescript-json-schema/issues"
   },
   "homepage": "https://github.com/mstream/purescript-json-schema#readme",
-  "devDependencies": {
-    "@release-it/conventional-changelog": "^8",
-    "release-it": "^17",
-    "scripty": "^2"
-  },
   "release-it": {
     "git": {
       "commitMessage": "chore: release v${version}",

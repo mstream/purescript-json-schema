@@ -14,13 +14,11 @@
     , ...
     }:
     let
-      name = "purescript-json-schema-monorepo";
-
+      name = " purescript-json-schema-monorepo";
       supportedSystems = [
         "aarch64-darwin"
         "x86_64-linux"
       ];
-
     in
     flake-utils.lib.eachSystem supportedSystems (system:
     let
@@ -32,13 +30,13 @@
 
       lint-nix = pkgs.stdenvNoCC.mkDerivation {
         checkPhase = ''
-          deadnix --exclude ./node_modules/lodash/flake.nix $src
+          deadnix --exclude --fail ./node_modules/lodash/flake.nix $src
           statix check --ignore 'spago-packages.nix' $src
         '';
         doCheck = true;
         dontBuild = true;
         installPhase = ''
-          mkdir "$out"
+          mkdir $out
         '';
         name = "lint-nix";
         nativeBuildInputs = with pkgs; [ deadnix statix ];
@@ -91,7 +89,9 @@
         };
         lib-path = ./lib/purescript-json-schema-cli;
         name = "json-schema-cli";
-        node-executables = { index = "Main"; };
+        node-executables = {
+          index = "Main";
+        };
       };
 
       purescript-json-schema-sandbox = lib.mkLib {
@@ -106,7 +106,9 @@
         };
         lib-path = ./lib/purescript-json-schema-sandbox;
         name = "json-schema-sandbox";
-        node-executables = { generate-docs = "GenerateDocs.Main"; };
+        node-executables = {
+          generate-docs = "GenerateDocs.Main";
+        };
       };
 
       purescript-markdown = lib.mkLib {
@@ -131,33 +133,31 @@
 
       devShellInputs = {
         easy-ps = with easy-ps; [
-          psa
-          purs-backend-es
-          purs-tidy
-          spago
           spago2nix
         ];
-
-        node-packages = with pkgs.nodePackages; [ prettier ];
 
         pkgs = with pkgs; [
           act
           bash
           docker
-          esbuild
           gh
           git
           httplz
-          imagemagick
-          mdbook
-          nodejs
-          purescript
+          node2nix
         ];
       };
 
+      release-it = pkgs.callPackage ./nix/packages/release-it/default.nix { };
+
+      release = flake-utils.lib.mkApp
+        {
+          drv = release-it.package;
+          name = "release-it";
+        };
+
       serve = flake-utils.lib.mkApp {
         drv =
-          pkgs.runCommandCC
+          pkgs.runCommand
             "serve"
             { }
             ''
@@ -172,22 +172,19 @@
 
     in
     {
-      apps = { inherit serve workflow; };
+      apps = { inherit release serve workflow; };
       checks = { inherit docs lint-nix; };
       devShells.default = pkgs.mkShell {
         inherit name;
         buildInputs =
           devShellInputs.easy-ps ++
-          devShellInputs.node-packages ++
           devShellInputs.pkgs;
-        inputsFrom = [ docs lint-nix ];
         shellHook = ''
           PS1="\[\e[33m\][\[\e[m\]\[\e[34;40m\]${name}:\[\e[m\]\[\e[36m\]\w\[\e[m\]\[\e[33m\]]\[\e[m\]\[\e[32m\]\\$\[\e[m\] "
         '';
       };
       packages = {
         inherit
-          docs
           purescript-computation
           purescript-docs
           purescript-docs-sandbox
@@ -198,6 +195,5 @@
           purescript-optparse
           purescript-utils;
       };
-    }
-    );
+    });
 }
